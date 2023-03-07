@@ -1,5 +1,11 @@
 # OSSU Game Project
 
+## Purpose
+
+This project is here to help people in the [OSSU](https://github.com/ossu/computer-science)
+program get their feet wet with a real project. We'll follow a lot of the normal
+process that you'd follow when writing code for a company.
+
 ## Setup
 
 We're using virtualenvs with Python 3.10, ensure you're using something similar:
@@ -16,7 +22,7 @@ python3 -m venv .
 
 Activate the virtual environment based on the operating system you're using. See
 the Python documentation on [activating your venv](https://docs.python.org/3/library/venv.html#how-venvs-work)
-for more details.
+for more details on how to activate it for your platform.
 
 Once you're activated, install any requirements necessary:
 
@@ -24,7 +30,23 @@ Once you're activated, install any requirements necessary:
 pip install -r requirements.txt
 ```
 
+That should have everything all set up. Just run the game:
+
+```
+python main.py
+```
+
 ## Coding
+
+### Contributing
+
+To contribute, just fork the repo and send a pull request.
+
+Before sending it though, ensure:
+
+- You're following the formatting guidelines listed below.
+- You're using [mypy](https://mypy-lang.org/) type annotations.
+- You're following the style guide as defined below.
 
 ### Formatting
 
