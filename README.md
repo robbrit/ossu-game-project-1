@@ -40,13 +40,22 @@ python main.py
 
 ### Contributing
 
-To contribute, just fork the repo and send a pull request.
+To contribute:
+
+- Grab an unclaimed issue in the [issues](https://github.com/robbrit/ossu-game-project-1/issues)
+  section.
+- If you need clarification, just ask.
+- If you have an idea, feel free to create an issue for it, but get buy-in from
+  @robbrit before spending a lot of time on it.
+- Fork the repo to start working on your change.
+- When you're done, send a pull request.
 
 Before sending it though, ensure:
 
 - You're following the formatting guidelines listed below.
 - You're using [mypy](https://mypy-lang.org/) type annotations.
 - You're following the style guide as defined below.
+- You specify which issue you're completing.
 
 ### Formatting
 
