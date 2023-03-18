@@ -17,10 +17,16 @@ from engine.gui import (
 class GuiState:
     api: Optional[game_state.GameAPI]
 
-    def __init__(self, viewport_size: Tuple[int, int]) -> None:
+    def __init__(
+        self,
+        initial_gui: game_state.GUI,
+    ) -> None:
         self.controller = controller.GuiController()
-        self.view = view.GuiView(viewport_size)
+        self.view = view.GuiView(initial_gui)
 
     def setup(self, api: game_state.GameAPI):
         self.view.setup()
         self.api = api
+
+    def set_gui(self, gui: game_state.GUI) -> None:
+        self.view.set_gui(gui)

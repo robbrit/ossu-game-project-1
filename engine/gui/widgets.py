@@ -1,3 +1,4 @@
+import importlib
 from typing import (
     Any,
     Callable,
@@ -8,7 +9,22 @@ from typing import (
     Tuple,
 )
 
-VoidCallable = Callable[[None], None]
+from engine import game_state
+
+GameCallable = Callable[[game_state.GameAPI], None]
+
+
+def _load_callable(path: str) -> GameCallable:
+    """Loads a callable object.
+
+    Note that this doesn't actually check if the thing is callable, or checks the
+    arguments/return type.
+    """
+    mod_name, class_name = path.rsplit(".", 1)
+
+    # TODO(rob): Determine if this is insecure.
+    mod = importlib.import_module(mod_name)
+    return getattr(mod, class_name)
 
 
 class Asset(NamedTuple):
@@ -16,9 +32,6 @@ class Asset(NamedTuple):
 
     name: str
     path: str
-
-    # TODO(rob): Create some sort of enum class to specify which type of asset
-    # this is.
 
 
 class Button(NamedTuple):
@@ -34,7 +47,21 @@ class Button(NamedTuple):
     down: Optional[str]
 
     center: Tuple[int, int]
-    action: VoidCallable
+    action: GameCallable
+
+    @classmethod
+    def create(cls, spec: Dict[str, Any]) -> "Button":
+        return Button(
+            selected_image_asset=spec["selected_image_asset"],
+            unselected_image_asset=spec["unselected_image_asset"],
+            name=spec["name"],
+            left=spec.get("left"),
+            right=spec.get("right"),
+            up=spec.get("up"),
+            down=spec.get("down"),
+            center=spec["center"],
+            action=_load_callable(spec["action"]),
+        )
 
 
 class Image(NamedTuple):
@@ -51,18 +78,21 @@ class GUISpec(NamedTuple):
     buttons: List[Button]
     images: List[Image]
 
-    cancel_action: VoidCallable
+    cancel_action: Optional[GameCallable]
 
-    def __init__(self, spec: Dict[str, Any], environment: Dict[str, VoidCallable]):
-        self.assets = [Asset(a) for a in spec.get("assets", [])]
-        self.buttons = [Button(b) for b in spec.get("buttons", [])]
-        self.images = [Image(b) for b in spec.get("images", [])]
-
+    @classmethod
+    def create(
+        cls,
+        spec: Dict[str, Any],
+    ) -> "GUISpec":
+        """Constructs a new GUISpec from raw dict data."""
+        cancel_action = None
         if "cancel_action" in spec:
-            self.cancel_action = environment[spec["cancel_action"]]
+            cancel_action = _load_callable(spec["cancel_action"])
 
-        # TODO(rob): We should probably validate things:
-        # * any assets specified by buttons/images should exist.
-        # * button links should exist.
-        # * center coordinates should be on screen.
-        # * asset/button names should be unique.
+        return GUISpec(
+            assets=[Asset(**a) for a in spec.get("assets", [])],
+            buttons=[Button.create(b) for b in spec.get("buttons", [])],
+            images=[Image(**b) for b in spec.get("images", [])],
+            cancel_action=cancel_action,
+        )

@@ -2,6 +2,7 @@ from typing import (
     Protocol,
 )
 
+import engine
 from engine import (
     controller,
     view,
@@ -9,7 +10,9 @@ from engine import (
 
 
 class GUI(Protocol):
-    ...
+    @property
+    def spec(self) -> "engine.gui.widgets.GUISpec":
+        ...
 
 
 class GameAPI(Protocol):

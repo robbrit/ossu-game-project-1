@@ -1,0 +1,17 @@
+{
+    "assets": [
+        {
+            "name": "start-button",
+            "path": "assets/gui/start-button.png"
+        }
+    ],
+    "buttons": [
+        {
+            "selected_image_asset": "start-button",
+            "unselected_image_asset": "start-button",
+            "name": "start-button",
+            "center": [400, 300],
+            "action": "game.gui.start.start_game"
+        }
+    ]
+}

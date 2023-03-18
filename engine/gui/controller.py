@@ -15,3 +15,6 @@ class GuiController:
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         # TODO(rob): Handle activate, cancel, and direction keys.
         pass
+
+    def on_update(self, delta_time: int) -> None:
+        pass
