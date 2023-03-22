@@ -1,9 +1,9 @@
-from engine import core
+from game import main as game
 
 
 def main():
     """Main function."""
-    core.Core().run()
+    game.run()
 
 
 if __name__ == "__main__":

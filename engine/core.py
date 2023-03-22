@@ -5,6 +5,7 @@ from engine import (
     game_state,
     model,
 )
+from engine.gui import game_state as gui_game_state
 from engine.ingame import game_state as ingame_state
 
 SCREEN_WIDTH = 1000
@@ -17,11 +18,12 @@ class Core(arcade.Window):
     Main application class.
     """
 
+    initial_gui: game_state.GUI
     game_state: game_state.GameState
     ingame_state: ingame_state.InGameState
     model: model.Model
 
-    def __init__(self):
+    def __init__(self, initial_gui: game_state.GUI):
         super().__init__(
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
@@ -29,15 +31,18 @@ class Core(arcade.Window):
         )
 
         self.model = model.Model()
-        self.ingame_state = ingame_state.InGameState(
-            self.model,
-            (self.width, self.height),
-        )
+        # TODO(rob): Probably should pull the game logic out of the engine and
+        # into the game code.
+        viewport = (self.width, self.height)
+        self.initial_gui = initial_gui
+        self.gui_state = gui_game_state.GuiState(initial_gui)
+        self.ingame_state = ingame_state.InGameState(self.model, viewport)
         self.state = None
 
     def setup(self) -> None:
         """Resets the game state."""
         self.model.setup()
+        self.gui_state.setup(self)
         self.ingame_state.setup(self)
 
     def start_game(self) -> None:
@@ -45,7 +50,8 @@ class Core(arcade.Window):
         self.game_state = self.ingame_state
 
     def show_gui(self, gui: game_state.GUI) -> None:
-        raise NotImplementedError("gui state not implemented yet.")
+        self.gui_state.set_gui(gui)
+        self.game_state = self.gui_state
 
     def on_draw(self) -> None:
         """Renders the game."""
@@ -69,5 +75,5 @@ class Core(arcade.Window):
     def run(self):
         """Runs the game."""
         self.setup()
-        self.start_game()
+        self.show_gui(self.initial_gui)
         arcade.run()
