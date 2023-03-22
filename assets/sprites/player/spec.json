@@ -1,0 +1,17 @@
+{
+    "width": 32,
+    "height": 32,
+
+    "initial_animation": "idle",
+    "root_directory": "assets/sprites/player",
+    "animations": {
+        "idle": {
+            "frame_speed": 1,
+            "num_frames": 1
+        },
+        "walk": {
+            "frame_speed": 0.3,
+            "num_frames": 3
+        }
+    }
+}

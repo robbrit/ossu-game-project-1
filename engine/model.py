@@ -5,7 +5,8 @@ from typing import (
 import arcade
 import arcade.tilemap
 
-CHARACTER_SCALING = 1
+from engine.ingame import game_sprite
+
 TILE_SCALING = 1
 
 PLAYER_MOVEMENT_SPEED = 5
@@ -50,9 +51,8 @@ class Model:
 
         self.scene.add_sprite_list("Player")
 
-        self.player_sprite = arcade.Sprite(
-            "assets/sprites/player.png",
-            CHARACTER_SCALING,
+        self.player_sprite = game_sprite.GameSprite(
+            "assets/sprites/player/spec.json",
         )
 
         self.player_sprite.center_x = start[0].shape[0]
@@ -65,6 +65,7 @@ class Model:
         )
 
     def on_update(self, delta_time: int) -> None:
+        self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
 
     def set_player_speed(
