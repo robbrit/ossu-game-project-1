@@ -16,6 +16,7 @@ class GuiView:
     def __init__(self, initial_gui: game_state.GUI):
         self.gui = initial_gui
         self.sprites = arcade.SpriteList()
+        self._load_sprites()
 
     def setup(self) -> None:
         # TODO(rob): Handle any setup.
@@ -32,6 +33,7 @@ class GuiView:
 
     def _load_sprites(self) -> None:
         spec = self.gui.spec
+
         assets = {name: path for name, path in spec.assets}
 
         self.sprites = arcade.SpriteList()

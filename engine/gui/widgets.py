@@ -80,6 +80,8 @@ class GUISpec(NamedTuple):
 
     cancel_action: Optional[GameCallable]
 
+    initial_selected_button: Optional[Button]
+
     @classmethod
     def create(
         cls,
@@ -90,9 +92,20 @@ class GUISpec(NamedTuple):
         if "cancel_action" in spec:
             cancel_action = _load_callable(spec["cancel_action"])
 
+        buttons = [Button.create(b) for b in spec.get("buttons", [])]
+
+        selected_button_name = spec.get("initial_selected_button")
+        selected_button = None
+        if selected_button_name is not None:
+            selected_button = next(
+                (b for b in buttons if b.name == selected_button_name),
+                None,
+            )
+
         return GUISpec(
             assets=[Asset(**a) for a in spec.get("assets", [])],
-            buttons=[Button.create(b) for b in spec.get("buttons", [])],
+            buttons=buttons,
             images=[Image(**b) for b in spec.get("images", [])],
             cancel_action=cancel_action,
+            initial_selected_button=selected_button,
         )

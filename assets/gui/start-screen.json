@@ -10,8 +10,9 @@
             "selected_image_asset": "start-button",
             "unselected_image_asset": "start-button",
             "name": "start-button",
-            "center": [400, 300],
+            "center": [500, 325],
             "action": "game.gui.start.start_game"
         }
-    ]
+    ],
+    "initial_selected_button": "start-button"
 }
