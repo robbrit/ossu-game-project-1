@@ -63,12 +63,18 @@ class GameSprite(arcade.Sprite):
     # How much time we we've spent in the current animation.
     time_index: float
 
+    # X and Y directions that the character is facing.
+    facing_x: float
+    facing_y: float
+
     def __init__(self, spec_filename: str):
         with open(spec_filename) as f:
             data = json.loads(f.read())
             spec = GameSpriteSpec.create(data)
 
         super().__init__(image_width=spec.width, image_height=spec.height)
+
+        self.set_facing(x=1.0, y=1.0)
 
         self.spec = spec
         self.animations = {
@@ -86,6 +92,11 @@ class GameSprite(arcade.Sprite):
         }
         self.current_animation = None
         self.set_animation(spec.initial_animation)
+
+    def set_facing(self, x: float, y: float) -> None:
+        """Sets the facing direction for the sprite."""
+        self.facing_x = x
+        self.facing_y = y
 
     def set_animation(self, name: str) -> None:
         if self.current_animation == name:
@@ -109,15 +120,23 @@ class GameSprite(arcade.Sprite):
         self.texture = current_animation.textures[current_frame]
 
     def on_update(self, dt: float) -> None:
-        if self.change_x == 0 and self.change_y == 0:
-            self.set_animation("idle")
-        elif self.change_x < 0:
-            self.set_animation("walk-left")
-        elif self.change_x > 0:
-            self.set_animation("walk-right")
-        elif self.change_y > 0:
-            self.set_animation("walk-up")
-        else:
-            self.set_animation("walk-down")
+        # TODO(rob): We can probably get rid of the idle animation since
+        # facing a direction can happen regardless of where we are looking.
 
+        moving = self.change_x != 0 or self.change_y != 0
+
+        animation = "walk" if moving else "idle"
+        direction = self._get_direction()
+
+        self.set_animation(f"{animation}-{direction}")
         self.update_animation(dt)
+
+    def _get_direction(self) -> str:
+        # TODO(rob): Should probably do an enum for facing direction.
+        fx, fy = self.facing_x, self.facing_y
+        afx, afy = abs(fx), abs(fy)
+
+        if afy > afx:
+            return "up" if fy > 0 else "down"
+
+        return "right" if fx > 0 else "left"

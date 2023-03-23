@@ -66,6 +66,9 @@ class Core(arcade.Window):
         """Handles incoming key releases."""
         self.game_state.controller.on_key_release(symbol, modifiers)
 
+    def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
+        self.game_state.controller.on_mouse_motion(screen_x, screen_y, dx, dy)
+
     def on_update(self, delta_time: int) -> None:
         """Handles updates."""
         self.model.on_update(delta_time)

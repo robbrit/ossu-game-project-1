@@ -4,7 +4,10 @@ from typing import (
 
 import arcade
 
-from engine import model
+from engine import (
+    model,
+    view,
+)
 
 
 class InGameController:
@@ -14,10 +17,12 @@ class InGameController:
     """
 
     model: model.Model
+    view: view.View
     keys: Dict[int, bool]
 
-    def __init__(self, model: model.Model):
+    def __init__(self, model: model.Model, view: view.View):
         self.model = model
+        self.view = view
 
         self.keys = {}
 
@@ -26,6 +31,14 @@ class InGameController:
 
     def on_key_release(self, symbol: int, modifiers: int) -> None:
         self.keys[symbol] = False
+
+    def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
+        wx, wy = self.view.to_world_coords(screen_x, screen_y)
+
+        player_dx = wx - self.model.player_sprite.center_x
+        player_dy = wy - self.model.player_sprite.center_y
+
+        self.model.set_player_facing(player_dx, player_dy)
 
     def on_update(self, delta_time: int) -> None:
         vx, vy = 0, 0

@@ -44,6 +44,13 @@ class InGameView:
     def on_update(self, delta_time: int) -> None:
         self._center_camera_to_player()
 
+    def to_world_coords(self, screen_x: int, screen_y: int) -> Tuple[int, int]:
+        """Converts from screen coordinates to world coordinates."""
+        return (
+            self.camera.position.x + screen_x,
+            self.camera.position.y + screen_y,
+        )
+
     def _center_camera_to_player(self) -> None:
         player = self.model.player_sprite
 

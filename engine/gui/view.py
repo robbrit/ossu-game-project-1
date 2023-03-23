@@ -1,4 +1,7 @@
-from typing import List
+from typing import (
+    List,
+    Tuple,
+)
 
 import arcade
 
@@ -27,6 +30,9 @@ class GuiView:
 
     def on_update(self, delta_time: int) -> None:
         pass
+
+    def to_world_coords(self, screen_x: int, screen_y: int) -> Tuple[int, int]:
+        return screen_x, screen_y
 
     def set_gui(self, gui: game_state.GUI) -> None:
         self.gui = gui

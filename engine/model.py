@@ -18,7 +18,7 @@ class Model:
     of the world.
     """
 
-    player_sprite: Optional[arcade.Sprite]
+    player_sprite: Optional[game_sprite.GameSprite]
     scene: Optional[arcade.Scene]
     tile_map: Optional[arcade.tilemap.TileMap]
     physics: Optional[arcade.PhysicsEngineSimple]
@@ -78,3 +78,7 @@ class Model:
 
         if vy is not None:
             self.player_sprite.change_y = vy * PLAYER_MOVEMENT_SPEED
+
+    def set_player_facing(self, facing_x: int, facing_y: int) -> None:
+        self.player_sprite.facing_x = facing_x
+        self.player_sprite.facing_y = facing_y

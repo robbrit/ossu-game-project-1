@@ -19,8 +19,8 @@ class InGameState:
     api: Optional[game_state.GameAPI]
 
     def __init__(self, model: model.Model, viewport_size: Tuple[int, int]) -> None:
-        self.controller = controller.InGameController(model)
         self.view = view.InGameView(model, viewport_size)
+        self.controller = controller.InGameController(model, self.view)
 
     def setup(self, api: game_state.GameAPI):
         self.view.setup()
