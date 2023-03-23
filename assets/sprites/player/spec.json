@@ -9,9 +9,21 @@
             "frame_speed": 1,
             "num_frames": 1
         },
-        "walk": {
+        "walk-left": {
             "frame_speed": 0.3,
             "num_frames": 3
+        },
+        "walk-right": {
+            "frame_speed": 0.3,
+            "num_frames": 3
+        },
+        "walk-up": {
+            "frame_speed": 0.3,
+            "num_frames": 2
+        },
+        "walk-down": {
+            "frame_speed": 0.3,
+            "num_frames": 2
         }
     }
 }

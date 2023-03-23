@@ -109,9 +109,15 @@ class GameSprite(arcade.Sprite):
         self.texture = current_animation.textures[current_frame]
 
     def on_update(self, dt: float) -> None:
-        if self.change_x != 0 or self.change_y != 0:
-            self.set_animation("walk")
-        else:
+        if self.change_x == 0 and self.change_y == 0:
             self.set_animation("idle")
+        elif self.change_x < 0:
+            self.set_animation("walk-left")
+        elif self.change_x > 0:
+            self.set_animation("walk-right")
+        elif self.change_y > 0:
+            self.set_animation("walk-up")
+        else:
+            self.set_animation("walk-down")
 
         self.update_animation(dt)
