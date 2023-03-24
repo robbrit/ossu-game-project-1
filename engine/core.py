@@ -15,15 +15,34 @@ SCREEN_TITLE = "OSSU Game Project"
 
 class Core(arcade.Window):
     """
-    Main application class.
+    Main application class, wraps everything.
+
+    The game uses an MVC pattern:
+    * Models - capture the state of the world in the game: players, regions, enemies,
+      etc.
+    * Views - handle rendering anything.
+    * Controllers - handles interacting with the user.
+
+    There's only one model, but the views and controllers are wrapped by GameState
+    objects. The game can be in one of two possible states:
+    * In a GUI - the model does not update, we render some sort of GUI, and all controls
+      go to manipulating the GUI.
+    * In the game - the model updates and all controls go to managing the character.
     """
 
-    initial_gui: game_state.GUI
     game_state: game_state.GameState
+    gui_state: gui_state.GuiState
     ingame_state: ingame_state.InGameState
+
     model: model.Model
+    initial_gui: game_state.GUI
 
     def __init__(self, initial_gui: game_state.GUI):
+        """Constructor.
+
+        Args:
+            initial_gui: The GUI screen to show when the game starts.
+        """
         super().__init__(
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
@@ -31,13 +50,13 @@ class Core(arcade.Window):
         )
 
         self.model = model.Model()
-        # TODO(rob): Probably should pull the game logic out of the engine and
-        # into the game code.
-        viewport = (self.width, self.height)
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
-        self.ingame_state = ingame_state.InGameState(self.model, viewport)
-        self.state = None
+        self.ingame_state = ingame_state.InGameState(
+            self.model,
+            (self.width, self.height),
+        )
+        self.game_state = None
 
     def setup(self) -> None:
         """Resets the game state."""
@@ -50,8 +69,21 @@ class Core(arcade.Window):
         self.game_state = self.ingame_state
 
     def show_gui(self, gui: game_state.GUI) -> None:
+        """Switches to the "GUI" state, and displays a certain GUI."""
         self.gui_state.set_gui(gui)
         self.game_state = self.gui_state
+
+    def run(self):
+        """Runs the game."""
+        self.setup()
+        self.show_gui(self.initial_gui)
+        arcade.run()
+
+    ############################################################################
+    # The rest of the methods are there to tie into Arcade's input and rendering
+    # system. For the most part they are just delegates to the appropriate
+    # object.
+    ############################################################################
 
     def on_draw(self) -> None:
         """Renders the game."""
@@ -74,9 +106,3 @@ class Core(arcade.Window):
         self.model.on_update(delta_time)
         self.game_state.controller.on_update(delta_time)
         self.game_state.view.on_update(delta_time)
-
-    def run(self):
-        """Runs the game."""
-        self.setup()
-        self.show_gui(self.initial_gui)
-        arcade.run()

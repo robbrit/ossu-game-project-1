@@ -39,6 +39,17 @@ class Model:
                 },
             },
         )
+
+        self.scene = arcade.Scene.from_tilemap(self.tile_map)
+
+        self._init_player()
+
+        self.physics_engine = arcade.PhysicsEngineSimple(
+            self.player_sprite,
+            self.tile_map.sprite_lists["Wall Tiles"],
+        )
+
+    def _init_player(self):
         start = [
             obj
             for obj in self.tile_map.object_lists["Key Points"]
@@ -46,8 +57,6 @@ class Model:
         ]
         if not start:
             raise Exception("No start location defined.")
-
-        self.scene = arcade.Scene.from_tilemap(self.tile_map)
 
         self.scene.add_sprite_list("Player")
 
@@ -59,11 +68,6 @@ class Model:
         self.player_sprite.center_y = start[0].shape[1]
         self.scene.add_sprite("Player", self.player_sprite)
 
-        self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite,
-            self.tile_map.sprite_lists["Wall Tiles"],
-        )
-
     def on_update(self, delta_time: int) -> None:
         self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
@@ -73,6 +77,11 @@ class Model:
         vx: Optional[int] = None,
         vy: Optional[int] = None,
     ) -> None:
+        """Sets the player's speed.
+
+        Each direction may be set to None to avoid changing the speed in that
+        direction.
+        """
         if vx is not None:
             self.player_sprite.change_x = vx * PLAYER_MOVEMENT_SPEED
 
@@ -80,5 +89,6 @@ class Model:
             self.player_sprite.change_y = vy * PLAYER_MOVEMENT_SPEED
 
     def set_player_facing(self, facing_x: int, facing_y: int) -> None:
+        """Sets the direction the player is facing."""
         self.player_sprite.facing_x = facing_x
         self.player_sprite.facing_y = facing_y

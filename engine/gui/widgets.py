@@ -72,7 +72,11 @@ class Image(NamedTuple):
 
 
 class GUISpec(NamedTuple):
-    """An outline for the static elements within the GUI."""
+    """An outline for the static elements within the GUI.
+
+    This is a declarative spec, intending to lay out how a GUI will look in an easily
+    serializable format like JSON, and then tie interactions to Python code.
+    """
 
     assets: List[Asset]
     buttons: List[Button]

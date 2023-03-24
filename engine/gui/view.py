@@ -10,7 +10,7 @@ from engine import game_state
 
 class GuiView:
     """
-    Main view class. This manages rendering things to the screen.
+    Manages rendering GUIs.
     """
 
     gui: game_state.GUI

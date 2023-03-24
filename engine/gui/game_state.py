@@ -15,6 +15,8 @@ from engine.gui import (
 
 
 class GuiState:
+    """Defines the GUI state."""
+
     api: Optional[game_state.GameAPI]
 
     def __init__(

@@ -11,7 +11,7 @@ from engine import model
 
 class InGameView:
     """
-    Main view class. This manages rendering things to the screen.
+    Renders the model while the user is in the game.
     """
 
     width: int

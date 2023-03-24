@@ -99,6 +99,14 @@ class GameSprite(arcade.Sprite):
         self.facing_y = y
 
     def set_animation(self, name: str) -> None:
+        """Changes the current animation for the sprite.
+
+        Args:
+            name: Which animation to show, as defined in the sprite's spec.
+
+        Raises:
+            KeyError: if there is no animation with that name.
+        """
         if self.current_animation == name:
             return
 
@@ -110,6 +118,7 @@ class GameSprite(arcade.Sprite):
         self.texture = current_animation.textures[0]
 
     def update_animation(self, dt: float) -> None:
+        """Progresses the animation by a certain time step."""
         current_animation = self.animations[self.current_animation]
         sequence_duration = (
             len(current_animation.textures) * current_animation.spec.frame_speed
@@ -120,9 +129,7 @@ class GameSprite(arcade.Sprite):
         self.texture = current_animation.textures[current_frame]
 
     def on_update(self, dt: float) -> None:
-        # TODO(rob): We can probably get rid of the idle animation since
-        # facing a direction can happen regardless of where we are looking.
-
+        """Updates the sprite by a certain time step."""
         moving = self.change_x != 0 or self.change_y != 0
 
         animation = "walk" if moving else "idle"

@@ -16,6 +16,8 @@ from engine.ingame import (
 
 
 class InGameState:
+    """Wraps the "in game" state."""
+
     api: Optional[game_state.GameAPI]
 
     def __init__(self, model: model.Model, viewport_size: Tuple[int, int]) -> None:
