@@ -31,7 +31,7 @@ class Core(arcade.Window):
     """
 
     game_state: game_state.GameState
-    gui_state: gui_state.GuiState
+    gui_state: gui_game_state.GuiState
     ingame_state: ingame_state.InGameState
 
     model: model.Model
