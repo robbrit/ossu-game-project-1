@@ -106,10 +106,43 @@ class GUISpec(NamedTuple):
                 None,
             )
 
-        return GUISpec(
+        gui_spec = GUISpec(
             assets=[Asset(**a) for a in spec.get("assets", [])],
             buttons=buttons,
             images=[Image(**b) for b in spec.get("images", [])],
             cancel_action=cancel_action,
             initial_selected_button=selected_button,
         )
+
+        cls.validate(gui_spec)
+        return gui_spec
+
+    def validate(self):
+        """Validates the GUISpec."""
+        # if len(self.buttons) == 0:
+        #     raise ValidationError("Must have at least one button")
+        # if len(self.images) == 0:
+        #     raise ValidationError("Must have at least one image")
+        # if len(self.assets) == 0:
+        #     raise ValidationError("Must have at least one asset")
+        for button in self.buttons:
+            # works
+            if button.name in [b.name for b in self.buttons]:
+                raise ValidationError(f"Duplicate button name: {button.name}")
+        # if len(self.images) != len(set(self.images)):
+        #     for image in self.images:
+        #         if image.image_asset in [i.image_asset for i in self.images]:
+        #             raise ValidationError(f"Duplicate image name: {image.image_asset}")
+        if len(self.assets) != len(set(self.assets)):
+            # works
+            for asset in self.assets:
+                if asset.name in [a.name for a in self.assets]:
+                    raise ValidationError(f"Duplicate asset name: {asset.name}")
+        # if self.initial_selected_button is not None and self.initial_selected_button not in self.buttons:
+        #     raise ValidationError(f"Initial selected button not in buttons: {self.initial_selected_button}")
+
+
+
+
+class ValidationError(Exception):
+    """An error during validation."""
