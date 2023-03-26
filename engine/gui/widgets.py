@@ -1,5 +1,4 @@
 import importlib
-import inspect
 from pathlib import Path
 from typing import (
     Any,
@@ -137,12 +136,17 @@ class GUISpec(NamedTuple):
             if self.buttons and asset.name not in [
                 a.selected_image_asset for a in self.buttons
             ]:
-                raise ValidationError(f"Asset name not in buttons: {asset.name}")
+                raise ValidationError(
+                    f"Asset name not in buttons: {asset.name}"
+                )
             if self.buttons and asset.name not in [
                 a.unselected_image_asset for a in self.buttons
             ]:
-                raise ValidationError(f"Asset name not in buttons: {asset.name}")
-            if self.images and asset.name not in [a.image_asset for a in self.images]:
+                raise ValidationError(
+                    f"Asset name not in buttons: {asset.name}"
+                )
+            if (self.images and
+                    asset.name not in [a.image_asset for a in self.images]):
                 raise ValidationError(f"Asset name not in images: {asset.name}")
             if not Path(asset.path).is_file():
                 raise ValidationError(f"Asset path does not exist: {asset.path}")
@@ -158,7 +162,9 @@ class GUISpec(NamedTuple):
                     f"Button {button.name} is off screen horizontally"
                 )
             if button.center[1] < 0 or button.center[1] > core.SCREEN_HEIGHT:
-                raise ValidationError(f"Button {button.name} is off screen vertically")
+                raise ValidationError(
+                    f"Button {button.name} is off screen vertically"
+                )
 
         seen_images = set()
         for image in self.images:
@@ -182,7 +188,8 @@ class GUISpec(NamedTuple):
                 raise ValidationError(
                     f"Initial selected button not in buttons: {self.initial_selected_button}"
                 )
-            # This check seems to already have been done on line 105. Doesn't work here
+            # This check seems to already have been done on line 105.
+            # Doesn't work here.
             if self.initial_selected_button.name not in [a.name for a in self.buttons]:
                 raise ValidationError(
                     f"Initial selected button not in buttons: {self.initial_selected_button}"
