@@ -40,6 +40,18 @@ class InGameController:
 
         self.model.set_player_facing(player_dx, player_dy)
 
+    def on_mouse_release(
+        self,
+        screen_x: int,
+        screen_y: int,
+        button: int,
+        modifiers: int,
+    ) -> None:
+        """Handles when the user releases a mouse button."""
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            # We activate when the right mouse button is hit.
+            self.model.activate()
+
     def on_update(self, delta_time: int) -> None:
         vx, vy = 0, 0
 

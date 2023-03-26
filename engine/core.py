@@ -101,6 +101,20 @@ class Core(arcade.Window):
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
         self.game_state.controller.on_mouse_motion(screen_x, screen_y, dx, dy)
 
+    def on_mouse_release(
+        self,
+        screen_x: int,
+        screen_y: int,
+        button: int,
+        modifiers: int,
+    ) -> None:
+        self.game_state.controller.on_mouse_release(
+            screen_x,
+            screen_y,
+            button,
+            modifiers,
+        )
+
     def on_update(self, delta_time: int) -> None:
         """Handles updates."""
         self.model.on_update(delta_time)
