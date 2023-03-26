@@ -1,4 +1,6 @@
 import importlib
+import inspect
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -9,7 +11,7 @@ from typing import (
     Tuple,
 )
 
-from engine import game_state
+from engine import game_state, core
 
 GameCallable = Callable[[game_state.GameAPI], None]
 
@@ -117,57 +119,74 @@ class GUISpec(NamedTuple):
         cls.validate(gui_spec)
         return gui_spec
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the GUISpec."""
-        from engine.core import SCREEN_WIDTH, SCREEN_HEIGHT
 
-        len_assets = len(self.assets)
-        no_buttons = len(self.buttons) == 0
-        no_images = len(self.images) == 0
-        # works
-        if len_assets == 0:
+        # Validation errors for images have not been tested
+        if not self.assets:
             raise ValidationError("Must have at least one asset")
-        if no_buttons & no_images:
+        if not self.buttons and not self.images:
             raise ValidationError("Must have at least one button or image")
 
-        # works
-        if len_assets != len(set(self.assets)):
+        if len(self.assets) != len(set(self.assets)):
             for asset in self.assets:
                 if asset.name in [a.name for a in self.assets]:
                     raise ValidationError(f"Duplicate asset name: {asset.name}")
-                if not no_buttons and asset.name not in [a.name for a in self.buttons]:
-                    print(asset.name)
-                    raise ValidationError(f"Asset name not in buttons: {asset.name}")
-                if not no_images and asset.name not in [a.image_asset for a in self.images]:
-                    raise ValidationError(f"Asset name not in images: {asset.name}")
-        #  works
+
+        for asset in self.assets:
+            if self.buttons and asset.name not in [
+                a.selected_image_asset for a in self.buttons
+            ]:
+                raise ValidationError(f"Asset name not in buttons: {asset.name}")
+            if self.buttons and asset.name not in [
+                a.unselected_image_asset for a in self.buttons
+            ]:
+                raise ValidationError(f"Asset name not in buttons: {asset.name}")
+            if self.images and asset.name not in [a.image_asset for a in self.images]:
+                raise ValidationError(f"Asset name not in images: {asset.name}")
+            if not Path(asset.path).is_file():
+                raise ValidationError(f"Asset path does not exist: {asset.path}")
+
         seen_names = set()
         for button in self.buttons:
-            if button.name in seen_names:
-                raise ValidationError(f"Duplicate button name: {button.name}")
-            else:
+            if button.name not in seen_names:
                 seen_names.add(button.name)
+            else:
+                raise ValidationError(f"Duplicate button name: {button.name}")
+            if button.center[0] < 0 or button.center[0] > core.SCREEN_WIDTH:
+                raise ValidationError(
+                    f"Button {button.name} is off screen horizontally"
+                )
+            if button.center[1] < 0 or button.center[1] > core.SCREEN_HEIGHT:
+                raise ValidationError(f"Button {button.name} is off screen vertically")
 
-        # untested
         seen_images = set()
         for image in self.images:
-            if image.image_asset in seen_images:
-                raise ValidationError(f"Duplicate image name: {image.image_asset}")
-            else:
+            if image.image_asset not in seen_images:
                 seen_images.add(image.image_asset)
+            else:
+                raise ValidationError(f"Duplicate image name: {image.image_asset}")
+            if image.center[0] < 0 or image.center[0] > core.SCREEN_WIDTH:
+                raise ValidationError(
+                    f"Image {image.image_asset} is off screen horizontally"
+                )
+            if image.center[1] < 0 or image.center[1] > core.SCREEN_HEIGHT:
+                raise ValidationError(
+                    f"Image {image.image_asset} is off screen vertically"
+                )
 
-        for button in self.buttons:
-            if button.center[0] < 0 or button.center[0] > SCREEN_WIDTH:
-                raise ValidationError(f"Button {button.name} is off screen horizontally")
-            # I believe the origin of the screen in Arcade if the bottom left corner
-            if button.center[1] < 0 or button.center[1] > SCREEN_HEIGHT:
-                raise ValidationError(f"Button {button.name} is off screen vertically")
-        # No error but nonworking button when value is changed for initial_selected_button or button.name
+        # No error but nonworking button when value is changed for
+        # initial_selected_button or button.name
         if self.initial_selected_button is not None:
-            if self.initial_selected_button not in self.buttons:
-                print(self.initial_selected_button)
-                print(self.buttons)
-                raise ValidationError(f"Initial selected button not in buttons: {self.initial_selected_button}")
+            if self.initial_selected_button.name not in [a.name for a in self.assets]:
+                raise ValidationError(
+                    f"Initial selected button not in buttons: {self.initial_selected_button}"
+                )
+            # This check seems to already have been done on line 105. Doesn't work here
+            if self.initial_selected_button.name not in [a.name for a in self.buttons]:
+                raise ValidationError(
+                    f"Initial selected button not in buttons: {self.initial_selected_button}"
+                )
 
 
 class ValidationError(Exception):

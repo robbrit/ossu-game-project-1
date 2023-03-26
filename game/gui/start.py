@@ -10,7 +10,7 @@ class StartScreen:
     spec: widgets.GUISpec
 
     def __init__(self):
-        with open("assets/gui/start-screen.json") as f:
+        with open("assets/gui/start-screen-test.json") as f:
             data = json.loads(f.read())
             self.spec = widgets.GUISpec.create(data)
 
