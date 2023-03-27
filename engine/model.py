@@ -6,6 +6,10 @@ import arcade
 import arcade.tilemap
 from pyglet import math as pmath
 
+from engine import (
+    game_state,
+    scripts,
+)
 from engine.ingame import game_sprite
 
 TILE_SCALING = 1
@@ -24,6 +28,8 @@ class Model:
     This class represents the model layer. It manages maintenance of the state
     of the world.
     """
+
+    api: game_state.GameAPI
 
     player_sprite: Optional[game_sprite.GameSprite]
     scene: Optional[arcade.Scene]
@@ -45,7 +51,8 @@ class Model:
     tile_map: Optional[arcade.tilemap.TileMap]
     activateable_objects: Optional[arcade.SpriteList]
 
-    def __init__(self):
+    def __init__(self, api: game_state.GameAPI):
+        self.api = api
         self.player_sprite = None
         self.scene = None
         self.tile_map = None
@@ -131,6 +138,7 @@ class Model:
             hit_box_algorithm="Simple",
         )
         sprite.set_hit_box(hit_box)
+        sprite.properties = obj.properties
         return sprite
 
     def on_update(self, delta_time: int) -> None:
@@ -177,4 +185,10 @@ class Model:
         if not objects:
             return
 
-        print(objects)
+        for obj in objects:
+            callable = obj.properties.get("on_activate")
+
+            if not callable:
+                continue
+
+            scripts.load_callable(callable)(self.api)

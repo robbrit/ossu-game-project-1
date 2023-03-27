@@ -1,7 +1,5 @@
-import importlib
 from typing import (
     Any,
-    Callable,
     Dict,
     List,
     NamedTuple,
@@ -9,22 +7,7 @@ from typing import (
     Tuple,
 )
 
-from engine import game_state
-
-GameCallable = Callable[[game_state.GameAPI], None]
-
-
-def _load_callable(path: str) -> GameCallable:
-    """Loads a callable object.
-
-    Note that this doesn't actually check if the thing is callable, or checks the
-    arguments/return type.
-    """
-    mod_name, class_name = path.rsplit(".", 1)
-
-    # TODO(rob): Determine if this is insecure.
-    mod = importlib.import_module(mod_name)
-    return getattr(mod, class_name)
+from engine import scripts
 
 
 class Asset(NamedTuple):
@@ -47,7 +30,7 @@ class Button(NamedTuple):
     down: Optional[str]
 
     center: Tuple[int, int]
-    action: GameCallable
+    action: scripts.GameCallable
 
     @classmethod
     def create(cls, spec: Dict[str, Any]) -> "Button":
@@ -60,7 +43,7 @@ class Button(NamedTuple):
             up=spec.get("up"),
             down=spec.get("down"),
             center=spec["center"],
-            action=_load_callable(spec["action"]),
+            action=scripts.load_callable(spec["action"]),
         )
 
 
@@ -82,7 +65,7 @@ class GUISpec(NamedTuple):
     buttons: List[Button]
     images: List[Image]
 
-    cancel_action: Optional[GameCallable]
+    cancel_action: Optional[scripts.GameCallable]
 
     initial_selected_button: Optional[Button]
 
@@ -94,7 +77,7 @@ class GUISpec(NamedTuple):
         """Constructs a new GUISpec from raw dict data."""
         cancel_action = None
         if "cancel_action" in spec:
-            cancel_action = _load_callable(spec["cancel_action"])
+            cancel_action = scripts.load_callable(spec["cancel_action"])
 
         buttons = [Button.create(b) for b in spec.get("buttons", [])]
 

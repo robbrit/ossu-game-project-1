@@ -49,7 +49,7 @@ class Core(arcade.Window):
             SCREEN_TITLE,
         )
 
-        self.model = model.Model()
+        self.model = model.Model(self)
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
         self.ingame_state = ingame_state.InGameState(
