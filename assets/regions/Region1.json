@@ -45,6 +45,7 @@
             5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 9, 5, 5, 5, 5, 1, 5, 5, 5, 9, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
          "height":40,
          "id":1,
+         "locked":true,
          "name":"Ground Tiles",
          "opacity":1,
          "type":"tilelayer",
@@ -120,8 +121,36 @@
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":720,
-                 "y":916
+                 "x":719,
+                 "y":952
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"Activateable Objects",
+         "objects":[
+                {
+                 "class":"",
+                 "height":31.3333,
+                 "id":4,
+                 "name":"Building 1 Door",
+                 "properties":[
+                        {
+                         "name":"on_activate",
+                         "type":"string",
+                         "value":"game.regions.region1.building1_door"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":32,
+                 "x":704.333333333333,
+                 "y":864.33335
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -129,8 +158,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":3,
+ "nextlayerid":5,
+ "nextobjectid":5,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

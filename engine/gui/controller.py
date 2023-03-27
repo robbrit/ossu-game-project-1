@@ -39,6 +39,15 @@ class GuiController:
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
         pass
 
+    def on_mouse_release(
+        self,
+        screen_x: int,
+        screen_y: int,
+        button: int,
+        modifiers: int,
+    ) -> None:
+        pass
+
     def on_update(self, delta_time: int) -> None:
         pass
 

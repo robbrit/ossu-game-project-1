@@ -18,6 +18,16 @@ class Controller(Protocol):
         """Handles when the user moves the mouse."""
         ...
 
+    def on_mouse_release(
+        self,
+        screen_x: int,
+        screen_y: int,
+        button: int,
+        modifiers: int,
+    ) -> None:
+        """Handles when the user releases a mouse button."""
+        ...
+
     def on_update(self, delta_time: int) -> None:
         """Handles game tick updates."""
         ...
