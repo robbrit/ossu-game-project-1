@@ -33,7 +33,7 @@ class Model:
 
     player_sprite: Optional[game_sprite.GameSprite]
     scene: Optional[arcade.Scene]
-    physics: Optional[arcade.PhysicsEngineSimple]
+    physics_engine: Optional[arcade.PhysicsEngineSimple]
 
     # The tile map is created by the Tiled tool and loaded by our system. Most of the
     # game data will be stored there.
@@ -53,12 +53,7 @@ class Model:
 
     def __init__(self, api: game_state.GameAPI):
         self.api = api
-        self.player_sprite = None
-        self.scene = None
-        self.tile_map = None
-        self.physics = None
 
-    def setup(self):
         self.tile_map = arcade.load_tilemap(
             "assets/regions/Region1.json",
             TILE_SCALING,

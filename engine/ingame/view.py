@@ -27,8 +27,6 @@ class InGameView:
 
         self.viewport_size = viewport_size
 
-        arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
-
     def setup(self) -> None:
         self.camera = arcade.Camera(
             self.viewport_size[0],

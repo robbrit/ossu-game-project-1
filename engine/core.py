@@ -1,3 +1,5 @@
+from typing import Optional
+
 import arcade
 import arcade.tilemap
 
@@ -32,9 +34,9 @@ class Core(arcade.Window):
 
     game_state: game_state.GameState
     gui_state: gui_game_state.GuiState
-    ingame_state: ingame_state.InGameState
+    ingame_state: Optional[ingame_state.InGameState]
 
-    model: model.Model
+    model: Optional[model.Model]
     initial_gui: game_state.GUI
 
     def __init__(self, initial_gui: game_state.GUI):
@@ -49,23 +51,24 @@ class Core(arcade.Window):
             SCREEN_TITLE,
         )
 
-        self.model = model.Model(self)
+        self.model = None
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
-        self.ingame_state = ingame_state.InGameState(
-            self.model,
-            (self.width, self.height),
-        )
+        self.ingame_state = None
         self.game_state = None
 
     def setup(self) -> None:
         """Resets the game state."""
-        self.model.setup()
         self.gui_state.setup(self)
-        self.ingame_state.setup(self)
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
+        self.model = model.Model(self)
+        self.ingame_state = ingame_state.InGameState(
+            self.model,
+            (self.width, self.height),
+        )
+        self.ingame_state.setup(self)
         self.game_state = self.ingame_state
 
     def show_gui(self, gui: game_state.GUI) -> None:
@@ -117,6 +120,4 @@ class Core(arcade.Window):
 
     def on_update(self, delta_time: int) -> None:
         """Handles updates."""
-        self.model.on_update(delta_time)
-        self.game_state.controller.on_update(delta_time)
-        self.game_state.view.on_update(delta_time)
+        self.game_state.on_update(delta_time)
