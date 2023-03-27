@@ -39,3 +39,7 @@ class GameState(Protocol):
     def setup(self, api: GameAPI) -> None:
         """Resets the game state."""
         ...
+
+    def on_update(self, dt: int) -> None:
+        """Updates the game state."""
+        ...

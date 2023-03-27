@@ -33,3 +33,7 @@ class GuiState:
 
     def set_gui(self, gui: game_state.GUI) -> None:
         self.view.set_gui(gui)
+
+    def on_update(self, dt: int) -> None:
+        self.view.on_update(dt)
+        self.controller.on_update(dt)
