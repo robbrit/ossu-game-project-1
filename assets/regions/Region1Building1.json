@@ -62,14 +62,15 @@
          "objects":[
                 {
                  "class":"",
-                 "height":27.3333333333334,
-                 "id":1,
+                 "height":0,
+                 "id":3,
                  "name":"Entryway",
+                 "point":true,
                  "rotation":0,
                  "visible":true,
-                 "width":30.3333333333333,
-                 "x":304.333333333333,
-                 "y":398.666666666667
+                 "width":0,
+                 "x":319.333333333333,
+                 "y":419
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -87,6 +88,12 @@
                  "height":30,
                  "id":2,
                  "name":"Exit",
+                 "properties":[
+                        {
+                         "name":"on_activate",
+                         "type":"string",
+                         "value":"game.regions.region1.building1_exit"
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":62.3333333333333,
@@ -100,7 +107,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":3,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

@@ -66,7 +66,6 @@ class Core(arcade.Window):
         """Switches to the "in game" state."""
         with open("assets/world-spec.json") as infile:
             data = json.loads(infile.read())
-            print(data)
             spec = model.WorldSpec.create(data)
 
         self.model = model.Model(self, spec)
@@ -77,8 +76,9 @@ class Core(arcade.Window):
         self.ingame_state.setup(self)
         self.game_state = self.ingame_state
 
-    def change_region(self, name: str) -> None:
+    def change_region(self, name: str, start_location: str) -> None:
         """Changes the region of the game."""
+        self.model.load_region(name, start_location)
 
     def show_gui(self, gui: game_state.GUI) -> None:
         """Switches to the "GUI" state, and displays a certain GUI."""

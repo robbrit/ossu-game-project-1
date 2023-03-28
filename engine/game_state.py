@@ -25,7 +25,7 @@ class GameAPI(Protocol):
         """Starts the game."""
         ...
 
-    def change_region(self, name: str) -> None:
+    def change_region(self, name: str, start_location: str) -> None:
         """Switches the region of the game."""
         ...
 
