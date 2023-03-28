@@ -109,7 +109,6 @@
         {
          "draworder":"topdown",
          "id":3,
-         "locked":true,
          "name":"Key Points",
          "objects":[
                 {
@@ -123,6 +122,18 @@
                  "width":0,
                  "x":719,
                  "y":952
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":6,
+                 "name":"Building 1 Exit",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":720.75,
+                 "y":908
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -133,6 +144,7 @@
         {
          "draworder":"topdown",
          "id":4,
+         "locked":true,
          "name":"Activateable Objects",
          "objects":[
                 {
@@ -159,7 +171,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":5,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

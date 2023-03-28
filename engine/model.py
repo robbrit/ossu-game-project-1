@@ -1,7 +1,7 @@
+import numbers
 from typing import (
     Any,
     Dict,
-    List,
     NamedTuple,
     Optional,
 )
@@ -103,9 +103,9 @@ class Model:
                 },
             )
 
-        self.load_region(spec.initial_region)
+        self.load_region(spec.initial_region, "Start")
 
-    def load_region(self, region_name: str, start_location: str = "Start") -> None:
+    def load_region(self, region_name: str, start_location: str) -> None:
         """Loads a region by name."""
         self.active_region = region_name
         tilemap = self.tilemaps[region_name]
@@ -138,11 +138,22 @@ class Model:
         if not start:
             raise Exception("No start location defined.")
 
+        shape = start[0].shape
+
+        if not isinstance(shape, list) or len(shape) != 2:
+            raise Exception("Start location must be a point.")
+
+        x, y = shape
+        if not isinstance(x, numbers.Number) or not isinstance(y, numbers.Number):
+            raise Exception("Start location must be a point.")
+
         self.player_sprite.center_x = start[0].shape[0]
         self.player_sprite.center_y = start[0].shape[1]
 
     def _create_object_sprite(
-        self, obj: arcade.TiledObject, map: arcade.TileMap
+        self,
+        obj: arcade.TiledObject,
+        map: arcade.TileMap,
     ) -> arcade.Sprite:
         # Find the bounding rectangle for all the points.
         min_x, min_y = float("inf"), float("inf")
