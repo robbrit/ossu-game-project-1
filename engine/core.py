@@ -77,6 +77,9 @@ class Core(arcade.Window):
         self.ingame_state.setup(self)
         self.game_state = self.ingame_state
 
+    def change_region(self, name: str) -> None:
+        """Changes the region of the game."""
+
     def show_gui(self, gui: game_state.GUI) -> None:
         """Switches to the "GUI" state, and displays a certain GUI."""
         self.gui_state.set_gui(gui)

@@ -25,6 +25,10 @@ class GameAPI(Protocol):
         """Starts the game."""
         ...
 
+    def change_region(self, name: str) -> None:
+        """Switches the region of the game."""
+        ...
+
     def show_gui(self, gui: GUI) -> None:
         """Shows a GUI."""
         ...
