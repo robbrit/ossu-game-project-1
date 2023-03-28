@@ -1,9 +1,8 @@
-from collections import Counter
+from collections
 import importlib
-from pathlib import Path
+from pathlib
 from typing import (
     Any,
-    Callable,
     Dict,
     List,
     NamedTuple,
@@ -27,6 +26,7 @@ def _load_callable(path: str) -> GameCallable:
     # TODO(rob): Determine if this is insecure.
     mod = importlib.import_module(mod_name)
     return getattr(mod, class_name)
+from engine import scripts
 
 
 class Asset(NamedTuple):
@@ -49,7 +49,7 @@ class Button(NamedTuple):
     down: Optional[str]
 
     center: Tuple[int, int]
-    action: GameCallable
+    action: scripts.GameCallable
 
     @classmethod
     def create(cls, spec: Dict[str, Any]) -> "Button":
@@ -62,7 +62,7 @@ class Button(NamedTuple):
             up=spec.get("up"),
             down=spec.get("down"),
             center=tuple(spec["center"]),
-            action=_load_callable(spec["action"]),
+            action=scripts.load_callable(spec["action"]),
         )
 
 
@@ -84,7 +84,7 @@ class GUISpec(NamedTuple):
     buttons: List[Button]
     images: List[Image]
 
-    cancel_action: Optional[GameCallable]
+    cancel_action: Optional[scripts.GameCallable]
 
     initial_selected_button: Optional[Button]
 
@@ -96,7 +96,7 @@ class GUISpec(NamedTuple):
         """Constructs a new GUISpec from raw dict data."""
         cancel_action = None
         if "cancel_action" in spec:
-            cancel_action = _load_callable(spec["cancel_action"])
+            cancel_action = scripts.load_callable(spec["cancel_action"])
 
         buttons = [Button.create(b) for b in spec.get("buttons", [])]
 

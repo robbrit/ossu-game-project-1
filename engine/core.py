@@ -1,3 +1,6 @@
+import json
+from typing import Optional
+
 import arcade
 import arcade.tilemap
 
@@ -32,9 +35,9 @@ class Core(arcade.Window):
 
     game_state: game_state.GameState
     gui_state: gui_game_state.GuiState
-    ingame_state: ingame_state.InGameState
+    ingame_state: Optional[ingame_state.InGameState]
 
-    model: model.Model
+    model: Optional[model.Model]
     initial_gui: game_state.GUI
 
     def __init__(self, initial_gui: game_state.GUI):
@@ -49,24 +52,33 @@ class Core(arcade.Window):
             SCREEN_TITLE,
         )
 
-        self.model = model.Model()
+        self.model = None
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
-        self.ingame_state = ingame_state.InGameState(
-            self.model,
-            (self.width, self.height),
-        )
+        self.ingame_state = None
         self.game_state = None
 
     def setup(self) -> None:
         """Resets the game state."""
-        self.model.setup()
         self.gui_state.setup(self)
-        self.ingame_state.setup(self)
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
+        with open("assets/world-spec.json") as infile:
+            data = json.loads(infile.read())
+            spec = model.WorldSpec.create(data)
+
+        self.model = model.Model(self, spec)
+        self.ingame_state = ingame_state.InGameState(
+            self.model,
+            (self.width, self.height),
+        )
+        self.ingame_state.setup(self)
         self.game_state = self.ingame_state
+
+    def change_region(self, name: str, start_location: str) -> None:
+        """Changes the region of the game."""
+        self.model.load_region(name, start_location)
 
     def show_gui(self, gui: game_state.GUI) -> None:
         """Switches to the "GUI" state, and displays a certain GUI."""
@@ -101,8 +113,20 @@ class Core(arcade.Window):
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
         self.game_state.controller.on_mouse_motion(screen_x, screen_y, dx, dy)
 
+    def on_mouse_release(
+        self,
+        screen_x: int,
+        screen_y: int,
+        button: int,
+        modifiers: int,
+    ) -> None:
+        self.game_state.controller.on_mouse_release(
+            screen_x,
+            screen_y,
+            button,
+            modifiers,
+        )
+
     def on_update(self, delta_time: int) -> None:
         """Handles updates."""
-        self.model.on_update(delta_time)
-        self.game_state.controller.on_update(delta_time)
-        self.game_state.view.on_update(delta_time)
+        self.game_state.on_update(delta_time)
