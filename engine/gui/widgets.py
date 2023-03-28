@@ -1,6 +1,5 @@
-from collections
-import importlib
-from pathlib
+import collections
+import pathlib
 from typing import (
     Any,
     Dict,
@@ -10,23 +9,7 @@ from typing import (
     Tuple,
 )
 
-from engine import game_state, core
-
-# GameCallable = Callable[[game_state.GameAPI], None]
-
-
-def _load_callable(path: str) -> GameCallable:
-    """Loads a callable object.
-
-    Note that this doesn't actually check if the thing is callable, or checks the
-    arguments/return type.
-    """
-    mod_name, class_name = path.rsplit(".", 1)
-
-    # TODO(rob): Determine if this is insecure.
-    mod = importlib.import_module(mod_name)
-    return getattr(mod, class_name)
-from engine import scripts
+from engine import scripts, core
 
 
 class Asset(NamedTuple):
@@ -129,7 +112,7 @@ class GUISpec(NamedTuple):
             raise ValidationError("Must have at least one button or image")
 
         duplicate_assets = [
-            asset for asset, count in Counter(self.assets).items() if count > 1
+            asset for asset, count in collections.Counter(self.assets).items() if count > 1
         ]
         if len(duplicate_assets) > 0:
             raise ValidationError(f"Duplicate asset name(s): {duplicate_assets}")
@@ -155,11 +138,11 @@ class GUISpec(NamedTuple):
                     raise ValidationError(f"Asset name not in images: {asset.name}")
 
         for a in self.assets:
-            if not Path(a.path).is_file():
+            if not pathlib.Path(a.path).is_file():
                 raise ValidationError(f"Asset path does not exist: {a.path}")
 
         duplicate_buttons = [
-            button for button, count in Counter(self.buttons).items() if count > 1
+            button for button, count in collections.Counter(self.buttons).items() if count > 1
         ]
         if len(duplicate_buttons) > 0:
             raise ValidationError(f"Duplicate button name(s): {duplicate_buttons}")
@@ -173,7 +156,7 @@ class GUISpec(NamedTuple):
                 raise ValidationError(f"Button {button.name} is off screen vertically")
 
         duplicate_images = [
-            image for image, count in Counter(self.images).items() if count > 1
+            image for image, count in collections.Counter(self.images).items() if count > 1
         ]
         if len(duplicate_images) > 0:
             raise ValidationError(f"Duplicate image name(s): {duplicate_images}")
