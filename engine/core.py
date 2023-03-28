@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import arcade
@@ -63,7 +64,12 @@ class Core(arcade.Window):
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
-        self.model = model.Model(self)
+        with open("assets/world-spec.json") as infile:
+            data = json.loads(infile.read())
+            print(data)
+            spec = model.WorldSpec.create(data)
+
+        self.model = model.Model(self, spec)
         self.ingame_state = ingame_state.InGameState(
             self.model,
             (self.width, self.height),

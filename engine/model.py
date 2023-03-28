@@ -1,4 +1,8 @@
 from typing import (
+    Any,
+    Dict,
+    List,
+    NamedTuple,
     Optional,
 )
 
@@ -20,7 +24,32 @@ PLAYER_MOVEMENT_SPEED = 5
 # activions.
 HITBOX_DISTANCE = 32
 
+KEY_POINTS = "Key Points"
 ACTIVATEABLE_OBJECTS = "Activateable Objects"
+
+
+class RegionSpec(NamedTuple):
+    """Specifies the details of a particular region."""
+
+    tiled_mapfile: str
+    wall_layer: str = "Wall Tiles"
+
+
+class WorldSpec(NamedTuple):
+    """Specifies the details for the entire world."""
+
+    regions: Dict[str, RegionSpec]
+    initial_region: str
+
+    @classmethod
+    def create(cls, data: Dict[str, Any]) -> "WorldSpec":
+        return WorldSpec(
+            regions={
+                region_name: RegionSpec(**r)
+                for region_name, r in data["regions"].items()
+            },
+            initial_region=data["initial_region"],
+        )
 
 
 class Model:
@@ -48,64 +77,78 @@ class Model:
     #
     # The initial tile map must have:
     # * An object layer called "Key Points", containing an object named "Start".
-    tile_map: Optional[arcade.tilemap.TileMap]
+    tilemaps: Dict[str, arcade.tilemap.TileMap]
+    active_region: str
     activateable_objects: Optional[arcade.SpriteList]
+    spec: str
 
-    def __init__(self, api: game_state.GameAPI):
+    def __init__(self, api: game_state.GameAPI, spec: WorldSpec):
         self.api = api
-
-        self.tile_map = arcade.load_tilemap(
-            "assets/regions/Region1.json",
-            TILE_SCALING,
-            {
-                "Wall Tiles": {
-                    "use_spatial_hash": True,
-                },
-            },
-        )
-
-        self.activateable_objects = arcade.SpriteList(
-            use_spatial_hash=True,
-        )
-        for obj in self.tile_map.object_lists.get(ACTIVATEABLE_OBJECTS, []):
-            self.activateable_objects.append(self._create_object_sprite(obj))
-
-        self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        self.scene.add_sprite_list(
-            name=ACTIVATEABLE_OBJECTS,
-            sprite_list=self.activateable_objects,
-        )
-
-        self._init_player()
-
-        self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite,
-            self.tile_map.sprite_lists["Wall Tiles"],
-        )
-
-    def _init_player(self):
-        start = [
-            obj
-            for obj in self.tile_map.object_lists["Key Points"]
-            if obj.name == "Start"
-        ]
-        if not start:
-            raise Exception("No start location defined.")
+        self.spec = spec
 
         self.player_sprite = game_sprite.GameSprite(
             "assets/sprites/player/spec.json",
         )
 
-        self.player_sprite.center_x = start[0].shape[0]
-        self.player_sprite.center_y = start[0].shape[1]
+        self.tilemaps = {}
+
+        for region_name, region in spec.regions.items():
+            self.tilemaps[region_name] = arcade.load_tilemap(
+                region.tiled_mapfile,
+                TILE_SCALING,
+                {
+                    region.wall_layer: {
+                        "use_spatial_hash": True,
+                    },
+                },
+            )
+
+        self.load_region(spec.initial_region)
+
+    def load_region(self, region_name: str, start_location: str = "Start") -> None:
+        """Loads a region by name."""
+        self.active_region = region_name
+        tilemap = self.tilemaps[region_name]
+        region_spec = self.spec.regions[region_name]
+
+        self.activateable_objects = arcade.SpriteList(
+            use_spatial_hash=True,
+        )
+        for obj in tilemap.object_lists.get(ACTIVATEABLE_OBJECTS, []):
+            self.activateable_objects.append(self._create_object_sprite(obj, tilemap))
+
+        self.scene = arcade.Scene.from_tilemap(tilemap)
+        self.scene.add_sprite_list(
+            name=ACTIVATEABLE_OBJECTS,
+            sprite_list=self.activateable_objects,
+        )
         self.scene.add_sprite("Player", self.player_sprite)
 
-    def _create_object_sprite(self, obj: arcade.TiledObject) -> arcade.Sprite:
+        self._reset_player(start_location, tilemap)
+
+        self.physics_engine = arcade.PhysicsEngineSimple(
+            self.player_sprite,
+            tilemap.sprite_lists[region_spec.wall_layer],
+        )
+
+    def _reset_player(self, start_location: str, map: arcade.TileMap):
+        start = [
+            obj for obj in map.object_lists[KEY_POINTS] if obj.name == start_location
+        ]
+        if not start:
+            raise Exception("No start location defined.")
+
+        self.player_sprite.center_x = start[0].shape[0]
+        self.player_sprite.center_y = start[0].shape[1]
+
+    def _create_object_sprite(
+        self, obj: arcade.TiledObject, map: arcade.TileMap
+    ) -> arcade.Sprite:
         # Find the bounding rectangle for all the points.
         min_x, min_y = float("inf"), float("inf")
         max_x, max_y = float("-inf"), float("-inf")
 
-        pixel_height = self.tile_map.height * self.tile_map.tile_height
+        pixel_height = map.height * map.tile_height
 
         for x, y in obj.shape:
             # The y coordinates come in as negative values, and they're relative to the
@@ -187,3 +230,23 @@ class Model:
                 continue
 
             scripts.load_callable(callable)(self.api)
+
+    @property
+    def width(self) -> int:
+        """Gets the width of the map in number of tiles."""
+        return self.tilemaps[self.active_region].width
+
+    @property
+    def height(self) -> int:
+        """Gets the height of the map in number of tiles."""
+        return self.tilemaps[self.active_region].height
+
+    @property
+    def tile_width(self) -> int:
+        """Gets the tile width of the map in pixels."""
+        return self.tilemaps[self.active_region].tile_width
+
+    @property
+    def tile_height(self) -> int:
+        """Gets the tile height of the map in pixels."""
+        return self.tilemaps[self.active_region].tile_height
