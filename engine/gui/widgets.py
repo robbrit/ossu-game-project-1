@@ -12,7 +12,7 @@ from typing import (
 
 from engine import game_state, core
 
-GameCallable = Callable[[game_state.GameAPI], None]
+# GameCallable = Callable[[game_state.GameAPI], None]
 
 
 def _load_callable(path: str) -> GameCallable:
