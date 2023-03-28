@@ -32,8 +32,8 @@ class InGameView:
             self.viewport_size[0],
             self.viewport_size[1],
         )
-        self.width = self.model.tile_map.width * self.model.tile_map.tile_width
-        self.height = self.model.tile_map.height * self.model.tile_map.tile_height
+        self.width = self.model.width * self.model.tile_width
+        self.height = self.model.height * self.model.tile_height
 
     def on_draw(self) -> None:
         self.camera.use()
