@@ -97,6 +97,7 @@
             14, 10, 14, 10, 14, 14, 10, 10, 2, 2, 6, 6, 6, 10, 10, 2, 10, 6, 14, 6, 2, 6, 10, 14, 10, 2, 2, 2, 14, 10, 10, 10, 10, 10, 6, 2, 6, 10, 10, 6, 10, 6, 6, 10, 14, 10, 14, 10, 6, 14],
          "height":40,
          "id":2,
+         "locked":true,
          "name":"Wall Tiles",
          "opacity":1,
          "type":"tilelayer",
@@ -211,6 +212,40 @@
         }, 
         {
          "draworder":"topdown",
+         "id":7,
+         "name":"NPCs",
+         "objects":[
+                {
+                 "class":"",
+                 "height":0,
+                 "id":8,
+                 "name":"IntroCharacter",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"script",
+                         "type":"string",
+                         "value":"game.regions.region1.IntroCharacter"
+                        }, 
+                        {
+                         "name":"spec",
+                         "type":"string",
+                         "value":"region1.intro_character"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":591.5,
+                 "y":911.5
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":3,
          "locked":true,
          "name":"Key Points",
@@ -274,8 +309,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":8,
+ "nextlayerid":8,
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

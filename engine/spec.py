@@ -61,9 +61,15 @@ class WorldSpec:
 @dataclasses.dataclass
 class GameSpec:
     world: WorldSpec
-
     player_spec: GameSpriteSpec
+    sprites: Dict[str, GameSpriteSpec]
 
-    def __init__(self, world: Dict[str, Any], player_spec: Dict[str, Any]):
+    def __init__(
+        self,
+        world: Dict[str, Any],
+        player_spec: Dict[str, Any],
+        sprites: Dict[str, Any],
+    ):
         self.world = WorldSpec(**world)
         self.player_spec = GameSpriteSpec(**player_spec)
+        self.sprites = {name: GameSpriteSpec(**spec) for name, spec in sprites.items()}

@@ -5,6 +5,7 @@ from typing import (
     Callable,
     Optional,
     Protocol,
+    Tuple,
 )
 
 import engine
@@ -32,6 +33,16 @@ class GameAPI(Protocol):
 
     def show_gui(self, gui: GUI) -> None:
         """Shows a GUI."""
+        ...
+
+    def create_sprite(
+        self,
+        spec_name: str,
+        name: str,
+        start_location: Tuple[int, int],
+        script: "Optional[Script]",
+    ) -> None:
+        """Creates a sprite."""
         ...
 
 
@@ -100,6 +111,18 @@ class Script:
     def on_event(self, event_name: str, data: Any) -> None:
         """Triggered when a custom event is fired."""
         pass
+
+
+class SavesAPI:
+    """Script mixin to save the API object."""
+
+    api: Optional[GameAPI]
+
+    def __init__(self):
+        self.api = None
+
+    def set_api(self, api: GameAPI):
+        self.api = api
 
 
 class ObjectScript(Script):
