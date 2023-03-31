@@ -1,0 +1,55 @@
+{
+    "world": {
+        "regions": {
+            "Region1": {
+                "tiled_mapfile": "assets/regions/Region1.json"
+            },
+            "Region1Building1": {
+                "tiled_mapfile": "assets/regions/Region1Building1.json"
+            }
+        },
+        "initial_region": "Region1"
+    },
+
+    "player_spec": {
+        "width": 32,
+        "height": 32,
+
+        "initial_animation": "idle-down",
+        "root_directory": "assets/sprites/player",
+        "animations": {
+            "idle-left": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "idle-right": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "idle-up": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "idle-down": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "walk-left": {
+                "frame_speed": 0.3,
+                "num_frames": 3
+            },
+            "walk-right": {
+                "frame_speed": 0.3,
+                "num_frames": 3
+            },
+            "walk-up": {
+                "frame_speed": 0.3,
+                "num_frames": 2
+            },
+            "walk-down": {
+                "frame_speed": 0.3,
+                "num_frames": 2
+            }
+        }
+    }
+}

@@ -13,6 +13,7 @@ from pyglet import math as pmath
 from engine import (
     game_state,
     scripts,
+    spec,
 )
 from engine.ingame import game_sprite
 
@@ -26,30 +27,6 @@ HITBOX_DISTANCE = 32
 
 KEY_POINTS = "Key Points"
 SCRIPTED_OBJECTS = "Scripted Objects"
-
-
-class RegionSpec(NamedTuple):
-    """Specifies the details of a particular region."""
-
-    tiled_mapfile: str
-    wall_layer: str = "Wall Tiles"
-
-
-class WorldSpec(NamedTuple):
-    """Specifies the details for the entire world."""
-
-    regions: Dict[str, RegionSpec]
-    initial_region: str
-
-    @classmethod
-    def create(cls, data: Dict[str, Any]) -> "WorldSpec":
-        return WorldSpec(
-            regions={
-                region_name: RegionSpec(**r)
-                for region_name, r in data["regions"].items()
-            },
-            initial_region=data["initial_region"],
-        )
 
 
 class ScriptedObject(NamedTuple):
@@ -90,20 +67,23 @@ class Model:
     active_region: str
     scripted_objects: Dict[str, ScriptedObject]
     scripted_objects_spritelist: Optional[arcade.SpriteList]
-    spec: str
+    spec: spec.WorldSpec
 
-    def __init__(self, api: game_state.GameAPI, spec: WorldSpec):
+    def __init__(
+        self,
+        api: game_state.GameAPI,
+        game_spec: spec.WorldSpec,
+        player_spec: spec.GameSpriteSpec,
+    ):
         self.api = api
-        self.spec = spec
+        self.spec = game_spec
         self.time = 0
 
-        self.player_sprite = game_sprite.GameSprite(
-            "assets/sprites/player/spec.json",
-        )
+        self.player_sprite = game_sprite.GameSprite(player_spec)
 
         self.tilemaps = {}
 
-        for region_name, region in spec.regions.items():
+        for region_name, region in game_spec.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
                 region.tiled_mapfile,
                 TILE_SCALING,
@@ -114,7 +94,7 @@ class Model:
                 },
             )
 
-        self.load_region(spec.initial_region, "Start")
+        self.load_region(game_spec.initial_region, "Start")
 
     def load_region(self, region_name: str, start_location: str) -> None:
         """Loads a region by name."""
