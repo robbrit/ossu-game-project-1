@@ -7,6 +7,7 @@ import arcade.tilemap
 from engine import (
     game_state,
     model,
+    spec,
 )
 from engine.gui import game_state as gui_game_state
 from engine.ingame import game_state as ingame_state
@@ -39,8 +40,9 @@ class Core(arcade.Window):
 
     model: Optional[model.Model]
     initial_gui: game_state.GUI
+    spec: spec.GameSpec
 
-    def __init__(self, initial_gui: game_state.GUI):
+    def __init__(self, initial_gui: game_state.GUI, game_spec: spec.GameSpec):
         """Constructor.
 
         Args:
@@ -52,6 +54,7 @@ class Core(arcade.Window):
             SCREEN_TITLE,
         )
 
+        self.spec = game_spec
         self.model = None
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
@@ -64,11 +67,7 @@ class Core(arcade.Window):
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
-        with open("assets/world-spec.json") as infile:
-            data = json.loads(infile.read())
-            spec = model.WorldSpec.create(data)
-
-        self.model = model.Model(self, spec)
+        self.model = model.Model(self, self.spec.world, self.spec.player_spec)
         self.ingame_state = ingame_state.InGameState(
             self.model,
             (self.width, self.height),
