@@ -295,4 +295,5 @@ class Model:
 
     @property
     def game_time(self) -> int:
+        '''Gets the in-game time in seconds.'''
         return self.time // 60
