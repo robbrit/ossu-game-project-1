@@ -72,6 +72,8 @@ class Model:
     scene: Optional[arcade.Scene]
     physics_engine: Optional[arcade.PhysicsEngineSimple]
 
+    time: int
+
     # The tile map is created by the Tiled tool and loaded by our system. Most of the
     # game data will be stored there.
     # Things that the tile map must have:
@@ -93,6 +95,7 @@ class Model:
     def __init__(self, api: game_state.GameAPI, spec: WorldSpec):
         self.api = api
         self.spec = spec
+        self.time = 0
 
         self.player_sprite = game_sprite.GameSprite(
             "assets/sprites/player/spec.json",
@@ -223,6 +226,7 @@ class Model:
     def on_update(self, delta_time: int) -> None:
         self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
+        self.time += 1
 
     def set_player_speed(
         self,
@@ -288,3 +292,7 @@ class Model:
     def tile_height(self) -> int:
         """Gets the tile height of the map in pixels."""
         return self.tilemaps[self.active_region].tile_height
+
+    @property
+    def game_time(self) -> int:
+        return self.time // 60
