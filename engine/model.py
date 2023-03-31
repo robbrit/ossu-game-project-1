@@ -43,7 +43,7 @@ class Model:
     of the world.
     """
 
-    api: game_state.GameAPI
+    api: scripts.GameAPI
 
     player_sprite: Optional[game_sprite.GameSprite]
     scene: Optional[arcade.Scene]
@@ -69,7 +69,7 @@ class Model:
 
     def __init__(
         self,
-        api: game_state.GameAPI,
+        api: scripts.GameAPI,
         game_spec: spec.WorldSpec,
         player_spec: spec.GameSpriteSpec,
     ):
