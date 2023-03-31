@@ -4,7 +4,9 @@ from typing import (
 
 import arcade.key
 
-from engine import game_state
+from engine import (
+    scripts,
+)
 from engine.gui import widgets
 
 
@@ -14,16 +16,16 @@ class GuiController:
     """
 
     selected_button: Optional[widgets.Button]
-    api: Optional[game_state.GameAPI]
-    gui: game_state.GUI
+    api: Optional[scripts.GameAPI]
+    gui: scripts.GUI
 
-    def __init__(self, initial_gui: game_state.GUI):
+    def __init__(self, initial_gui: scripts.GUI):
         self.selected_button = None
         self.api = None
         self.gui = initial_gui
         self.selected_button = self.gui.spec.initial_selected_button
 
-    def setup(self, api: game_state.GameAPI) -> None:
+    def setup(self, api: scripts.GameAPI) -> None:
         self.api = api
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:

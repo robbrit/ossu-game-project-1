@@ -5,8 +5,8 @@ from typing import (
 
 
 from engine import (
-    game_state,
     model,
+    scripts,
 )
 
 from engine.ingame import (
@@ -18,7 +18,7 @@ from engine.ingame import (
 class InGameState:
     """Wraps the "in game" state."""
 
-    api: Optional[game_state.GameAPI]
+    api: Optional[scripts.GameAPI]
     model: model.Model
 
     def __init__(self, model: model.Model, viewport_size: Tuple[int, int]) -> None:
@@ -26,7 +26,7 @@ class InGameState:
         self.view = view.InGameView(model, viewport_size)
         self.controller = controller.InGameController(model, self.view)
 
-    def setup(self, api: game_state.GameAPI):
+    def setup(self, api: scripts.GameAPI):
         self.view.setup()
         self.api = api
 

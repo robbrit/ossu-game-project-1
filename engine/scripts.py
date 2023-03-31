@@ -7,10 +7,35 @@ from typing import (
     Protocol,
 )
 
-from engine import game_state
+import engine
 
 
-GameCallable = Callable[[game_state.GameAPI], None]
+class GUI(Protocol):
+    """A GUI is a set of buttons and images that the user interacts with."""
+
+    @property
+    def spec(self) -> "engine.gui.widgets.GUISpec":
+        """A declarative form of the GUI, saying how it should be rendered."""
+        ...
+
+
+class GameAPI(Protocol):
+    """A protocol for how game objects will interact with the engine."""
+
+    def start_game(self) -> None:
+        """Starts the game."""
+        ...
+
+    def change_region(self, name: str, start_location: str) -> None:
+        """Switches the region of the game."""
+        ...
+
+    def show_gui(self, gui: GUI) -> None:
+        """Shows a GUI."""
+        ...
+
+
+GameCallable = Callable[[GameAPI], None]
 
 
 def _load_symbol(path: str):
@@ -47,7 +72,7 @@ class Player(Entity):
 class Script:
     """Base class for all scripts."""
 
-    def set_api(self, api: game_state.GameAPI):
+    def set_api(self, api: GameAPI):
         """Called after construction to set the API object for the script.
 
         Can safely be ignored for scripts that don't need it.
@@ -84,21 +109,21 @@ class ObjectScript(Script):
     simple and instead just want to tie to some function.
     """
 
-    api: Optional[game_state.GameAPI]
+    api: Optional[GameAPI]
     _on_activate: GameCallable
     # TODO(rob): Fill in all the other functions.
 
     def __init__(self, on_activate: Optional[str]):
         self._on_activate = load_callable(on_activate) if on_activate else self._dummy
 
-    def set_api(self, api: game_state.GameAPI) -> None:
+    def set_api(self, api: GameAPI) -> None:
         self.api = api
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
         if self._on_activate:
             self._on_activate(self.api)
 
-    def _dummy(self, api: game_state.GameAPI) -> None:
+    def _dummy(self, api: GameAPI) -> None:
         pass
 
 

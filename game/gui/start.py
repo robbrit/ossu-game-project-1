@@ -1,6 +1,6 @@
 import json
 
-from engine import game_state
+from engine import scripts
 from engine.gui import widgets
 
 
@@ -15,5 +15,5 @@ class StartScreen:
             self.spec = widgets.GUISpec.create(data)
 
 
-def start_game(api: game_state.GameAPI) -> None:
+def start_game(api: scripts.GameAPI) -> None:
     api.start_game()
