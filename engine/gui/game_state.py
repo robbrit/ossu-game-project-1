@@ -5,7 +5,7 @@ from typing import (
 
 
 from engine import (
-    game_state,
+    scripts,
 )
 
 from engine.gui import (
@@ -17,21 +17,21 @@ from engine.gui import (
 class GuiState:
     """Defines the GUI state."""
 
-    api: Optional[game_state.GameAPI]
+    api: Optional[scripts.GameAPI]
 
     def __init__(
         self,
-        initial_gui: game_state.GUI,
+        initial_gui: scripts.GUI,
     ) -> None:
         self.controller = controller.GuiController(initial_gui)
         self.view = view.GuiView(initial_gui)
 
-    def setup(self, api: game_state.GameAPI):
+    def setup(self, api: scripts.GameAPI):
         self.view.setup()
         self.controller.setup(api)
         self.api = api
 
-    def set_gui(self, gui: game_state.GUI) -> None:
+    def set_gui(self, gui: scripts.GUI) -> None:
         self.view.set_gui(gui)
 
     def on_update(self, dt: int) -> None:

@@ -1,9 +1,9 @@
-from engine import game_state
+from engine import scripts
 
 
-def building1_door(api: game_state.GameAPI) -> None:
+def building1_door(api: scripts.GameAPI) -> None:
     api.change_region("Region1Building1", "Entryway")
 
 
-def building1_exit(api: game_state.GameAPI) -> None:
+def building1_exit(api: scripts.GameAPI) -> None:
     api.change_region("Region1", "Building 1 Exit")
