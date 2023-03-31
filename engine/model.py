@@ -226,7 +226,7 @@ class Model:
     def on_update(self, delta_time: int) -> None:
         self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
-        self.time += 1
+        self.time += delta_time
 
     def set_player_speed(
         self,
@@ -296,4 +296,4 @@ class Model:
     @property
     def game_time(self) -> int:
         '''Gets the in-game time in seconds.'''
-        return self.time // 60
+        return int(self.time)
