@@ -11,6 +11,22 @@
         "initial_region": "Region1"
     },
 
+    "sprites": {
+        "region1.intro_character": {
+            "width": 32,
+            "height": 32,
+
+            "initial_animation": "idle",
+            "root_directory": "assets/sprites/intro_character",
+            "animations": {
+                "idle": {
+                    "frame_speed": 1,
+                    "num_frames": 1
+                }
+            }
+        }
+    },
+
     "player_spec": {
         "width": 32,
         "height": 32,

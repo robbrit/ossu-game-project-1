@@ -1,9 +1,10 @@
 import numbers
 from typing import (
-    Any,
     Dict,
+    List,
     NamedTuple,
     Optional,
+    Tuple,
 )
 
 import arcade
@@ -27,6 +28,7 @@ HITBOX_DISTANCE = 32
 
 KEY_POINTS = "Key Points"
 SCRIPTED_OBJECTS = "Scripted Objects"
+NPCS = "NPCs"
 
 
 class ScriptedObject(NamedTuple):
@@ -45,7 +47,7 @@ class Model:
 
     api: scripts.GameAPI
 
-    player_sprite: Optional[game_sprite.GameSprite]
+    player_sprite: game_sprite.GameSprite
     scene: Optional[arcade.Scene]
     physics_engine: Optional[arcade.PhysicsEngineSimple]
 
@@ -66,24 +68,23 @@ class Model:
     tilemaps: Dict[str, arcade.tilemap.TileMap]
     active_region: str
     scripted_objects: Dict[str, ScriptedObject]
-    scripted_objects_spritelist: Optional[arcade.SpriteList]
-    spec: spec.WorldSpec
+
+    spec: spec.GameSpec
 
     def __init__(
         self,
         api: scripts.GameAPI,
-        game_spec: spec.WorldSpec,
-        player_spec: spec.GameSpriteSpec,
+        game_spec: spec.GameSpec,
     ):
         self.api = api
         self.spec = game_spec
         self.time = 0
 
-        self.player_sprite = game_sprite.GameSprite(player_spec)
+        self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
 
         self.tilemaps = {}
 
-        for region_name, region in game_spec.regions.items():
+        for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
                 region.tiled_mapfile,
                 TILE_SCALING,
@@ -94,32 +95,17 @@ class Model:
                 },
             )
 
-        self.load_region(game_spec.initial_region, "Start")
+        self.load_region(game_spec.world.initial_region, "Start")
 
     def load_region(self, region_name: str, start_location: str) -> None:
         """Loads a region by name."""
         self.active_region = region_name
         tilemap = self.tilemaps[region_name]
-        region_spec = self.spec.regions[region_name]
-
-        self.scripted_objects = {}
-        self.scripted_objects_spritelist = arcade.SpriteList(
-            use_spatial_hash=True,
-        )
-        for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
-            sprite = self._create_object_sprite(obj, tilemap)
-            self.scripted_objects_spritelist.append(sprite)
-            self.scripted_objects[obj.name] = ScriptedObject(
-                sprite=sprite,
-                owner=obj,
-                script=self._load_object_script(obj),
-            )
+        region_spec = self.spec.world.regions[region_name]
 
         self.scene = arcade.Scene.from_tilemap(tilemap)
-        self.scene.add_sprite_list(
-            name=SCRIPTED_OBJECTS,
-            sprite_list=self.scripted_objects_spritelist,
-        )
+        self._load_scripted_objects(tilemap)
+
         self.scene.add_sprite("Player", self.player_sprite)
 
         self._reset_player(start_location, tilemap)
@@ -128,6 +114,61 @@ class Model:
             self.player_sprite,
             tilemap.sprite_lists[region_spec.wall_layer],
         )
+
+    def _load_scripted_objects(self, tilemap: arcade.TileMap) -> None:
+        self.scripted_objects = {}
+        self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
+
+        sprites = []
+
+        for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
+            sprite = self._create_object_sprite(obj, tilemap)
+            sprites.append(sprite)
+            self.scripted_objects[obj.name] = ScriptedObject(
+                sprite=sprite,
+                owner=obj,
+                script=self._load_object_script(obj),
+            )
+
+        for obj in tilemap.object_lists.get(NPCS, []):
+            sprite_spec = self.spec.sprites[obj.properties["spec"]]
+            script = None
+            if "script" in obj.properties:
+                script_cls = scripts.load_script_class(obj.properties["script"])
+                script = script_cls()
+                script.set_api(self.api)
+
+            sprite = self.create_sprite(sprite_spec, obj.name, obj.shape, script)
+
+        self.scene.get_sprite_list(SCRIPTED_OBJECTS).extend(sprites)
+
+    def create_sprite(
+        self,
+        spec: spec.GameSpriteSpec,
+        name: str,
+        start_location: Tuple[int, int],
+        script: Optional[scripts.Script],
+    ) -> arcade.Sprite:
+        """Adds a sprite to the model."""
+        sprite = game_sprite.GameSprite(spec)
+        sprite.properties = {
+            "name": name,
+        }
+        sprite.center_x = start_location[0]
+        sprite.center_y = start_location[1]
+
+        if script:
+            self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
+            self.scripted_objects[name] = ScriptedObject(
+                sprite=sprite,
+                owner=sprite,
+                script=script,
+            )
+        else:
+            # TODO(rob): Handle non-scripted sprites.
+            raise NotImplemented("Non-scripted sprites are not supported yet.")
+
+        return sprite
 
     def _reset_player(self, start_location: str, map: arcade.TileMap):
         start = [
@@ -242,7 +283,7 @@ class Model:
                 int(hitbox_center.x + self.player_sprite.center_x),
                 int(hitbox_center.y + self.player_sprite.center_y),
             ),
-            self.scripted_objects_spritelist,
+            self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
 
         if not objects:
