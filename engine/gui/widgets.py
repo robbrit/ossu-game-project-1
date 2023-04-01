@@ -105,47 +105,41 @@ class GUISpec(NamedTuple):
     def validate(self) -> None:
         """Validates the GUISpec."""
 
-        # Validation errors for images have not been tested
-        if not self.assets:
-            raise ValidationError("Must have at least one asset")
         if not self.buttons and not self.images:
             raise ValidationError("Must have at least one button or image")
 
-        duplicate_assets = [
-            asset for asset, count in collections.Counter(self.assets).items() if count > 1
-        ]
-        if len(duplicate_assets) > 0:
-            raise ValidationError(f"Duplicate asset name(s): {duplicate_assets}")
+        asset_names = collections.Counter([a.name for a in self.assets])
+        duplicate_assets = [asset for asset, count in asset_names.items() if count > 1]
+        if duplicate_assets:
+            raise ValidationError(f"Duplicate asset name: {duplicate_assets}.")
 
-        if len(set(self.assets)) != len(set(self.buttons)) + len(set(self.images)):
-            # Can be general with the commented error below or
-            # more detailed by iterating through the assets.
-            # raise ValidationError(
-            #     "Number of assets does not match the number of buttons and/or images."
-            # )
-            for asset in self.assets:
-                if self.buttons and asset.name not in [
-                    a.selected_image_asset for a in self.buttons
-                ]:
-                    raise ValidationError(f"Asset name not in buttons: {asset.name}")
-                if self.buttons and asset.name not in [
-                    a.unselected_image_asset for a in self.buttons
-                ]:
-                    raise ValidationError(f"Asset name not in buttons: {asset.name}")
-                if self.images and asset.name not in [
-                    a.image_asset for a in self.images
-                ]:
-                    raise ValidationError(f"Asset name not in images: {asset.name}")
+        button_names = collections.Counter([b.name for b in self.buttons])
+        duplicate_buttons = [name for name, count in button_names.items() if count > 1]
+        if duplicate_buttons:
+            raise ValidationError(f"Duplicate button name: {duplicate_buttons}")
+
+        image_names = collections.Counter([i.image_asset for i in self.images])
+        duplicate_images = [image for image, count in image_names.items() if count > 1]
+        if duplicate_images:
+            raise ValidationError(f"Duplicate image name(s): {duplicate_images}")
+
+        for b_names in button_names.items():
+            if b_names[0] not in list(asset_names.elements()):
+                raise ValidationError(f"Button {b_names[0]} not in assets")
+
+        for i_names in image_names.items():
+            if i_names[0] not in list(asset_names.elements()):
+                raise ValidationError(f"Image {i_names[0]} not in assets")
+
+        # for name in asset_names.elements():
+        #     if name not in [b for b in button_names.elements()]:
+        #         raise ValidationError(f"Asset {name} not in buttons")
+        #     if name not in [i for i in self.images]:
+        #         raise ValidationError(f"Asset {name} not in images")
 
         for a in self.assets:
             if not pathlib.Path(a.path).is_file():
                 raise ValidationError(f"Asset path does not exist: {a.path}")
-
-        duplicate_buttons = [
-            button for button, count in collections.Counter(self.buttons).items() if count > 1
-        ]
-        if len(duplicate_buttons) > 0:
-            raise ValidationError(f"Duplicate button name(s): {duplicate_buttons}")
 
         for button in self.buttons:
             if button.center[0] < 0 or button.center[0] > core.SCREEN_WIDTH:
@@ -154,12 +148,15 @@ class GUISpec(NamedTuple):
                 )
             if button.center[1] < 0 or button.center[1] > core.SCREEN_HEIGHT:
                 raise ValidationError(f"Button {button.name} is off screen vertically")
+            for direction in ["left", "right", "up", "down"]:
+                name = getattr(button, direction)
+                if name and name not in button_names:
+                    raise ValidationError(
+                        f"Button {name} referenced by {direction} not in buttons"
+                    )
 
-        duplicate_images = [
-            image for image, count in collections.Counter(self.images).items() if count > 1
-        ]
-        if len(duplicate_images) > 0:
-            raise ValidationError(f"Duplicate image name(s): {duplicate_images}")
+        if self.initial_selected_button not in self.buttons:
+            raise ValidationError("Initial selected button not in buttons")
 
         for image in self.images:
             if image.center[0] < 0 or image.center[0] > core.SCREEN_WIDTH:
