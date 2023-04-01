@@ -1,5 +1,8 @@
 import json
-from typing import Optional
+from typing import (
+    Optional,
+    Tuple,
+)
 
 import arcade
 import arcade.tilemap
@@ -7,6 +10,8 @@ import arcade.tilemap
 from engine import (
     game_state,
     model,
+    scripts,
+    spec,
 )
 from engine.gui import game_state as gui_game_state
 from engine.ingame import game_state as ingame_state
@@ -38,9 +43,10 @@ class Core(arcade.Window):
     ingame_state: Optional[ingame_state.InGameState]
 
     model: Optional[model.Model]
-    initial_gui: game_state.GUI
+    initial_gui: scripts.GUI
+    spec: spec.GameSpec
 
-    def __init__(self, initial_gui: game_state.GUI):
+    def __init__(self, initial_gui: scripts.GUI, game_spec: spec.GameSpec):
         """Constructor.
 
         Args:
@@ -52,6 +58,7 @@ class Core(arcade.Window):
             SCREEN_TITLE,
         )
 
+        self.spec = game_spec
         self.model = None
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
@@ -64,11 +71,7 @@ class Core(arcade.Window):
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
-        with open("assets/world-spec.json") as infile:
-            data = json.loads(infile.read())
-            spec = model.WorldSpec.create(data)
-
-        self.model = model.Model(self, spec)
+        self.model = model.Model(self, self.spec)
         self.ingame_state = ingame_state.InGameState(
             self.model,
             (self.width, self.height),
@@ -80,10 +83,21 @@ class Core(arcade.Window):
         """Changes the region of the game."""
         self.model.load_region(name, start_location)
 
-    def show_gui(self, gui: game_state.GUI) -> None:
+    def show_gui(self, gui: scripts.GUI) -> None:
         """Switches to the "GUI" state, and displays a certain GUI."""
         self.gui_state.set_gui(gui)
         self.game_state = self.gui_state
+
+    def create_sprite(
+        self,
+        spec_name: str,
+        name: str,
+        start_location: Tuple[int, int],
+        script: Optional[scripts.Script],
+    ) -> None:
+        """Creates a sprite."""
+        spec = self.spec.sprites[spec_name]
+        self.model.create_sprite(spec, name, start_location, script)
 
     def run(self):
         """Runs the game."""

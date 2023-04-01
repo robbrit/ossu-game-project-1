@@ -5,7 +5,7 @@ from typing import (
 
 import arcade
 
-from engine import game_state
+from engine import scripts
 
 
 class GuiView:
@@ -13,10 +13,10 @@ class GuiView:
     Manages rendering GUIs.
     """
 
-    gui: game_state.GUI
+    gui: scripts.GUI
     sprites: arcade.SpriteList
 
-    def __init__(self, initial_gui: game_state.GUI):
+    def __init__(self, initial_gui: scripts.GUI):
         self.gui = initial_gui
         self.sprites = arcade.SpriteList()
         self._load_sprites()
@@ -34,7 +34,7 @@ class GuiView:
     def to_world_coords(self, screen_x: int, screen_y: int) -> Tuple[int, int]:
         return screen_x, screen_y
 
-    def set_gui(self, gui: game_state.GUI) -> None:
+    def set_gui(self, gui: scripts.GUI) -> None:
         self.gui = gui
 
     def _load_sprites(self) -> None:

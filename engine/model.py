@@ -1,9 +1,10 @@
 import numbers
 from typing import (
-    Any,
     Dict,
+    List,
     NamedTuple,
     Optional,
+    Tuple,
 )
 
 import arcade
@@ -13,6 +14,7 @@ from pyglet import math as pmath
 from engine import (
     game_state,
     scripts,
+    spec,
 )
 from engine.ingame import game_sprite
 
@@ -25,31 +27,16 @@ PLAYER_MOVEMENT_SPEED = 5
 HITBOX_DISTANCE = 32
 
 KEY_POINTS = "Key Points"
-ACTIVATEABLE_OBJECTS = "Activateable Objects"
+SCRIPTED_OBJECTS = "Scripted Objects"
+NPCS = "NPCs"
 
 
-class RegionSpec(NamedTuple):
-    """Specifies the details of a particular region."""
+class ScriptedObject(NamedTuple):
+    """Ties a world object to a script."""
 
-    tiled_mapfile: str
-    wall_layer: str = "Wall Tiles"
-
-
-class WorldSpec(NamedTuple):
-    """Specifies the details for the entire world."""
-
-    regions: Dict[str, RegionSpec]
-    initial_region: str
-
-    @classmethod
-    def create(cls, data: Dict[str, Any]) -> "WorldSpec":
-        return WorldSpec(
-            regions={
-                region_name: RegionSpec(**r)
-                for region_name, r in data["regions"].items()
-            },
-            initial_region=data["initial_region"],
-        )
+    sprite: arcade.Sprite
+    owner: scripts.ScriptOwner
+    script: scripts.Script
 
 
 class Model:
@@ -58,11 +45,13 @@ class Model:
     of the world.
     """
 
-    api: game_state.GameAPI
+    api: scripts.GameAPI
 
-    player_sprite: Optional[game_sprite.GameSprite]
+    player_sprite: game_sprite.GameSprite
     scene: Optional[arcade.Scene]
     physics_engine: Optional[arcade.PhysicsEngineSimple]
+
+    sec_passed: float
 
     # The tile map is created by the Tiled tool and loaded by our system. Most of the
     # game data will be stored there.
@@ -70,29 +59,32 @@ class Model:
     # * A tile layer called "Wall Tiles" containing all walls.
     #
     # They may have:
-    # * An object layer called "Activateable Objects". All objects of this type must:
-    #   * Have a custom property called "on_activate" that binds to a function that
-    #     accepts a GameAPI object.
-    #   * Be rectangular.
+    # * An object layer called "Scripted Objects". These objects can be scripted, which
+    #   means the game can attach custom functionality to them. See engine/scripts.py
+    #   for more details.
     #
     # The initial tile map must have:
     # * An object layer called "Key Points", containing an object named "Start".
     tilemaps: Dict[str, arcade.tilemap.TileMap]
     active_region: str
-    activateable_objects: Optional[arcade.SpriteList]
-    spec: str
+    scripted_objects: Dict[str, ScriptedObject]
 
-    def __init__(self, api: game_state.GameAPI, spec: WorldSpec):
+    spec: spec.GameSpec
+
+    def __init__(
+        self,
+        api: scripts.GameAPI,
+        game_spec: spec.GameSpec,
+    ):
         self.api = api
-        self.spec = spec
+        self.spec = game_spec
+        self.sec_passed = 0.0
 
-        self.player_sprite = game_sprite.GameSprite(
-            "assets/sprites/player/spec.json",
-        )
+        self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
 
         self.tilemaps = {}
 
-        for region_name, region in spec.regions.items():
+        for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
                 region.tiled_mapfile,
                 TILE_SCALING,
@@ -103,25 +95,17 @@ class Model:
                 },
             )
 
-        self.load_region(spec.initial_region, "Start")
+        self.load_region(game_spec.world.initial_region, "Start")
 
     def load_region(self, region_name: str, start_location: str) -> None:
         """Loads a region by name."""
         self.active_region = region_name
         tilemap = self.tilemaps[region_name]
-        region_spec = self.spec.regions[region_name]
-
-        self.activateable_objects = arcade.SpriteList(
-            use_spatial_hash=True,
-        )
-        for obj in tilemap.object_lists.get(ACTIVATEABLE_OBJECTS, []):
-            self.activateable_objects.append(self._create_object_sprite(obj, tilemap))
+        region_spec = self.spec.world.regions[region_name]
 
         self.scene = arcade.Scene.from_tilemap(tilemap)
-        self.scene.add_sprite_list(
-            name=ACTIVATEABLE_OBJECTS,
-            sprite_list=self.activateable_objects,
-        )
+        self._load_scripted_objects(tilemap)
+
         self.scene.add_sprite("Player", self.player_sprite)
 
         self._reset_player(start_location, tilemap)
@@ -130,6 +114,61 @@ class Model:
             self.player_sprite,
             tilemap.sprite_lists[region_spec.wall_layer],
         )
+
+    def _load_scripted_objects(self, tilemap: arcade.TileMap) -> None:
+        self.scripted_objects = {}
+        self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
+
+        sprites = []
+
+        for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
+            sprite = self._create_object_sprite(obj, tilemap)
+            sprites.append(sprite)
+            self.scripted_objects[obj.name] = ScriptedObject(
+                sprite=sprite,
+                owner=obj,
+                script=self._load_object_script(obj),
+            )
+
+        for obj in tilemap.object_lists.get(NPCS, []):
+            sprite_spec = self.spec.sprites[obj.properties["spec"]]
+            script = None
+            if "script" in obj.properties:
+                script_cls = scripts.load_script_class(obj.properties["script"])
+                script = script_cls()
+                script.set_api(self.api)
+
+            sprite = self.create_sprite(sprite_spec, obj.name, obj.shape, script)
+
+        self.scene.get_sprite_list(SCRIPTED_OBJECTS).extend(sprites)
+
+    def create_sprite(
+        self,
+        spec: spec.GameSpriteSpec,
+        name: str,
+        start_location: Tuple[int, int],
+        script: Optional[scripts.Script],
+    ) -> arcade.Sprite:
+        """Adds a sprite to the model."""
+        sprite = game_sprite.GameSprite(spec)
+        sprite.properties = {
+            "name": name,
+        }
+        sprite.center_x = start_location[0]
+        sprite.center_y = start_location[1]
+
+        if script:
+            self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
+            self.scripted_objects[name] = ScriptedObject(
+                sprite=sprite,
+                owner=sprite,
+                script=script,
+            )
+        else:
+            # TODO(rob): Handle non-scripted sprites.
+            raise NotImplemented("Non-scripted sprites are not supported yet.")
+
+        return sprite
 
     def _reset_player(self, start_location: str, map: arcade.TileMap):
         start = [
@@ -187,12 +226,28 @@ class Model:
             hit_box_algorithm="Simple",
         )
         sprite.set_hit_box(hit_box)
-        sprite.properties = obj.properties
+        sprite.properties = {
+            "name": obj.name,
+        }
         return sprite
+
+    def _load_object_script(self, obj: arcade.TiledObject) -> scripts.Script:
+        obj: scripts.Script
+        if "script" in obj.properties:
+            cls = scripts.load_script_class(obj.properties["script"])
+            obj = cls()
+        else:
+            obj = scripts.ObjectScript(
+                on_activate=obj.properties.get("on_activate"),
+            )
+
+        obj.set_api(self.api)
+        return obj
 
     def on_update(self, delta_time: int) -> None:
         self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
+        self.sec_passed += delta_time
 
     def set_player_speed(
         self,
@@ -228,19 +283,16 @@ class Model:
                 int(hitbox_center.x + self.player_sprite.center_x),
                 int(hitbox_center.y + self.player_sprite.center_y),
             ),
-            self.activateable_objects,
+            self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
 
         if not objects:
             return
 
         for obj in objects:
-            callable = obj.properties.get("on_activate")
-
-            if not callable:
-                continue
-
-            scripts.load_callable(callable)(self.api)
+            name = obj.properties["name"]
+            obj = self.scripted_objects[name]
+            obj.script.on_activate(obj.owner, self.player_sprite)
 
     @property
     def width(self) -> int:
@@ -261,3 +313,8 @@ class Model:
     def tile_height(self) -> int:
         """Gets the tile height of the map in pixels."""
         return self.tilemaps[self.active_region].tile_height
+
+    @property
+    def game_time_sec(self) -> float:
+        '''Gets the in-game time in seconds.'''
+        return self.sec_passed

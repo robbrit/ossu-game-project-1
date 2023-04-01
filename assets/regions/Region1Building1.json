@@ -28,7 +28,7 @@
          "width":20,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -54,7 +54,7 @@
          "width":20,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":3,
@@ -77,11 +77,11 @@
          "visible":true,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":4,
-         "name":"Activateable Objects",
+         "name":"Scripted Objects",
          "objects":[
                 {
                  "class":"",
