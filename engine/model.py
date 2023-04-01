@@ -51,7 +51,7 @@ class Model:
     scene: Optional[arcade.Scene]
     physics_engine: Optional[arcade.PhysicsEngineSimple]
 
-    time: int
+    sec_passed: float
 
     # The tile map is created by the Tiled tool and loaded by our system. Most of the
     # game data will be stored there.
@@ -78,7 +78,7 @@ class Model:
     ):
         self.api = api
         self.spec = game_spec
-        self.time = 0
+        self.sec_passed = 0.0
 
         self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
 
@@ -247,7 +247,8 @@ class Model:
     def on_update(self, delta_time: int) -> None:
         self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
-        self.time += delta_time
+        self.sec_passed += delta_time
+        print(self.game_time_sec)
 
     def set_player_speed(
         self,
@@ -315,6 +316,6 @@ class Model:
         return self.tilemaps[self.active_region].tile_height
 
     @property
-    def game_time(self) -> int:
+    def game_time_sec(self) -> float:
         '''Gets the in-game time in seconds.'''
-        return int(self.time)
+        return self.sec_passed
