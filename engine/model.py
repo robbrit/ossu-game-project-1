@@ -248,7 +248,6 @@ class Model:
         self.player_sprite.on_update(delta_time)
         self.physics_engine.update()
         self.sec_passed += delta_time
-        print(self.game_time_sec)
 
     def set_player_speed(
         self,
