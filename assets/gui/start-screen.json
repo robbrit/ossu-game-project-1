@@ -3,16 +3,34 @@
         {
             "name": "start-button",
             "path": "assets/gui/start-button.png"
+        },
+        {
+            "name": "start-selected-button",
+            "path": "assets/gui/start-selected-button.png"
+        },
+        {
+            "name": "load-button",
+            "path": "assets/gui/load-button.png"
         }
     ],
     "buttons": [
         {
-            "selected_image_asset": "start-button",
+            "selected_image_asset": "start-selected-button",
             "unselected_image_asset": "start-button",
-            "name": "start-button",
+            "name": "start-selected-button",
+            "down": "load-button",
             "center": [500, 325],
             "action": "game.gui.start.start_game"
+        },
+        {
+            "selected_image_asset": "load-button",
+            "unselected_image_asset": "load-button",
+            "name": "load-button",
+            "up": "start-selected-button",
+            "center": [500, 215],
+            "action": "game.gui.start.start_game"
         }
+
     ],
-    "initial_selected_button": "start-button"
+    "initial_selected_button": "start-selected-button"
 }
