@@ -86,10 +86,14 @@ class GUISpec(NamedTuple):
         selected_button_name = spec.get("initial_selected_button")
         selected_button = None
         if selected_button_name is not None:
-            selected_button = next(
-                (b for b in buttons if b.name == selected_button_name),
-                None,
-            )
+            try:
+                selected_button = next(
+                    (b for b in buttons if b.name == selected_button_name)
+                )
+            except StopIteration as exc:
+                raise ValidationError(
+                    f"Initial select button {selected_button_name} does not exist."
+                ) from exc
 
         gui_spec = GUISpec(
             assets=[Asset(**a) for a in spec.get("assets", [])],
@@ -99,7 +103,7 @@ class GUISpec(NamedTuple):
             initial_selected_button=selected_button,
         )
 
-        cls.validate(gui_spec)
+        gui_spec.validate()
         return gui_spec
 
     def validate(self) -> None:
@@ -123,19 +127,15 @@ class GUISpec(NamedTuple):
         if duplicate_images:
             raise ValidationError(f"Duplicate image name(s): {duplicate_images}")
 
-        for b_names in button_names.items():
-            if b_names[0] not in list(asset_names.elements()):
-                raise ValidationError(f"Button {b_names[0]} not in assets")
+        for button in self.buttons:
+            if button.selected_image_asset not in [a.name for a in self.assets]:
+                raise ValidationError(
+                    f"Button {button.selected_image_asset} not in assets"
+                )
 
-        for i_names in image_names.items():
-            if i_names[0] not in list(asset_names.elements()):
-                raise ValidationError(f"Image {i_names[0]} not in assets")
-
-        # for name in asset_names.elements():
-        #     if name not in [b for b in button_names.elements()]:
-        #         raise ValidationError(f"Asset {name} not in buttons")
-        #     if name not in [i for i in self.images]:
-        #         raise ValidationError(f"Asset {name} not in images")
+        for image in self.images:
+            if image.image_asset not in [i.name for i in self.assets]:
+                raise ValidationError(f"Image {image.image_asset} not in assets")
 
         for a in self.assets:
             if not pathlib.Path(a.path).is_file():
@@ -154,9 +154,6 @@ class GUISpec(NamedTuple):
                     raise ValidationError(
                         f"Button {name} referenced by {direction} not in buttons"
                     )
-
-        if self.initial_selected_button not in self.buttons:
-            raise ValidationError("Initial selected button not in buttons")
 
         for image in self.images:
             if image.center[0] < 0 or image.center[0] > core.SCREEN_WIDTH:
