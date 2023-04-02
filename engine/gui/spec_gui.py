@@ -1,5 +1,9 @@
-import arcade
+from typing import Iterable
 
+import arcade
+from arcade import gui
+
+from engine import scripts
 from engine.gui import widgets
 
 
@@ -15,6 +19,12 @@ class SpecGUI:
 
     def draw(self) -> None:
         self.sprites.draw()
+
+    def set_api(self, api: scripts.GameAPI):
+        pass
+
+    def set_manager(self, manager: gui.UIManager):
+        pass
 
     def _load_sprites(self) -> None:
         assets = {name: path for name, path in self.spec.assets}

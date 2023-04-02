@@ -316,5 +316,5 @@ class Model:
 
     @property
     def game_time_sec(self) -> float:
-        '''Gets the in-game time in seconds.'''
+        """Gets the in-game time in seconds."""
         return self.sec_passed

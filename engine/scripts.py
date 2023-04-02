@@ -3,10 +3,13 @@ import importlib
 from typing import (
     Any,
     Callable,
+    Iterable,
     Optional,
     Protocol,
     Tuple,
 )
+
+from arcade import gui
 
 import engine
 
@@ -16,6 +19,14 @@ class GUI(Protocol):
 
     def draw(self) -> None:
         """Draws the GUI to the screen."""
+        ...
+
+    def set_api(self, api: "GameAPI") -> None:
+        """Sets the API for this GUI."""
+        ...
+
+    def set_manager(self, manager: gui.UIManager) -> None:
+        """Sets the UI manager for this GUI."""
         ...
 
 
