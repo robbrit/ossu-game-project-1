@@ -14,9 +14,8 @@ import engine
 class GUI(Protocol):
     """A GUI is a set of buttons and images that the user interacts with."""
 
-    @property
-    def spec(self) -> "engine.gui.widgets.GUISpec":
-        """A declarative form of the GUI, saying how it should be rendered."""
+    def draw(self) -> None:
+        """Draws the GUI to the screen."""
         ...
 
 

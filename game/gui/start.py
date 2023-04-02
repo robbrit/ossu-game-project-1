@@ -1,18 +1,20 @@
 import json
 
 from engine import scripts
-from engine.gui import widgets
+from engine.gui import (
+    spec_gui,
+    widgets,
+)
 
 
-class StartScreen:
+class StartScreen(spec_gui.SpecGUI):
     """Represents the start screen of the game."""
-
-    spec: widgets.GUISpec
 
     def __init__(self):
         with open("assets/gui/start-screen.json") as f:
             data = json.loads(f.read())
-            self.spec = widgets.GUISpec.create(data)
+            spec = widgets.GUISpec.create(data)
+            super().__init__(spec)
 
 
 def start_game(api: scripts.GameAPI) -> None:
