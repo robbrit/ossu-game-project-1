@@ -27,7 +27,7 @@ class GuiState:
         self.view = view.GuiView(initial_gui)
 
     def setup(self, api: scripts.GameAPI):
-        self.view.setup()
+        self.view.setup(api)
         self.controller.setup(api)
         self.api = api
 
