@@ -15,6 +15,10 @@
         {
             "name": "load-selected-button",
             "path": "assets/gui/load-selected-button.png"
+        },
+        {
+            "name": "ossu-logo",
+            "path": "assets/gui/ossu.png"
         }
     ],
     "buttons": [
@@ -35,6 +39,12 @@
             "action": "game.gui.start.start_game"
         }
 
+    ],
+    "images": [
+        {
+            "image_asset": "ossu-logo",
+            "center": [500, 500]
+        }
     ],
     "initial_selected_button": "start-button"
 }
