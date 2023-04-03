@@ -246,8 +246,30 @@ class Model:
 
     def on_update(self, delta_time: int) -> None:
         self.player_sprite.on_update(delta_time)
+        self.prevent_oob()
         self.physics_engine.update()
         self.sec_passed += delta_time
+
+    def prevent_oob(self) -> None:
+        """Prevents the player from going out-of-bounds."""
+        map_width = self.width * self.tile_width
+        map_height = self.height * self.tile_height
+
+        vx = self.player_sprite.change_x
+        vy = self.player_sprite.change_y
+
+        new_x = self.player_sprite.center_x + vx
+        new_y = self.player_sprite.center_y + vy
+        new_vx = None
+        new_vy = None
+
+        if (new_x <= 0 and vx < 0) or (new_x >= map_width and vx > 0):
+            new_vx = 0
+
+        if (new_y <= 0 and vy < 0) or (new_y >= map_height and vy > 0):
+            new_vy = 0
+
+        self.set_player_speed(new_vx, new_vy)
 
     def set_player_speed(
         self,
@@ -316,5 +338,5 @@ class Model:
 
     @property
     def game_time_sec(self) -> float:
-        '''Gets the in-game time in seconds.'''
+        """Gets the in-game time in seconds."""
         return self.sec_passed
