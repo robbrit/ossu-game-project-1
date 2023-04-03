@@ -27,7 +27,7 @@ class SpecGUI:
         pass
 
     def _load_sprites(self) -> None:
-        assets = {name: path for name, path in self.spec.assets}
+        assets = dict(self.spec.assets)
 
         self.sprites = arcade.SpriteList()
 
@@ -38,4 +38,8 @@ class SpecGUI:
             button.center_y = button_spec.center[1]
             self.sprites.append(button)
 
-        # TODO(rob): Also handle images.
+        for image_spec in self.spec.images:
+            image = arcade.Sprite(assets[image_spec.image_asset])
+            image.center_x = image_spec.center[0]
+            image.center_y = image_spec.center[1]
+            self.sprites.append(image)
