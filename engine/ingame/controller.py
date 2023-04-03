@@ -53,16 +53,28 @@ class InGameController:
             self.model.activate()
 
     def on_update(self, delta_time: int) -> None:
+        """
+        Updates player speed based on keypress,
+        and prevents player going out-of-bounds.
+        """
         vx, vy = 0, 0
 
-        if self._up_key_pressed():
+        player_sprite = self.model.player_sprite
+        map_width = self.model.width * self.model.tile_width
+        map_height = self.model.height * self.model.tile_height
+
+        if (self._up_key_pressed() and not
+        (player_sprite.top >= map_height)):
             vy += 1
-        if self._down_key_pressed():
+        if (self._down_key_pressed() and not
+        (player_sprite.bottom <= 0)):
             vy -= 1
 
-        if self._left_key_pressed():
+        if (self._left_key_pressed() and not
+        (player_sprite.left <= 0)):
             vx -= 1
-        if self._right_key_pressed():
+        if (self._right_key_pressed() and not
+        (player_sprite.right >= map_width)):
             vx += 1
 
         self.model.set_player_speed(vx=vx, vy=vy)
