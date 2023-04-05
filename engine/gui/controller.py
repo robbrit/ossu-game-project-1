@@ -49,8 +49,6 @@ class GuiController:
             if self.selected_button.down is not None:
                 self._change_current_button(self.selected_button.down)
 
-        # TODO(rob): Handle activate, cancel, and direction keys.
-
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
         pass
 

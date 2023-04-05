@@ -27,7 +27,7 @@
             "unselected_image_asset": "start-button",
             "name": "start-button",
             "down": "load-button",
-            "center": [500, 325],
+            "center": [400, 290],
             "action": "game.gui.start.start_game"
         },
         {
@@ -35,7 +35,7 @@
             "unselected_image_asset": "load-button",
             "name": "load-button",
             "up": "start-button",
-            "center": [500, 215],
+            "center": [400, 180],
             "action": "game.gui.start.start_game"
         }
 
