@@ -4,9 +4,20 @@ jobs:
   pylint:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+
+      - uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+        with:
+          requirement_files: requirements.txt
+
+      - uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - run: pip install -r requirements.txt
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
       - name: Run lint
         run: |
-         source bin/activate
          make lint
