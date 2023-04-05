@@ -26,13 +26,17 @@ class GuiController:
         self.selected_button = self.gui.spec.initial_selected_button
 
     def setup(self, api: scripts.GameAPI) -> None:
+        """Sets up the controller."""
         self.api = api
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
-        # Don't really need to do anything here.
-        pass
+        """Handles key presses."""
+        # pylint: disable=unused-argument
 
     def on_key_release(self, symbol: int, modifiers: int) -> None:
+        """Handles key releases."""
+        # py lint: disable=unused-argument
+
         if symbol == arcade.key.ENTER:
             self._activate_current_button()
         elif symbol == arcade.key.RIGHT:
@@ -50,7 +54,8 @@ class GuiController:
                 self._change_current_button(self.selected_button.down)
 
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
-        pass
+        """Handles mouse motion."""
+        # pylint: disable=unused-argument
 
     def on_mouse_release(
         self,
@@ -59,10 +64,12 @@ class GuiController:
         button: int,
         modifiers: int,
     ) -> None:
-        pass
+        """Handles mouse button release."""
+        # pylint: disable=unused-argument
 
-    def on_update(self, delta_time: int) -> None:
-        pass
+    def on_update(self, delta_time: float) -> None:
+        """Handles updates."""
+        # pylint: disable=unused-argument
 
     def _activate_current_button(self):
         if self.selected_button is None:

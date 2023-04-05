@@ -9,7 +9,7 @@ from typing import (
     Tuple,
 )
 
-from engine import scripts, core
+from engine import scripts
 
 
 class Asset(NamedTuple):
@@ -36,6 +36,7 @@ class Button(NamedTuple):
 
     @classmethod
     def create(cls, spec: Dict[str, Any]) -> "Button":
+        """Constructs a new Button from a dict."""
         return Button(
             selected_image_asset=spec["selected_image_asset"],
             unselected_image_asset=spec["unselected_image_asset"],
@@ -75,6 +76,7 @@ class GUISpec(NamedTuple):
     def create(
         cls,
         spec: Dict[str, Any],
+        dimensions: Tuple[int, int],
     ) -> "GUISpec":
         """Constructs a new GUISpec from raw dict data."""
         cancel_action = None
@@ -103,10 +105,10 @@ class GUISpec(NamedTuple):
             initial_selected_button=selected_button,
         )
 
-        gui_spec.validate()
+        gui_spec.validate(dimensions)
         return gui_spec
 
-    def validate(self) -> None:
+    def validate(self, dimensions: Tuple[int, int]) -> None:
         """Validates the GUISpec."""
 
         if not self.buttons and not self.images:
@@ -137,16 +139,18 @@ class GUISpec(NamedTuple):
             if image.image_asset not in [i.name for i in self.assets]:
                 raise ValidationError(f"Image {image.image_asset} not in assets")
 
-        for a in self.assets:
-            if not pathlib.Path(a.path).is_file():
-                raise ValidationError(f"Asset path does not exist: {a.path}")
+        for asset in self.assets:
+            if not pathlib.Path(asset.path).is_file():
+                raise ValidationError(f"Asset path does not exist: {asset.path}")
+
+        screen_width, screen_height = dimensions
 
         for button in self.buttons:
-            if button.center[0] < 0 or button.center[0] > core.SCREEN_WIDTH:
+            if button.center[0] < 0 or button.center[0] > screen_width:
                 raise ValidationError(
                     f"Button {button.name} is off screen horizontally"
                 )
-            if button.center[1] < 0 or button.center[1] > core.SCREEN_HEIGHT:
+            if button.center[1] < 0 or button.center[1] > screen_height:
                 raise ValidationError(f"Button {button.name} is off screen vertically")
             for direction in ["left", "right", "up", "down"]:
                 name = getattr(button, direction)
@@ -156,11 +160,11 @@ class GUISpec(NamedTuple):
                     )
 
         for image in self.images:
-            if image.center[0] < 0 or image.center[0] > core.SCREEN_WIDTH:
+            if image.center[0] < 0 or image.center[0] > screen_width:
                 raise ValidationError(
                     f"Image {image.image_asset} is off screen horizontally"
                 )
-            if image.center[1] < 0 or image.center[1] > core.SCREEN_HEIGHT:
+            if image.center[1] < 0 or image.center[1] > screen_height:
                 raise ValidationError(
                     f"Image {image.image_asset} is off screen vertically"
                 )

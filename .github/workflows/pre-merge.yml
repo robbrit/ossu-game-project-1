@@ -1,0 +1,12 @@
+name: Premerge Checks
+on: [push]
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+      - name: Run lint
+        run: |
+         source bin/activate
+         make lint

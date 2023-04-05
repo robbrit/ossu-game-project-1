@@ -16,29 +16,35 @@ class InGameController:
     the game and the user.
     """
 
-    model: model.Model
-    view: view.View
-    keys: Dict[int, bool]
+    _model: model.Model
+    _view: view.View
+    _keys: Dict[int, bool]
 
-    def __init__(self, model: model.Model, view: view.View):
-        self.model = model
-        self.view = view
+    def __init__(self, _model: model.Model, _view: view.View):
+        self._model = _model
+        self._view = _view
 
-        self.keys = {}
+        self._keys = {}
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
-        self.keys[symbol] = True
+        """Handles when a key is pressed."""
+        # pylint: disable=unused-argument
+        self._keys[symbol] = True
 
     def on_key_release(self, symbol: int, modifiers: int) -> None:
-        self.keys[symbol] = False
+        """Handles when a key is released."""
+        # pylint: disable=unused-argument
+        self._keys[symbol] = False
 
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
-        wx, wy = self.view.to_world_coords(screen_x, screen_y)
+        """Handles when the mouse is moved."""
+        # pylint: disable=unused-argument
+        world_x, world_y = self._view.to_world_coords(screen_x, screen_y)
 
-        player_dx = wx - self.model.player_sprite.center_x
-        player_dy = wy - self.model.player_sprite.center_y
+        player_dx = world_x - self._model.player_sprite.center_x
+        player_dy = world_y - self._model.player_sprite.center_y
 
-        self.model.set_player_facing(player_dx, player_dy)
+        self._model.set_player_facing(player_dx, player_dy)
 
     def on_mouse_release(
         self,
@@ -48,11 +54,15 @@ class InGameController:
         modifiers: int,
     ) -> None:
         """Handles when the user releases a mouse button."""
+        # pylint: disable=unused-argument
+
         if button == arcade.MOUSE_BUTTON_RIGHT:
             # We activate when the right mouse button is hit.
-            self.model.activate()
+            self._model.activate()
 
-    def on_update(self, delta_time: int) -> None:
+    def on_update(self, delta_time: float) -> None:
+        """Updates the model."""
+        # pylint: disable=unused-argument
         vx, vy = 0, 0
 
         if self._up_key_pressed():
@@ -65,16 +75,16 @@ class InGameController:
         if self._right_key_pressed():
             vx += 1
 
-        self.model.set_player_speed(vx=vx, vy=vy)
+        self._model.set_player_speed(vx=vx, vy=vy)
 
     def _up_key_pressed(self) -> bool:
-        return self.keys.get(arcade.key.UP) or self.keys.get(arcade.key.W)
+        return self._keys.get(arcade.key.UP) or self._keys.get(arcade.key.W)
 
     def _down_key_pressed(self) -> bool:
-        return self.keys.get(arcade.key.DOWN) or self.keys.get(arcade.key.S)
+        return self._keys.get(arcade.key.DOWN) or self._keys.get(arcade.key.S)
 
     def _left_key_pressed(self) -> bool:
-        return self.keys.get(arcade.key.LEFT) or self.keys.get(arcade.key.A)
+        return self._keys.get(arcade.key.LEFT) or self._keys.get(arcade.key.A)
 
     def _right_key_pressed(self) -> bool:
-        return self.keys.get(arcade.key.RIGHT) or self.keys.get(arcade.key.D)
+        return self._keys.get(arcade.key.RIGHT) or self._keys.get(arcade.key.D)

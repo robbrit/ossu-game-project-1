@@ -16,30 +16,34 @@ class InGameView:
 
     width: int
     height: int
-    model: model.Model
+    game_model: model.Model
     camera: Optional[arcade.Camera]
 
-    def __init__(self, model: model.Model, viewport_size: Tuple[int, int]):
+    def __init__(self, game_model: model.Model, viewport_size: Tuple[int, int]):
         self.width = 0
         self.height = 0
-        self.model = model
+        self.game_model = game_model
         self.camera = None
 
         self.viewport_size = viewport_size
 
     def setup(self) -> None:
+        """Sets up the view."""
         self.camera = arcade.Camera(
             self.viewport_size[0],
             self.viewport_size[1],
         )
-        self.width = self.model.width * self.model.tile_width
-        self.height = self.model.height * self.model.tile_height
+        self.width = self.game_model.width * self.game_model.tile_width
+        self.height = self.game_model.height * self.game_model.tile_height
 
     def on_draw(self) -> None:
+        """Renders the view."""
         self.camera.use()
-        self.model.scene.draw()
+        self.game_model.scene.draw()
 
-    def on_update(self, delta_time: int) -> None:
+    def on_update(self, delta_time: float) -> None:
+        """Triggers an update for the view."""
+        # pylint: disable=unused-argument
         self._center_camera_to_player()
 
     def to_world_coords(self, screen_x: int, screen_y: int) -> Tuple[int, int]:
@@ -50,7 +54,7 @@ class InGameView:
         )
 
     def _center_camera_to_player(self) -> None:
-        player = self.model.player_sprite
+        player = self.game_model.player_sprite
 
         v_width = self.camera.viewport_width
         v_height = self.camera.viewport_height

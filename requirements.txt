@@ -1,8 +1,13 @@
 arcade==2.6.17
+astroid==2.15.2
 attrs==22.2.0
 black==23.1.0
 cffi==1.15.1
 click==8.1.3
+dill==0.3.6
+isort==5.12.0
+lazy-object-proxy==1.9.0
+mccabe==0.7.0
 mypy-extensions==1.0.0
 packaging==23.0
 pathspec==0.11.0
@@ -10,7 +15,10 @@ Pillow==9.3.0
 platformdirs==3.0.0
 pycparser==2.21
 pyglet==2.0.dev23
+pylint==2.17.2
 pymunk==6.4.0
 pytiled-parser==2.2.0
 tomli==2.0.1
+tomlkit==0.11.7
 typing_extensions==4.5.0
+wrapt==1.15.0
