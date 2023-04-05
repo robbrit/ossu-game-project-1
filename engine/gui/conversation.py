@@ -70,16 +70,18 @@ class GUI:
         self.manager = None
 
     def set_api(self, api: scripts.GameAPI) -> None:
+        """Sets the game API for this GUI."""
         self.api = api
 
     def set_manager(self, manager: gui.UIManager) -> None:
+        """Sets the UI manager for this GUI."""
         self.manager = manager
 
         self.manager.clear()
         self._reset_widgets()
 
     def draw(self) -> None:
-        pass
+        """Renders the conversation."""
 
     def _choice_picked(self, event: gui.UIOnClickEvent):
         index = event.source.index

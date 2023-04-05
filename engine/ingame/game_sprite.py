@@ -1,8 +1,6 @@
-import json
 import math
 from os import path
 from typing import (
-    Any,
     Dict,
     List,
     NamedTuple,
@@ -33,7 +31,7 @@ class GameSprite(arcade.Sprite):
     # Name of the animation that is currently selected.
     current_animation: Optional[str]
     # The spec for this sprite.
-    spec: spec.GameSpriteSpec
+    _spec: spec.GameSpriteSpec
 
     # How much time we we've spent in the current animation.
     time_index: float
@@ -47,7 +45,7 @@ class GameSprite(arcade.Sprite):
 
         self.set_facing(x=1.0, y=1.0)
 
-        self.spec = sprite_spec
+        self._spec = sprite_spec
         self.animations = {
             name: Animation(
                 spec=animation_spec,
@@ -88,18 +86,18 @@ class GameSprite(arcade.Sprite):
         self.time_index = 0.0
         self.texture = current_animation.textures[0]
 
-    def update_animation(self, dt: float) -> None:
+    def update_animation(self, delta_time: float = 1 / 60):
         """Progresses the animation by a certain time step."""
         current_animation = self.animations[self.current_animation]
         sequence_duration = (
             len(current_animation.textures) * current_animation.spec.frame_speed
         )
-        self.time_index = (self.time_index + dt) % sequence_duration
+        self.time_index = (self.time_index + delta_time) % sequence_duration
         current_frame = math.floor(self.time_index / current_animation.spec.frame_speed)
 
         self.texture = current_animation.textures[current_frame]
 
-    def on_update(self, dt: float) -> None:
+    def on_update(self, delta_time: float = 1 / 60):
         """Updates the sprite by a certain time step."""
         moving = self.change_x != 0 or self.change_y != 0
 
@@ -107,14 +105,13 @@ class GameSprite(arcade.Sprite):
         direction = self._get_direction()
 
         self.set_animation(f"{animation}-{direction}")
-        self.update_animation(dt)
+        self.update_animation(delta_time)
 
     def _get_direction(self) -> str:
         # TODO(rob): Should probably do an enum for facing direction.
-        fx, fy = self.facing_x, self.facing_y
-        afx, afy = abs(fx), abs(fy)
+        afx, afy = abs(self.facing_x), abs(self.facing_y)
 
         if afy > afx:
-            return "up" if fy > 0 else "down"
+            return "up" if self.facing_y > 0 else "down"
 
-        return "right" if fx > 0 else "left"
+        return "right" if self.facing_x > 0 else "left"

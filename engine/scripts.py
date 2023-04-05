@@ -11,23 +11,18 @@ from typing import (
 
 from arcade import gui
 
-import engine
-
 
 class GUI(Protocol):
     """A GUI is a set of buttons and images that the user interacts with."""
 
     def draw(self) -> None:
         """Draws the GUI to the screen."""
-        ...
 
     def set_api(self, api: "GameAPI") -> None:
         """Sets the API for this GUI."""
-        ...
 
     def set_manager(self, manager: gui.UIManager) -> None:
         """Sets the UI manager for this GUI."""
-        ...
 
 
 class GameAPI(Protocol):
@@ -35,15 +30,12 @@ class GameAPI(Protocol):
 
     def start_game(self) -> None:
         """Starts the game."""
-        ...
 
     def change_region(self, name: str, start_location: str) -> None:
         """Switches the region of the game."""
-        ...
 
-    def show_gui(self, gui: GUI) -> None:
+    def show_gui(self, _gui: GUI) -> None:
         """Shows a GUI."""
-        ...
 
     def create_sprite(
         self,
@@ -53,7 +45,6 @@ class GameAPI(Protocol):
         script: "Optional[Script]",
     ) -> None:
         """Creates a sprite."""
-        ...
 
 
 GameCallable = Callable[[GameAPI], None]
@@ -74,7 +65,7 @@ def load_callable(path: str) -> GameCallable:
     """
     obj = _load_symbol(path)
     if not callable(obj):
-        raise Exception(f"Object {path} is not callable.")
+        raise ValueError(f"Object {path} is not callable.")
     return obj
 
 
@@ -98,29 +89,23 @@ class Script:
 
         Can safely be ignored for scripts that don't need it.
         """
-        pass
 
     def on_start(self, owner: ScriptOwner) -> None:
         """Triggered when the owner is loaded for the first time."""
-        pass
 
     def on_tick(self, game_time: datetime.timedelta) -> None:
         """Triggered on every clock tick."""
-        pass
 
     def on_collide(self, owner: ScriptOwner, other: Entity) -> None:
         """Triggered when the owner collides with another entity."""
-        pass
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
         """Triggered when the player activates the owner.
 
         Note that this requires the owner to be rectangular."""
-        pass
 
     def on_event(self, event_name: str, data: Any) -> None:
         """Triggered when a custom event is fired."""
-        pass
 
 
 class SavesAPI:
@@ -132,6 +117,7 @@ class SavesAPI:
         self.api = None
 
     def set_api(self, api: GameAPI):
+        """Sets the API for this script."""
         self.api = api
 
 
@@ -182,6 +168,6 @@ def load_script_class(path: str) -> Script:
 
     cls = _load_symbol(path)
     if not issubclass(cls, Script):
-        raise Exception("A script class must inherit from Script.")
+        raise TypeError("A script class must inherit from Script.")
 
     return cls

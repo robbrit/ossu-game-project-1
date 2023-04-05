@@ -60,6 +60,8 @@ class WorldSpec:
 
 @dataclasses.dataclass
 class GameSpec:
+    """Contains all the configuration details for the entire game."""
+
     world: WorldSpec
     player_spec: GameSpriteSpec
     sprites: Dict[str, GameSpriteSpec]

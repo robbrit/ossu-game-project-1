@@ -2,7 +2,6 @@ import numbers
 from typing import (
     Any,
     Dict,
-    List,
     NamedTuple,
     Optional,
     Tuple,
@@ -13,7 +12,6 @@ import arcade.tilemap
 from pyglet import math as pmath
 
 from engine import (
-    game_state,
     scripts,
     spec,
 )
@@ -82,7 +80,7 @@ class Model:
     active_region: str
     scripted_objects: Dict[str, ScriptedObject]
 
-    spec: spec.GameSpec
+    _spec: spec.GameSpec
 
     def __init__(
         self,
@@ -90,7 +88,7 @@ class Model:
         game_spec: spec.GameSpec,
     ):
         self.api = api
-        self.spec = game_spec
+        self._spec = game_spec
         self.sec_passed = 0.0
 
         self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
@@ -114,7 +112,7 @@ class Model:
         """Loads a region by name."""
         self.active_region = region_name
         tilemap = self.tilemaps[region_name]
-        region_spec = self.spec.world.regions[region_name]
+        region_spec = self._spec.world.regions[region_name]
 
         self.scene = arcade.Scene.from_tilemap(tilemap)
         self._load_scripted_objects(tilemap)
@@ -144,7 +142,7 @@ class Model:
             )
 
         for obj in tilemap.object_lists.get(NPCS, []):
-            sprite_spec = self.spec.sprites[obj.properties["spec"]]
+            sprite_spec = self._spec.sprites[obj.properties["spec"]]
             script = None
             if "script" in obj.properties:
                 script_cls = scripts.load_script_class(obj.properties["script"])
@@ -157,13 +155,13 @@ class Model:
 
     def create_sprite(
         self,
-        spec: spec.GameSpriteSpec,
+        sprite_spec: spec.GameSpriteSpec,
         name: str,
         start_location: Tuple[int, int],
         script: Optional[scripts.Script],
     ) -> arcade.Sprite:
         """Adds a sprite to the model."""
-        sprite = game_sprite.GameSprite(spec)
+        sprite = game_sprite.GameSprite(sprite_spec)
         sprite.properties = {
             "name": name,
         }
@@ -179,25 +177,27 @@ class Model:
             )
         else:
             # TODO(rob): Handle non-scripted sprites.
-            raise NotImplemented("Non-scripted sprites are not supported yet.")
+            raise NotImplementedError("Non-scripted sprites are not supported yet.")
 
         return sprite
 
-    def _reset_player(self, start_location: str, map: arcade.TileMap):
+    def _reset_player(self, start_location: str, tilemap: arcade.TileMap):
         start = [
-            obj for obj in map.object_lists[KEY_POINTS] if obj.name == start_location
+            obj
+            for obj in tilemap.object_lists[KEY_POINTS]
+            if obj.name == start_location
         ]
         if not start:
-            raise Exception("No start location defined.")
+            raise ValueError("No start location defined.")
 
         shape = start[0].shape
 
         if not isinstance(shape, list) or len(shape) != 2:
-            raise Exception("Start location must be a point.")
+            raise TypeError("Start location must be a point.")
 
         x, y = shape
         if not isinstance(x, numbers.Number) or not isinstance(y, numbers.Number):
-            raise Exception("Start location must be a point.")
+            raise TypeError("Start location must be a point.")
 
         self.player_sprite.center_x = start[0].shape[0]
         self.player_sprite.center_y = start[0].shape[1]
@@ -205,13 +205,13 @@ class Model:
     def _create_object_sprite(
         self,
         obj: arcade.TiledObject,
-        map: arcade.TileMap,
+        tilemap: arcade.TileMap,
     ) -> arcade.Sprite:
         # Find the bounding rectangle for all the points.
         min_x, min_y = float("inf"), float("inf")
         max_x, max_y = float("-inf"), float("-inf")
 
-        pixel_height = map.height * map.tile_height
+        pixel_height = tilemap.height * tilemap.tile_height
 
         for x, y in obj.shape:
             # The y coordinates come in as negative values, and they're relative to the
@@ -260,9 +260,10 @@ class Model:
         obj.set_api(self.api)
         return obj
 
-    def on_update(self, delta_time: int) -> None:
+    def on_update(self, delta_time: float) -> None:
+        """Updates the model."""
         self.player_sprite.on_update(delta_time)
-        self.prevent_oob()
+        self._prevent_oob()
         self.physics_engine.update()
         self._handle_collisions()
         self.sec_passed += delta_time
@@ -280,7 +281,7 @@ class Model:
             obj = self.scripted_objects[collision.properties["name"]]
             obj.script.on_collide(obj.owner, self.player_sprite)
 
-    def prevent_oob(self) -> None:
+    def _prevent_oob(self) -> None:
         """Prevents the player from going out-of-bounds."""
         map_width = self.width * self.tile_width
         map_height = self.height * self.tile_height

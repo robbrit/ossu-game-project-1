@@ -26,24 +26,31 @@ class SpecGUI:
         self._load_textures()
 
     def draw(self) -> None:
+        """Draws the GUI."""
         self.sprites.draw()
 
     def set_api(self, api: scripts.GameAPI):
+        """Sets the game API for this GUI."""
         self.api = api
 
     def set_manager(self, manager: gui.UIManager):
+        """Sets the UI manager for this GUI."""
         self.manager = manager
         self.manager.clear()
         self._build_widgets()
 
     def _build_widgets(self) -> None:
         for button_spec in self.spec.buttons:
+
+            def _on_click(action: scripts.GameCallable) -> None:
+                return lambda unused: action(self.api)
+
             button = gui.UITextureButton(
                 texture=self.textures[button_spec.unselected_image_asset],
                 x=button_spec.center[0],
                 y=button_spec.center[1],
             )
-            button.on_click = lambda unused: button_spec.action(self.api)
+            button.on_click = _on_click(button_spec.action)
             self.manager.add(button, index=0)
 
     def _load_textures(self) -> None:

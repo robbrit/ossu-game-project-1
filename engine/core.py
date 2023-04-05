@@ -1,4 +1,3 @@
-import json
 from typing import (
     Optional,
     Tuple,
@@ -44,7 +43,7 @@ class Core(arcade.Window):
 
     model: Optional[model.Model]
     initial_gui: scripts.GUI
-    spec: spec.GameSpec
+    _spec: spec.GameSpec
 
     def __init__(self, initial_gui: scripts.GUI, game_spec: spec.GameSpec):
         """Constructor.
@@ -58,7 +57,7 @@ class Core(arcade.Window):
             SCREEN_TITLE,
         )
 
-        self.spec = game_spec
+        self._spec = game_spec
         self.model = None
         self.initial_gui = initial_gui
         self.gui_state = gui_game_state.GuiState(initial_gui)
@@ -71,7 +70,7 @@ class Core(arcade.Window):
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
-        self.model = model.Model(self, self.spec)
+        self.model = model.Model(self, self._spec)
         self.ingame_state = ingame_state.InGameState(
             self.model,
             (self.width, self.height),
@@ -96,8 +95,8 @@ class Core(arcade.Window):
         script: Optional[scripts.Script],
     ) -> None:
         """Creates a sprite."""
-        spec = self.spec.sprites[spec_name]
-        self.model.create_sprite(spec, name, start_location, script)
+        _spec = self._spec.sprites[spec_name]
+        self.model.create_sprite(_spec, name, start_location, script)
 
     def run(self):
         """Runs the game."""
@@ -124,23 +123,25 @@ class Core(arcade.Window):
         """Handles incoming key releases."""
         self.game_state.controller.on_key_release(symbol, modifiers)
 
-    def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
-        self.game_state.controller.on_mouse_motion(screen_x, screen_y, dx, dy)
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
+        """Handles mouse movement."""
+        self.game_state.controller.on_mouse_motion(x, y, dx, dy)
 
     def on_mouse_release(
         self,
-        screen_x: int,
-        screen_y: int,
+        x: int,
+        y: int,
         button: int,
         modifiers: int,
     ) -> None:
+        """Handles releasing the mouse button."""
         self.game_state.controller.on_mouse_release(
-            screen_x,
-            screen_y,
+            x,
+            y,
             button,
             modifiers,
         )
 
-    def on_update(self, delta_time: int) -> None:
+    def on_update(self, delta_time: float) -> None:
         """Handles updates."""
         self.game_state.on_update(delta_time)
