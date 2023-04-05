@@ -253,6 +253,8 @@ class Model:
             obj = scripts.ObjectScript(
                 on_activate=obj.properties.get("on_activate"),
                 on_activate_args=_pull_script_args("on_activate_", obj.properties),
+                on_collide=obj.properties.get("on_collide"),
+                on_collide_args=_pull_script_args("on_collide_", obj.properties),
             )
 
         obj.set_api(self.api)
@@ -262,7 +264,21 @@ class Model:
         self.player_sprite.on_update(delta_time)
         self.prevent_oob()
         self.physics_engine.update()
+        self._handle_collisions()
         self.sec_passed += delta_time
+
+    def _handle_collisions(self) -> None:
+        """Handles any collisions between different objects."""
+        collisions = arcade.check_for_collision_with_lists(
+            self.player_sprite,
+            [
+                self.scene.get_sprite_list(SCRIPTED_OBJECTS),
+            ],
+        )
+
+        for collision in collisions:
+            obj = self.scripted_objects[collision.properties["name"]]
+            obj.script.on_collide(obj.owner, self.player_sprite)
 
     def prevent_oob(self) -> None:
         """Prevents the player from going out-of-bounds."""

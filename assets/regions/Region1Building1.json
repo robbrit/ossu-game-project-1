@@ -90,17 +90,17 @@
                  "name":"Exit",
                  "properties":[
                         {
-                         "name":"on_activate",
+                         "name":"on_collide",
                          "type":"string",
                          "value":"engine.builtin.transition_region"
                         }, 
                         {
-                         "name":"on_activate_region",
+                         "name":"on_collide_region",
                          "type":"string",
                          "value":"Region1"
                         }, 
                         {
-                         "name":"on_activate_start_location",
+                         "name":"on_collide_start_location",
                          "type":"string",
                          "value":"Building 1 Exit"
                         }],
