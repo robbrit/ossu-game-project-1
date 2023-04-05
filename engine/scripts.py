@@ -3,7 +3,7 @@ import importlib
 from typing import (
     Any,
     Callable,
-    Iterable,
+    Dict,
     Optional,
     Protocol,
     Tuple,
@@ -144,17 +144,20 @@ class ObjectScript(Script):
 
     api: Optional[GameAPI]
     _on_activate: GameCallable
+    _on_activate_args: Dict[str, Any]
+
     # TODO(rob): Fill in all the other functions.
 
-    def __init__(self, on_activate: Optional[str]):
+    def __init__(self, on_activate: Optional[str], on_activate_args: Dict[str, Any]):
         self._on_activate = load_callable(on_activate) if on_activate else self._dummy
+        self._on_activate_args = on_activate_args
 
     def set_api(self, api: GameAPI) -> None:
         self.api = api
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
         if self._on_activate:
-            self._on_activate(self.api)
+            self._on_activate(self.api, **self._on_activate_args)
 
     def _dummy(self, api: GameAPI) -> None:
         pass

@@ -1,5 +1,6 @@
 import numbers
 from typing import (
+    Any,
     Dict,
     List,
     NamedTuple,
@@ -37,6 +38,18 @@ class ScriptedObject(NamedTuple):
     sprite: arcade.Sprite
     owner: scripts.ScriptOwner
     script: scripts.Script
+
+
+def _pull_script_args(prefix: str, properties: Dict[str, Any]) -> Dict[str, Any]:
+    """Extracts a set of arguments from a dict that has a certain prefix.
+
+    The prefix is stripped from the keys in the result.
+    """
+    return {
+        key.removeprefix(prefix): value
+        for key, value in properties.items()
+        if key.startswith(prefix)
+    }
 
 
 class Model:
@@ -239,6 +252,7 @@ class Model:
         else:
             obj = scripts.ObjectScript(
                 on_activate=obj.properties.get("on_activate"),
+                on_activate_args=_pull_script_args("on_activate_", obj.properties),
             )
 
         obj.set_api(self.api)

@@ -28,7 +28,7 @@
          "width":20,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -54,7 +54,7 @@
          "width":20,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "draworder":"topdown",
          "id":3,
@@ -77,7 +77,7 @@
          "visible":true,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "draworder":"topdown",
          "id":4,
@@ -92,7 +92,17 @@
                         {
                          "name":"on_activate",
                          "type":"string",
-                         "value":"game.regions.region1.building1_exit"
+                         "value":"engine.builtin.transition_region"
+                        }, 
+                        {
+                         "name":"on_activate_region",
+                         "type":"string",
+                         "value":"Region1"
+                        }, 
+                        {
+                         "name":"on_activate_start_location",
+                         "type":"string",
+                         "value":"Building 1 Exit"
                         }],
                  "rotation":0,
                  "visible":true,
