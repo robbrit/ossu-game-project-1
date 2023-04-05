@@ -295,7 +295,17 @@
                         {
                          "name":"on_activate",
                          "type":"string",
-                         "value":"game.regions.region1.building1_door"
+                         "value":"engine.builtin.transition_region"
+                        }, 
+                        {
+                         "name":"on_activate_region",
+                         "type":"string",
+                         "value":"Region1Building1"
+                        }, 
+                        {
+                         "name":"on_activate_start_location",
+                         "type":"string",
+                         "value":"Entryway"
                         }],
                  "rotation":0,
                  "visible":true,
