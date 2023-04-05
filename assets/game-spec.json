@@ -6,6 +6,9 @@
             },
             "Region1Building1": {
                 "tiled_mapfile": "assets/regions/Region1Building1.json"
+            },
+            "Region2": {
+                "tiled_mapfile": "assets/regions/Region2.json"
             }
         },
         "initial_region": "Region1"
