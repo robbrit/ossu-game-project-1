@@ -85,7 +85,7 @@
          "objects":[
                 {
                  "class":"",
-                 "height":30,
+                 "height":15.8181818181818,
                  "id":2,
                  "name":"Exit",
                  "properties":[
@@ -108,7 +108,7 @@
                  "visible":true,
                  "width":62.3333333333333,
                  "x":289,
-                 "y":448.666666666667
+                 "y":462.848484848485
                 }],
          "opacity":1,
          "type":"objectgroup",
