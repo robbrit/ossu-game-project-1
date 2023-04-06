@@ -1,12 +1,11 @@
 name: Premerge Checks
 on: [push]
 jobs:
-  pylint:
+  create-virtualenv:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
-
       - uses: syphar/restore-virtualenv@v1
         id: cache-virtualenv
         with:
@@ -18,6 +17,28 @@ jobs:
       - run: pip install -r requirements.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
+  pylint:
+    needs: create-virtualenv
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+      - uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+
       - name: Run lint
         run: |
          make lint
+
+  mypy:
+    needs: create-virtualenv
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+      - uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+
+      - name: Run mypy
+        run: |
+         make mypy

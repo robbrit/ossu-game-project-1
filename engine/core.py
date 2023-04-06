@@ -20,6 +20,10 @@ SCREEN_HEIGHT = 650
 SCREEN_TITLE = "OSSU Game Project"
 
 
+class GameNotInitializedError(Exception):
+    """Raised when functions are called before the game was properly initialized."""
+
+
 class Core(arcade.Window):
     """
     Main application class, wraps everything.
@@ -37,7 +41,7 @@ class Core(arcade.Window):
     * In the game - the model updates and all controls go to managing the character.
     """
 
-    game_state: game_state.GameState
+    current_state: Optional[game_state.GameState]
     gui_state: gui_game_state.GuiState
     ingame_state: Optional[ingame_state.InGameState]
 
@@ -60,13 +64,13 @@ class Core(arcade.Window):
         self._spec = game_spec
         self.model = None
         self.initial_gui = initial_gui
-        self.gui_state = gui_game_state.GuiState(initial_gui)
+        self.gui_state = gui_game_state.GuiState(self, initial_gui)
         self.ingame_state = None
-        self.game_state = None
+        self.current_state = None
 
     def setup(self) -> None:
         """Resets the game state."""
-        self.gui_state.setup(self)
+        self.gui_state.setup()
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
@@ -78,18 +82,21 @@ class Core(arcade.Window):
                 self.model,
                 (self.width, self.height),
             )
-            self.ingame_state.setup(self)
+            self.ingame_state.setup()
 
-        self.game_state = self.ingame_state
+        self.current_state = self.ingame_state
 
     def change_region(self, name: str, start_location: str) -> None:
         """Changes the region of the game."""
+        if self.model is None:
+            raise GameNotInitializedError()
+
         self.model.load_region(name, start_location)
 
     def show_gui(self, gui: scripts.GUI) -> None:
         """Switches to the "GUI" state, and displays a certain GUI."""
         self.gui_state.set_gui(gui)
-        self.game_state = self.gui_state
+        self.current_state = self.gui_state
 
     def create_sprite(
         self,
@@ -99,6 +106,9 @@ class Core(arcade.Window):
         script: Optional[scripts.Script],
     ) -> None:
         """Creates a sprite."""
+        if self.model is None:
+            raise GameNotInitializedError()
+
         _spec = self._spec.sprites[spec_name]
         self.model.create_sprite(_spec, name, start_location, script)
 
@@ -116,20 +126,32 @@ class Core(arcade.Window):
 
     def on_draw(self) -> None:
         """Renders the game."""
+        if self.current_state is None:
+            raise GameNotInitializedError()
+
         self.clear()
-        self.game_state.view.on_draw()
+        self.current_state.view.on_draw()
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         """Handles incoming key presses."""
-        self.game_state.controller.on_key_press(symbol, modifiers)
+        if self.current_state is None:
+            raise GameNotInitializedError()
+
+        self.current_state.controller.on_key_press(symbol, modifiers)
 
     def on_key_release(self, symbol: int, modifiers: int) -> None:
         """Handles incoming key releases."""
-        self.game_state.controller.on_key_release(symbol, modifiers)
+        if self.current_state is None:
+            raise GameNotInitializedError()
+
+        self.current_state.controller.on_key_release(symbol, modifiers)
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
         """Handles mouse movement."""
-        self.game_state.controller.on_mouse_motion(x, y, dx, dy)
+        if self.current_state is None:
+            raise GameNotInitializedError()
+
+        self.current_state.controller.on_mouse_motion(x, y, dx, dy)
 
     def on_mouse_release(
         self,
@@ -139,7 +161,10 @@ class Core(arcade.Window):
         modifiers: int,
     ) -> None:
         """Handles releasing the mouse button."""
-        self.game_state.controller.on_mouse_release(
+        if self.current_state is None:
+            raise GameNotInitializedError()
+
+        self.current_state.controller.on_mouse_release(
             x,
             y,
             button,
@@ -148,4 +173,7 @@ class Core(arcade.Window):
 
     def on_update(self, delta_time: float) -> None:
         """Handles updates."""
-        self.game_state.on_update(delta_time)
+        if self.current_state is None:
+            raise GameNotInitializedError()
+
+        self.current_state.on_update(delta_time)

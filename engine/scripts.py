@@ -6,6 +6,7 @@ from typing import (
     Dict,
     Optional,
     Protocol,
+    Type,
     Tuple,
 )
 
@@ -41,7 +42,7 @@ class GameAPI(Protocol):
         self,
         spec_name: str,
         name: str,
-        start_location: Tuple[int, int],
+        start_location: Tuple[float, float],
         script: "Optional[Script]",
     ) -> None:
         """Creates a sprite."""
@@ -77,7 +78,7 @@ class Entity(Protocol):
     """Defines something in the game: a player, a monster, etc."""
 
 
-class Player(Entity):
+class Player(Protocol):
     """Represents the player to scripts."""
 
 
@@ -128,7 +129,7 @@ class ObjectScript(Script):
     simple and instead just want to tie to some function.
     """
 
-    api: Optional[GameAPI]
+    api: GameAPI
     _on_activate: GameCallable
     _on_activate_args: Dict[str, Any]
     _on_collide: GameCallable
@@ -138,11 +139,13 @@ class ObjectScript(Script):
 
     def __init__(
         self,
+        api: GameAPI,
         on_activate: Optional[str],
         on_activate_args: Dict[str, Any],
         on_collide: Optional[str],
         on_collide_args: Dict[str, Any],
     ):
+        self.api = api
         self._on_activate = load_callable(on_activate) if on_activate else self._dummy
         self._on_activate_args = on_activate_args
         self._on_collide = load_callable(on_collide) if on_collide else self._dummy
@@ -152,18 +155,16 @@ class ObjectScript(Script):
         self.api = api
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
-        if self._on_activate:
-            self._on_activate(self.api, **self._on_activate_args)
+        self._on_activate(self.api, **self._on_activate_args)
 
     def on_collide(self, owner: ScriptOwner, other: Entity) -> None:
-        if self._on_collide:
-            self._on_collide(self.api, **self._on_collide_args)
+        self._on_collide(self.api, **self._on_collide_args)
 
     def _dummy(self, api: GameAPI) -> None:
         pass
 
 
-def load_script_class(path: str) -> Script:
+def load_script_class(path: str) -> Type[Script]:
     """Loads a script class at path."""
 
     cls = _load_symbol(path)

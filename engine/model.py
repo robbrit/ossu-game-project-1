@@ -30,6 +30,10 @@ SCRIPTED_OBJECTS = "Scripted Objects"
 NPCS = "NPCs"
 
 
+class SceneNotInitialized(Exception):
+    """Raised when methods are called on the model before the scene was initialized."""
+
+
 class ScriptedObject(NamedTuple):
     """Ties a world object to a script."""
 
@@ -127,12 +131,18 @@ class Model:
         )
 
     def _load_scripted_objects(self, tilemap: arcade.TileMap) -> None:
+        if self.scene is None:
+            raise SceneNotInitialized()
+
         self.scripted_objects = {}
         self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
 
         sprites = []
 
         for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
+            if obj.name is None:
+                raise ValueError("Missing name attribute for scripted object.")
+
             sprite = self._create_object_sprite(obj, tilemap)
             sprites.append(sprite)
             self.scripted_objects[obj.name] = ScriptedObject(
@@ -142,6 +152,12 @@ class Model:
             )
 
         for obj in tilemap.object_lists.get(NPCS, []):
+            if obj.properties is None:
+                raise ValueError("NPC must have properties set.")
+
+            if obj.name is None:
+                raise ValueError("NPC must have name set.")
+
             sprite_spec = self._spec.sprites[obj.properties["spec"]]
             script = None
             if "script" in obj.properties:
@@ -149,7 +165,13 @@ class Model:
                 script = script_cls()
                 script.set_api(self.api)
 
-            sprite = self.create_sprite(sprite_spec, obj.name, obj.shape, script)
+            shape: Tuple[float, float]
+            # Do some hackery to get the type checker to be happy.
+            # TODO(rob): We should probably ensure that the shape is a point and not
+            # a rectangle or something.
+            shape = obj.shape  # type: ignore
+
+            sprite = self.create_sprite(sprite_spec, obj.name, shape, script)
 
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).extend(sprites)
 
@@ -157,10 +179,13 @@ class Model:
         self,
         sprite_spec: spec.GameSpriteSpec,
         name: str,
-        start_location: Tuple[int, int],
+        start_location: Tuple[float, float],
         script: Optional[scripts.Script],
     ) -> arcade.Sprite:
         """Adds a sprite to the model."""
+        if self.scene is None:
+            raise SceneNotInitialized()
+
         sprite = game_sprite.GameSprite(sprite_spec)
         sprite.properties = {
             "name": name,
@@ -199,8 +224,8 @@ class Model:
         if not isinstance(x, numbers.Number) or not isinstance(y, numbers.Number):
             raise TypeError("Start location must be a point.")
 
-        self.player_sprite.center_x = start[0].shape[0]
-        self.player_sprite.center_y = start[0].shape[1]
+        self.player_sprite.center_x = start[0].shape[0]  # type: ignore
+        self.player_sprite.center_y = start[0].shape[1]  # type: ignore
 
     def _create_object_sprite(
         self,
@@ -213,7 +238,11 @@ class Model:
 
         pixel_height = tilemap.height * tilemap.tile_height
 
-        for x, y in obj.shape:
+        # TODO(rob): Should probably ensure that shape is a point list.
+        shape: arcade.PointList
+        shape = obj.shape  # type: ignore
+
+        for x, y in shape:
             # The y coordinates come in as negative values, and they're relative to the
             # top of the map. They need to be translated to values from the bottom.
             y = pixel_height + y
@@ -229,9 +258,7 @@ class Model:
         center_y = min_y + height / 2
 
         # Hit boxes in arcade need to be relative to the center.
-        hit_box = [
-            ((x - center_x), (pixel_height + y - center_y)) for x, y in obj.shape
-        ]
+        hit_box = [((x - center_x), (pixel_height + y - center_y)) for x, y in shape]
 
         sprite = arcade.Sprite(
             center_x=center_x,
@@ -244,24 +271,33 @@ class Model:
         }
         return sprite
 
-    def _load_object_script(self, obj: arcade.TiledObject) -> scripts.Script:
+    def _load_object_script(self, tiled_obj: arcade.TiledObject) -> scripts.Script:
+        properties = tiled_obj.properties or {}
+
         obj: scripts.Script
-        if "script" in obj.properties:
-            cls = scripts.load_script_class(obj.properties["script"])
+        if "script" in properties:
+            cls = scripts.load_script_class(properties["script"])
             obj = cls()
+            obj.set_api(self.api)
         else:
             obj = scripts.ObjectScript(
-                on_activate=obj.properties.get("on_activate"),
-                on_activate_args=_pull_script_args("on_activate_", obj.properties),
-                on_collide=obj.properties.get("on_collide"),
-                on_collide_args=_pull_script_args("on_collide_", obj.properties),
+                self.api,
+                on_activate=properties.get("on_activate"),
+                on_activate_args=_pull_script_args(
+                    "on_activate_",
+                    properties,
+                ),
+                on_collide=properties.get("on_collide"),
+                on_collide_args=_pull_script_args("on_collide_", properties),
             )
 
-        obj.set_api(self.api)
         return obj
 
     def on_update(self, delta_time: float) -> None:
         """Updates the model."""
+        if self.physics_engine is None:
+            raise SceneNotInitialized()
+
         self.player_sprite.on_update(delta_time)
         self._prevent_oob()
         self.physics_engine.update()
@@ -270,6 +306,9 @@ class Model:
 
     def _handle_collisions(self) -> None:
         """Handles any collisions between different objects."""
+        if self.scene is None:
+            raise SceneNotInitialized()
+
         collisions = arcade.check_for_collision_with_lists(
             self.player_sprite,
             [
@@ -318,13 +357,15 @@ class Model:
         if vy is not None:
             self.player_sprite.change_y = vy * PLAYER_MOVEMENT_SPEED
 
-    def set_player_facing(self, facing_x: int, facing_y: int) -> None:
+    def set_player_facing(self, facing_x: float, facing_y: float) -> None:
         """Sets the direction the player is facing."""
         self.player_sprite.facing_x = facing_x
         self.player_sprite.facing_y = facing_y
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
+        if self.scene is None:
+            raise SceneNotInitialized()
 
         # Do a little bit of math to figure out where to place the hitbox.
         facing = pmath.Vec2(self.player_sprite.facing_x, self.player_sprite.facing_y)
@@ -344,8 +385,8 @@ class Model:
 
         for obj in objects:
             name = obj.properties["name"]
-            obj = self.scripted_objects[name]
-            obj.script.on_activate(obj.owner, self.player_sprite)
+            script_obj = self.scripted_objects[name]
+            script_obj.script.on_activate(script_obj.owner, self.player_sprite)
 
     @property
     def width(self) -> int:
@@ -371,3 +412,8 @@ class Model:
     def game_time_sec(self) -> float:
         """Gets the in-game time in seconds."""
         return self.sec_passed
+
+    def draw(self) -> None:
+        """Renders the model."""
+        if self.scene is not None:
+            self.scene.draw()

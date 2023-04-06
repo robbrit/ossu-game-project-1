@@ -24,5 +24,5 @@ class Controller(Protocol):
     ) -> None:
         """Handles when the user releases a mouse button."""
 
-    def on_update(self, delta_time: int) -> None:
+    def on_update(self, delta_time: float) -> None:
         """Handles game tick updates."""
