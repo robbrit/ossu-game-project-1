@@ -4,7 +4,6 @@ from typing import (
 
 from engine import (
     controller,
-    scripts,
     view,
 )
 
@@ -12,11 +11,16 @@ from engine import (
 class GameState(Protocol):
     """Wraps a view and controller to represent a particular game state."""
 
-    view: view.View
-    controller: controller.Controller
-
-    def setup(self, api: scripts.GameAPI) -> None:
+    def setup(self) -> None:
         """Resets the game state."""
 
     def on_update(self, delta_time: float) -> None:
         """Updates the game state."""
+
+    @property
+    def controller(self) -> controller.Controller:
+        """Gets the controller for this state."""
+
+    @property
+    def view(self) -> view.View:
+        """Gets the view for this state."""

@@ -1,5 +1,4 @@
 from typing import (
-    Optional,
     Tuple,
 )
 
@@ -17,29 +16,26 @@ class InGameView:
     width: int
     height: int
     game_model: model.Model
-    camera: Optional[arcade.Camera]
+    camera: arcade.Camera
 
     def __init__(self, game_model: model.Model, viewport_size: Tuple[int, int]):
         self.width = 0
         self.height = 0
         self.game_model = game_model
-        self.camera = None
-
-        self.viewport_size = viewport_size
+        self.camera = arcade.Camera(
+            viewport_size[0],
+            viewport_size[1],
+        )
 
     def setup(self) -> None:
         """Sets up the view."""
-        self.camera = arcade.Camera(
-            self.viewport_size[0],
-            self.viewport_size[1],
-        )
         self.width = self.game_model.width * self.game_model.tile_width
         self.height = self.game_model.height * self.game_model.tile_height
 
     def on_draw(self) -> None:
         """Renders the view."""
         self.camera.use()
-        self.game_model.scene.draw()
+        self.game_model.draw()
 
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the view."""
