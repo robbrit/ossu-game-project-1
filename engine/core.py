@@ -1,4 +1,5 @@
 from typing import (
+    Callable,
     Optional,
     Tuple,
 )
@@ -49,7 +50,11 @@ class Core(arcade.Window):
     initial_gui: scripts.GUI
     _spec: spec.GameSpec
 
-    def __init__(self, initial_gui: scripts.GUI, game_spec: spec.GameSpec):
+    def __init__(
+        self,
+        initial_gui: Callable[[scripts.GameAPI], scripts.GUI],
+        game_spec: spec.GameSpec,
+    ):
         """Constructor.
 
         Args:
@@ -63,8 +68,8 @@ class Core(arcade.Window):
 
         self._spec = game_spec
         self.model = None
-        self.initial_gui = initial_gui
-        self.gui_state = gui_game_state.GuiState(self, initial_gui)
+        self.initial_gui = initial_gui(self)
+        self.gui_state = gui_game_state.GuiState(self, self.initial_gui)
         self.ingame_state = None
         self.current_state = None
 
