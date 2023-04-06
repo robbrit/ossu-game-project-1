@@ -1,4 +1,7 @@
-from engine import scripts
+from engine import (
+    builtin,
+    scripts,
+)
 from engine.gui import conversation
 
 
@@ -22,7 +25,11 @@ class TalkToNPC(conversation.GUI):
                             text="Hi!",
                             choices=[],
                         ),
-                    )
+                    ),
+                    conversation.Choice(
+                        text="Bye!",
+                        action=builtin.resume_game,
+                    ),
                 ],
             )
         )

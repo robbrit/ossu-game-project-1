@@ -13,3 +13,8 @@ def transition_region(api: scripts.GameAPI, region: str, start_location: str) ->
                         appear when the transition is complete.
     """
     api.change_region(region, start_location)
+
+
+def resume_game(api: scripts.GameAPI) -> None:
+    """Starts/resumes the game."""
+    api.start_game()
