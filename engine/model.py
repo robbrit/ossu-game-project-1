@@ -326,7 +326,10 @@ class Model:
         self.player_sprite.facing_y = facing_y
 
     def activate(self) -> None:
-        """Activates whatever is in front of the player."""
+        """
+        Activates whatever is in front of the player,
+        by checking for collision with a hitbox_sprite.
+        """
 
         # Do a little bit of math to figure out where to place the hitbox.
         facing = pmath.Vec2(self.player_sprite.facing_x, self.player_sprite.facing_y)
