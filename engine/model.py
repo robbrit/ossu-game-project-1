@@ -24,6 +24,8 @@ PLAYER_MOVEMENT_SPEED = 5
 # The distance in pixels from the center of the player object that we use for testing
 # activions.
 HITBOX_DISTANCE = 32
+HITBOX_WIDTH = 64
+HITBOX_HEIGHT = 32
 
 KEY_POINTS = "Key Points"
 SCRIPTED_OBJECTS = "Scripted Objects"
@@ -330,25 +332,23 @@ class Model:
         facing = pmath.Vec2(self.player_sprite.facing_x, self.player_sprite.facing_y)
 
         hitbox_center = facing.normalize().scale(HITBOX_DISTANCE)
-        hitbox_center_x = hitbox_center.x + self.player_sprite.center_x
-        hitbox_center_y = hitbox_center.y + self.player_sprite.center_y
-        hitbox_sprite = arcade.Sprite(
-            center_x=hitbox_center_x + self.player_sprite.center_x,
-            center_y=hitbox_center_y + self.player_sprite.center_y,
-        )
+
         hitbox_corners = [
-            (-HITBOX_DISTANCE / 2, -HITBOX_DISTANCE / 2),
-            (HITBOX_DISTANCE / 2, -HITBOX_DISTANCE / 2),
-            (HITBOX_DISTANCE / 2, HITBOX_DISTANCE / 2),
-            (-HITBOX_DISTANCE / 2, HITBOX_DISTANCE / 2),
+            (-HITBOX_WIDTH / 2, -HITBOX_HEIGHT / 2),
+            (HITBOX_WIDTH / 2, -HITBOX_HEIGHT / 2),
+            (HITBOX_WIDTH / 2, HITBOX_HEIGHT / 2),
+            (-HITBOX_WIDTH / 2, HITBOX_HEIGHT / 2),
         ]
+        hitbox_sprite = arcade.Sprite(
+            center_x=hitbox_center.x + self.player_sprite.center_x,
+            center_y=hitbox_center.y + self.player_sprite.center_y,
+        )
         hitbox_sprite.set_hit_box(
             [
-                (corner_x + hitbox_center_x, corner_y + hitbox_center_y)
+                (corner_x + hitbox_center.x, corner_y + hitbox_center.y)
                 for corner_x, corner_y in hitbox_corners
             ]
         )
-
         objects = arcade.check_for_collision_with_list(
             hitbox_sprite, self.scene.get_sprite_list(SCRIPTED_OBJECTS)
         )
