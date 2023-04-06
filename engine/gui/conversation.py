@@ -90,9 +90,10 @@ class GUI:
         if choice.link is not None:
             self.current = choice.link
 
-        self._reset_widgets()
+        if choice.action is not None:
+            choice.action(self.api)
 
-        # TODO(rob): Call action if it exists.
+        self._reset_widgets()
 
     def _reset_widgets(self) -> None:
         self.manager.clear()

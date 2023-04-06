@@ -70,12 +70,16 @@ class Core(arcade.Window):
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
-        self.model = model.Model(self, self._spec)
-        self.ingame_state = ingame_state.InGameState(
-            self.model,
-            (self.width, self.height),
-        )
-        self.ingame_state.setup(self)
+        if self.model is None:
+            self.model = model.Model(self, self._spec)
+
+        if self.ingame_state is None:
+            self.ingame_state = ingame_state.InGameState(
+                self.model,
+                (self.width, self.height),
+            )
+            self.ingame_state.setup(self)
+
         self.game_state = self.ingame_state
 
     def change_region(self, name: str, start_location: str) -> None:
