@@ -1,4 +1,6 @@
 from typing import (
+    Any,
+    Callable,
     Dict,
     Optional,
 )
@@ -15,10 +17,11 @@ class SpecGUI:
 
     sprites: arcade.SpriteList
     manager: Optional[gui.UIManager]
-    api: Optional[scripts.GameAPI]
-    button_textures: Dict[str, arcade.Texture]
+    api: scripts.GameAPI
+    textures: Dict[str, arcade.Texture]
 
-    def __init__(self, spec: widgets.GUISpec):
+    def __init__(self, api: scripts.GameAPI, spec: widgets.GUISpec):
+        self.api = api
         self.spec = spec
         self.sprites = arcade.SpriteList()
         self.manager = None
@@ -37,12 +40,14 @@ class SpecGUI:
         """Sets the UI manager for this GUI."""
         self.manager = manager
         self.manager.clear()
-        self._build_widgets()
+        self._build_widgets(manager)
 
-    def _build_widgets(self) -> None:
+    def _build_widgets(self, manager: gui.UIManager) -> None:
         for button_spec in self.spec.buttons:
 
-            def _on_click(action: scripts.GameCallable) -> None:
+            def _on_click(
+                action: scripts.GameCallable,
+            ) -> Callable[[gui.UIOnClickEvent], Any]:
                 return lambda unused: action(self.api)
 
             button = gui.UITextureButton(
@@ -50,8 +55,8 @@ class SpecGUI:
                 x=button_spec.center[0],
                 y=button_spec.center[1],
             )
-            button.on_click = _on_click(button_spec.action)
-            self.manager.add(button, index=0)
+            button.on_click = _on_click(button_spec.action)  # type: ignore
+            manager.add(button, index=0)
 
     def _load_textures(self) -> None:
         self.textures = {}

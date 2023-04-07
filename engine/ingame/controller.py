@@ -78,13 +78,13 @@ class InGameController:
         self._model.set_player_speed(vx=vx, vy=vy)
 
     def _up_key_pressed(self) -> bool:
-        return self._keys.get(arcade.key.UP) or self._keys.get(arcade.key.W)
+        return self._keys.get(arcade.key.UP) or self._keys.get(arcade.key.W) or False
 
     def _down_key_pressed(self) -> bool:
-        return self._keys.get(arcade.key.DOWN) or self._keys.get(arcade.key.S)
+        return self._keys.get(arcade.key.DOWN) or self._keys.get(arcade.key.S) or False
 
     def _left_key_pressed(self) -> bool:
-        return self._keys.get(arcade.key.LEFT) or self._keys.get(arcade.key.A)
+        return self._keys.get(arcade.key.LEFT) or self._keys.get(arcade.key.A) or False
 
     def _right_key_pressed(self) -> bool:
-        return self._keys.get(arcade.key.RIGHT) or self._keys.get(arcade.key.D)
+        return self._keys.get(arcade.key.RIGHT) or self._keys.get(arcade.key.D) or False

@@ -1,5 +1,4 @@
 from typing import (
-    Optional,
     Tuple,
 )
 
@@ -13,18 +12,17 @@ class GuiView:
     Manages rendering GUIs.
     """
 
-    api: Optional[scripts.GameAPI]
+    api: scripts.GameAPI
     gui: scripts.GUI
 
-    def __init__(self, initial_gui: scripts.GUI):
-        self.api = None
+    def __init__(self, api: scripts.GameAPI, initial_gui: scripts.GUI):
+        self.api = api
         self.gui = initial_gui
         self.manager = gui.UIManager()
         self.manager.enable()
 
-    def setup(self, api: scripts.GameAPI) -> None:
+    def setup(self) -> None:
         """Sets up the view."""
-        self.api = api
 
     def on_draw(self) -> None:
         """ "Renders the view."""

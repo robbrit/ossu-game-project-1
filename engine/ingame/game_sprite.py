@@ -4,7 +4,6 @@ from typing import (
     Dict,
     List,
     NamedTuple,
-    Optional,
 )
 
 import arcade
@@ -29,7 +28,7 @@ class GameSprite(arcade.Sprite):
     # Mapping from animation name to the animation details.
     animations: Dict[str, Animation]
     # Name of the animation that is currently selected.
-    current_animation: Optional[str]
+    current_animation: str
     # The spec for this sprite.
     _spec: spec.GameSpriteSpec
 
@@ -59,8 +58,7 @@ class GameSprite(arcade.Sprite):
             )
             for name, animation_spec in sprite_spec.animations.items()
         }
-        self.current_animation = None
-        self.set_animation(sprite_spec.initial_animation)
+        self._reset_animation(sprite_spec.initial_animation)
 
     def set_facing(self, x: float, y: float) -> None:
         """Sets the facing direction for the sprite."""
@@ -79,6 +77,9 @@ class GameSprite(arcade.Sprite):
         if self.current_animation == name:
             return
 
+        self._reset_animation(name)
+
+    def _reset_animation(self, name: str) -> None:
         self.current_animation = name
 
         current_animation = self.animations[name]

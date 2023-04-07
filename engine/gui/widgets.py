@@ -38,15 +38,15 @@ class Button(NamedTuple):
     def create(cls, spec: Dict[str, Any]) -> "Button":
         """Constructs a new Button from a dict."""
         return Button(
-            selected_image_asset=spec["selected_image_asset"],
-            unselected_image_asset=spec["unselected_image_asset"],
-            name=spec["name"],
-            left=spec.get("left"),
-            right=spec.get("right"),
-            up=spec.get("up"),
-            down=spec.get("down"),
-            center=tuple(spec["center"]),
-            action=scripts.load_callable(spec["action"]),
+            selected_image_asset=spec["selected_image_asset"],  # type: ignore
+            unselected_image_asset=spec["unselected_image_asset"],  # type: ignore
+            name=spec["name"],  # type: ignore
+            left=spec.get("left"),  # type: ignore
+            right=spec.get("right"),  # type: ignore
+            up=spec.get("up"),  # type: ignore
+            down=spec.get("down"),  # type: ignore
+            center=tuple(spec["center"]),  # type: ignore
+            action=scripts.load_callable(spec["action"]),  # type: ignore
         )
 
 
