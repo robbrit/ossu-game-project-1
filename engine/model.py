@@ -372,11 +372,20 @@ class Model:
 
         hitbox_center = facing.normalize().scale(HITBOX_DISTANCE)
 
-        objects = arcade.get_sprites_at_point(
-            (
-                int(hitbox_center.x + self.player_sprite.center_x),
-                int(hitbox_center.y + self.player_sprite.center_y),
-            ),
+        hitbox_corners = [
+            (-HITBOX_DISTANCE, -HITBOX_DISTANCE),
+            (HITBOX_DISTANCE, -HITBOX_DISTANCE),
+            (HITBOX_DISTANCE, HITBOX_DISTANCE),
+            (-HITBOX_DISTANCE, HITBOX_DISTANCE),
+        ]
+        hitbox_sprite = arcade.Sprite(
+            center_x=hitbox_center.x + self.player_sprite.center_x,
+            center_y=hitbox_center.y + self.player_sprite.center_y,
+        )
+        hitbox_sprite.set_hit_box(hitbox_corners)
+
+        objects = arcade.check_for_collision_with_list(
+            hitbox_sprite,
             self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
 
