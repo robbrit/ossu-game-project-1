@@ -7,6 +7,27 @@
             "Region1Building1": {
                 "tiled_mapfile": "assets/regions/Region1Building1.json"
             },
+            "Region1Building2": {
+                "tiled_mapfile": "assets/regions/Region1Building2.json"
+            },
+            "Region1Building3": {
+                "tiled_mapfile": "assets/regions/Region1Building3.json"
+            },
+            "Region1Building4": {
+                "tiled_mapfile": "assets/regions/Region1Building4.json"
+            },
+            "Region1Building5": {
+                "tiled_mapfile": "assets/regions/Region1Building5.json"
+            },
+            "Region1Building6": {
+                "tiled_mapfile": "assets/regions/Region1Building6.json"
+            },
+            "Region1Building7": {
+                "tiled_mapfile": "assets/regions/Region1Building7.json"
+            },
+            "Region1Building8": {
+                "tiled_mapfile": "assets/regions/Region1Building8.json"
+            },
             "Region2": {
                 "tiled_mapfile": "assets/regions/Region2.json"
             }

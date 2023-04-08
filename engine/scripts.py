@@ -85,6 +85,8 @@ class Player(Protocol):
 class Script:
     """Base class for all scripts."""
 
+    _state: Dict[str, Any]
+
     def set_api(self, api: GameAPI):
         """Called after construction to set the API object for the script.
 
@@ -107,6 +109,16 @@ class Script:
 
     def on_event(self, event_name: str, data: Any) -> None:
         """Triggered when a custom event is fired."""
+
+    @property
+    def state(self) -> Dict[str, Any]:
+        """Gets the persistable state of this script."""
+        return self._state
+
+    @state.setter
+    def state(self, value: Dict[str, Any]) -> None:
+        """Sets the persistable state of this script."""
+        self._state = value
 
 
 class SavesAPI:
