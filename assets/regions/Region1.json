@@ -235,8 +235,7 @@
                          "name":"solid",
                          "type":"bool",
                          "value":true
-                        }
-                     ],
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":0,
