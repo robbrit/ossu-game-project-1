@@ -91,7 +91,7 @@
                         {
                          "name":"on_collide_start_location",
                          "type":"string",
-                         "value":"Building 1 Exit"
+                         "value":"Building 8 Exit"
                         }],
                  "rotation":0,
                  "visible":true,
