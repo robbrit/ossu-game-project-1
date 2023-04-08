@@ -230,7 +230,13 @@
                          "name":"spec",
                          "type":"string",
                          "value":"region1.intro_character"
-                        }],
+                        },
+                        {
+                         "name":"solid",
+                         "type":"bool",
+                         "value":true
+                        }
+                     ],
                  "rotation":0,
                  "visible":true,
                  "width":0,
