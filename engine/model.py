@@ -178,14 +178,25 @@ class Model:
         self.scripted_objects = {}
         self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
 
+        self.scene.add_sprite_list("Solid Objects", use_spatial_hash=True)
+
         sprites = []
         script: Optional[scripts.Script] = None
 
+        solid_objects = []
+
         for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
+            if obj.properties is None:
+                raise ValueError("Missing properties attribute for scripted object.")
+
             if obj.name is None:
                 raise ValueError("Missing name attribute for scripted object.")
 
             sprite = self._create_object_sprite(obj, tilemap)
+
+            if obj.properties.get("solid", False):
+                solid_objects.append(sprite)
+
             sprites.append(sprite)
 
             script = self._load_object_script(obj)
@@ -222,7 +233,11 @@ class Model:
 
             sprite = self.create_sprite(sprite_spec, obj.name, shape, script)
 
+            if obj.properties.get("solid", False):
+                solid_objects.append(sprite)
+
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).extend(sprites)
+        self.scene.get_sprite_list("Solid Objects").extend(solid_objects)
 
     def create_sprite(
         self,
@@ -372,6 +387,9 @@ class Model:
 
     def _prevent_oob(self) -> None:
         """Prevents the player from going out-of-bounds."""
+        if self.scene is None:
+            raise SceneNotInitialized()
+
         map_width = self.width * self.tile_width
         map_height = self.height * self.tile_height
 
@@ -387,6 +405,27 @@ class Model:
             new_vx = 0
 
         if (new_y <= 0 and vy < 0) or (new_y >= map_height and vy > 0):
+            new_vy = 0
+
+        # Stops movement in only one direction, by checking x and y separately.
+        collisions_x = arcade.get_sprites_at_point(
+            (
+                new_x,
+                self.player_sprite.center_y,
+            ),
+            self.scene.get_sprite_list("Solid Objects"),
+        )
+        if collisions_x:
+            new_vx = 0
+
+        collisions_y = arcade.get_sprites_at_point(
+            (
+                self.player_sprite.center_x,
+                new_y,
+            ),
+            self.scene.get_sprite_list("Solid Objects"),
+        )
+        if collisions_y:
             new_vy = 0
 
         self.set_player_speed(new_vx, new_vy)
