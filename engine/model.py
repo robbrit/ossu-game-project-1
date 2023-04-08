@@ -143,12 +143,15 @@ class Model:
         solid_objects = []
 
         for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
+            if obj.properties is None:
+                raise ValueError("Missing properties attribute for scripted object.")
+
             if obj.name is None:
                 raise ValueError("Missing name attribute for scripted object.")
 
             sprite = self._create_object_sprite(obj, tilemap)
 
-            if (obj.properties is not None) and obj.properties.get("solid", False):
+            if obj.properties.get("solid", False):
                 solid_objects.append(sprite)
 
             sprites.append(sprite)
@@ -311,7 +314,6 @@ class Model:
 
         self.player_sprite.on_update(delta_time)
         self._prevent_oob()
-        self.handle_collisions_with_solids()
         self.physics_engine.update()
         self._handle_collisions()
         self.sec_passed += delta_time
@@ -334,6 +336,9 @@ class Model:
 
     def _prevent_oob(self) -> None:
         """Prevents the player from going out-of-bounds."""
+        if self.scene is None:
+            raise SceneNotInitialized()
+
         map_width = self.width * self.tile_width
         map_height = self.height * self.tile_height
 
@@ -351,19 +356,7 @@ class Model:
         if (new_y <= 0 and vy < 0) or (new_y >= map_height and vy > 0):
             new_vy = 0
 
-        self.set_player_speed(new_vx, new_vy)
-
-    def handle_collisions_with_solids(self) -> None:
-        """Prevents the player from moving through solid objects."""
-        if self.scene is None:
-            raise SceneNotInitialized()
-
-        new_x = self.player_sprite.center_x + self.player_sprite.change_x
-        new_y = self.player_sprite.center_y + self.player_sprite.change_y
-
-        new_vx = None
-        new_vy = None
-
+        # Stops movement in only one direction, by checking x and y separately.
         collisions_x = arcade.get_sprites_at_point(
             (
                 new_x,
