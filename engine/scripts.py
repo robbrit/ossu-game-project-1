@@ -47,6 +47,14 @@ class GameAPI(Protocol):
     ) -> None:
         """Creates a sprite."""
 
+    @property
+    def player_state(self) -> Dict[str, Any]:
+        """Gets the player's state."""
+
+    @player_state.setter
+    def player_state(self, value: Dict[str, Any]) -> None:
+        """Sets the player's state."""
+
 
 GameCallable = Callable[[GameAPI], None]
 

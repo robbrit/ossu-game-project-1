@@ -1,5 +1,7 @@
 from typing import (
+    Any,
     Callable,
+    Dict,
     Optional,
     Tuple,
 )
@@ -48,12 +50,14 @@ class Core(arcade.Window):
 
     model: Optional[model.Model]
     initial_gui: scripts.GUI
+    initial_player_state: Dict[str, Any]
     _spec: spec.GameSpec
 
     def __init__(
         self,
         initial_gui: Callable[[scripts.GameAPI], scripts.GUI],
         game_spec: spec.GameSpec,
+        initial_player_state: Dict[str, Any],
     ):
         """Constructor.
 
@@ -69,6 +73,7 @@ class Core(arcade.Window):
         self._spec = game_spec
         self.model = None
         self.initial_gui = initial_gui(self)
+        self.initial_player_state = initial_player_state
         self.gui_state = gui_game_state.GuiState(self, self.initial_gui)
         self.ingame_state = None
         self.current_state = None
@@ -80,7 +85,7 @@ class Core(arcade.Window):
     def start_game(self) -> None:
         """Switches to the "in game" state."""
         if self.model is None:
-            self.model = model.Model(self, self._spec)
+            self.model = model.Model(self, self._spec, self.initial_player_state)
 
         if self.ingame_state is None:
             self.ingame_state = ingame_state.InGameState(
@@ -116,6 +121,20 @@ class Core(arcade.Window):
 
         _spec = self._spec.sprites[spec_name]
         self.model.create_sprite(_spec, name, start_location, script)
+
+    @property
+    def player_state(self) -> Dict[str, Any]:
+        if self.model is None:
+            raise GameNotInitializedError()
+
+        return self.model.player_state
+
+    @player_state.setter
+    def player_state(self, value: Dict[str, Any]):
+        if self.model is None:
+            raise GameNotInitializedError()
+
+        self.model.player_state = value
 
     def run(self):
         """Runs the game."""
