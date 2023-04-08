@@ -1,3 +1,4 @@
+import dataclasses
 import numbers
 from typing import (
     Any,
@@ -34,12 +35,22 @@ class SceneNotInitialized(Exception):
     """Raised when methods are called on the model before the scene was initialized."""
 
 
-class ScriptedObject(NamedTuple):
+@dataclasses.dataclass
+class ScriptedObject:
     """Ties a world object to a script."""
 
+    name: str
     sprite: arcade.Sprite
     owner: scripts.ScriptOwner
     script: scripts.Script
+
+
+@dataclasses.dataclass
+class RegionState:
+    """Stores the state of a region."""
+
+    # Mapping from scripted object names to their state.
+    object_states: Dict[str, Dict[str, Any]] = dataclasses.field(default_factory=dict)
 
 
 def _pull_script_args(prefix: str, properties: Dict[str, Any]) -> Dict[str, Any]:
@@ -59,6 +70,15 @@ class Model:
     This class represents the model layer. It manages maintenance of the state
     of the world.
     """
+
+    # TODO(rob): This class is getting big and incohesive. Some refactors that would
+    # clean it up:
+    # - Merge the ScriptedObject stuff and a lot of the sprite stuff into a single
+    #   ScriptedSprite class that inherits from Sprite.
+    # - Create a TiledObjectSprite class that wraps the _create_object_sprite stuff.
+    #   This could inherit from ScriptedSprite.
+    # - Make RegionState a bit smarter, have it manage serialization of itself.
+    # - Create a PlayerSprite object that wraps all the player-specific stuff.
 
     api: scripts.GameAPI
 
@@ -82,6 +102,8 @@ class Model:
     # * An object layer called "Key Points", containing an object named "Start".
     tilemaps: Dict[str, arcade.tilemap.TileMap]
     active_region: str
+    region_states: Dict[str, RegionState]
+
     scripted_objects: Dict[str, ScriptedObject]
 
     _spec: spec.GameSpec
@@ -98,6 +120,9 @@ class Model:
         self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
 
         self.tilemaps = {}
+        self.region_states = {}
+        self.scripted_objects = {}
+        self.active_region = ""
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -114,12 +139,25 @@ class Model:
 
     def load_region(self, region_name: str, start_location: str) -> None:
         """Loads a region by name."""
+        if self.active_region != "":
+            self.region_states[self.active_region] = RegionState(
+                object_states={
+                    name: obj.script.state
+                    for name, obj in self.scripted_objects.items()
+                },
+            )
+
         self.active_region = region_name
         tilemap = self.tilemaps[region_name]
         region_spec = self._spec.world.regions[region_name]
 
+        if region_name not in self.region_states:
+            region_state = RegionState()
+        else:
+            region_state = self.region_states[region_name]
+
         self.scene = arcade.Scene.from_tilemap(tilemap)
-        self._load_scripted_objects(tilemap)
+        self._load_scripted_objects(tilemap, region_state)
 
         self.scene.add_sprite("Player", self.player_sprite)
 
@@ -130,7 +168,11 @@ class Model:
             tilemap.sprite_lists[region_spec.wall_layer],
         )
 
-    def _load_scripted_objects(self, tilemap: arcade.TileMap) -> None:
+    def _load_scripted_objects(
+        self,
+        tilemap: arcade.TileMap,
+        region_state: RegionState,
+    ) -> None:
         if self.scene is None:
             raise SceneNotInitialized()
 
@@ -145,10 +187,15 @@ class Model:
 
             sprite = self._create_object_sprite(obj, tilemap)
             sprites.append(sprite)
+
+            script = self._load_object_script(obj)
+            script.state = region_state.object_states.get(obj.name, {})
+
             self.scripted_objects[obj.name] = ScriptedObject(
+                name=obj.name,
                 sprite=sprite,
                 owner=obj,
-                script=self._load_object_script(obj),
+                script=script,
             )
 
         for obj in tilemap.object_lists.get(NPCS, []):
@@ -164,6 +211,7 @@ class Model:
                 script_cls = scripts.load_script_class(obj.properties["script"])
                 script = script_cls()
                 script.set_api(self.api)
+                script.state = region_state.object_states.get(obj.name, {})
 
             shape: Tuple[float, float]
             # Do some hackery to get the type checker to be happy.
@@ -196,6 +244,7 @@ class Model:
         if script:
             self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
             self.scripted_objects[name] = ScriptedObject(
+                name=name,
                 sprite=sprite,
                 owner=sprite,
                 script=script,
