@@ -3,7 +3,6 @@ import numbers
 from typing import (
     Any,
     Dict,
-    NamedTuple,
     Optional,
     Tuple,
 )
@@ -180,6 +179,7 @@ class Model:
         self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
 
         sprites = []
+        script: Optional[scripts.Script] = None
 
         for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
             if obj.name is None:
@@ -206,12 +206,13 @@ class Model:
                 raise ValueError("NPC must have name set.")
 
             sprite_spec = self._spec.sprites[obj.properties["spec"]]
-            script = None
             if "script" in obj.properties:
                 script_cls = scripts.load_script_class(obj.properties["script"])
                 script = script_cls()
                 script.set_api(self.api)
                 script.state = region_state.object_states.get(obj.name, {})
+            else:
+                script = None
 
             shape: Tuple[float, float]
             # Do some hackery to get the type checker to be happy.
