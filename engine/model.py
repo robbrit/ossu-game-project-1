@@ -167,7 +167,6 @@ class Model:
 
             sprite_spec = self._spec.sprites[obj.properties["spec"]]
             script = None
-            obj.properties["script"]
             if "script" in obj.properties:
                 script_cls = scripts.load_script_class(obj.properties["script"])
                 script = script_cls()
