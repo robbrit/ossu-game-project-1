@@ -7,6 +7,8 @@ from engine import (
 )
 from game.gui import start
 
+STARTING_HP = 10
+
 
 def run() -> None:
     """Runs the game."""
@@ -20,4 +22,7 @@ def run() -> None:
     core.Core(
         initial_gui=create_start_screen,
         game_spec=game_spec,
+        initial_player_state={
+            "hp": 10,
+        },
     ).run()

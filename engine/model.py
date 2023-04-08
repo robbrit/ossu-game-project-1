@@ -83,6 +83,8 @@ class Model:
     api: scripts.GameAPI
 
     player_sprite: game_sprite.GameSprite
+    player_state: Dict[str, Any]
+
     scene: Optional[arcade.Scene]
     physics_engine: Optional[arcade.PhysicsEngineSimple]
 
@@ -113,12 +115,14 @@ class Model:
         self,
         api: scripts.GameAPI,
         game_spec: spec.GameSpec,
+        initial_player_state: Dict[str, Any],
     ):
         self.api = api
         self._spec = game_spec
         self.sec_passed = 0.0
 
         self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
+        self.player_state = initial_player_state
 
         self.tilemaps = {}
         self.region_states = {}
