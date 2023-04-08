@@ -260,6 +260,7 @@ class Model:
         start_location: Tuple[float, float],
         script: Optional[scripts.Script],
     ) -> arcade.Sprite:
+        """Adds a sprite to the model."""
         return self._create_sprite(
             sprite_spec,
             name,
@@ -276,7 +277,6 @@ class Model:
         script: Optional[scripts.Script],
         is_first_load: bool,
     ) -> arcade.Sprite:
-        """Adds a sprite to the model."""
         if self.scene is None:
             raise SceneNotInitialized()
 
