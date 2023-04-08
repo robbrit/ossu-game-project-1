@@ -124,6 +124,7 @@ class Core(arcade.Window):
 
     @property
     def player_state(self) -> Dict[str, Any]:
+        """Gets the player's state."""
         if self.model is None:
             raise GameNotInitializedError()
 
@@ -131,6 +132,7 @@ class Core(arcade.Window):
 
     @player_state.setter
     def player_state(self, value: Dict[str, Any]):
+        """Sets the player's state."""
         if self.model is None:
             raise GameNotInitializedError()
 
