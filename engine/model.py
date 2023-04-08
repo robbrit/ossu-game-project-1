@@ -4,6 +4,7 @@ from typing import (
     Any,
     Dict,
     Optional,
+    Set,
     Tuple,
 )
 
@@ -102,6 +103,7 @@ class Model:
     tilemaps: Dict[str, arcade.tilemap.TileMap]
     active_region: str
     region_states: Dict[str, RegionState]
+    regions_loaded: Set[str]
 
     scripted_objects: Dict[str, ScriptedObject]
 
@@ -122,6 +124,7 @@ class Model:
         self.region_states = {}
         self.scripted_objects = {}
         self.active_region = ""
+        self.regions_loaded = set()
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -155,8 +158,11 @@ class Model:
         else:
             region_state = self.region_states[region_name]
 
+        is_first_load = region_name not in self.regions_loaded
+        self.regions_loaded.add(region_name)
+
         self.scene = arcade.Scene.from_tilemap(tilemap)
-        self._load_scripted_objects(tilemap, region_state)
+        self._load_scripted_objects(tilemap, region_state, is_first_load)
 
         self.scene.add_sprite("Player", self.player_sprite)
 
@@ -171,19 +177,18 @@ class Model:
         self,
         tilemap: arcade.TileMap,
         region_state: RegionState,
+        is_first_load: bool,
     ) -> None:
         if self.scene is None:
             raise SceneNotInitialized()
 
         self.scripted_objects = {}
         self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
-
         self.scene.add_sprite_list("Solid Objects", use_spatial_hash=True)
 
         sprites = []
-        script: Optional[scripts.Script] = None
-
         solid_objects = []
+        script: Optional[scripts.Script] = None
 
         for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
             if obj.properties is None:
@@ -201,6 +206,9 @@ class Model:
 
             script = self._load_object_script(obj)
             script.state = region_state.object_states.get(obj.name, {})
+
+            if is_first_load:
+                script.on_start(obj)
 
             self.scripted_objects[obj.name] = ScriptedObject(
                 name=obj.name,
@@ -231,7 +239,13 @@ class Model:
             # a rectangle or something.
             shape = obj.shape  # type: ignore
 
-            sprite = self.create_sprite(sprite_spec, obj.name, shape, script)
+            sprite = self._create_sprite(
+                sprite_spec,
+                obj.name,
+                shape,
+                script,
+                is_first_load=is_first_load,
+            )
 
             if obj.properties.get("solid", False):
                 solid_objects.append(sprite)
@@ -245,6 +259,22 @@ class Model:
         name: str,
         start_location: Tuple[float, float],
         script: Optional[scripts.Script],
+    ) -> arcade.Sprite:
+        return self._create_sprite(
+            sprite_spec,
+            name,
+            start_location,
+            script,
+            is_first_load=True,
+        )
+
+    def _create_sprite(
+        self,
+        sprite_spec: spec.GameSpriteSpec,
+        name: str,
+        start_location: Tuple[float, float],
+        script: Optional[scripts.Script],
+        is_first_load: bool,
     ) -> arcade.Sprite:
         """Adds a sprite to the model."""
         if self.scene is None:
@@ -265,6 +295,9 @@ class Model:
                 owner=sprite,
                 script=script,
             )
+
+            if is_first_load:
+                script.on_start(sprite)
         else:
             # TODO(rob): Handle non-scripted sprites.
             raise NotImplementedError("Non-scripted sprites are not supported yet.")
@@ -354,6 +387,8 @@ class Model:
                 ),
                 on_collide=properties.get("on_collide"),
                 on_collide_args=_pull_script_args("on_collide_", properties),
+                on_start=properties.get("on_start"),
+                on_start_args=_pull_script_args("on_start_", properties),
             )
 
         return obj
