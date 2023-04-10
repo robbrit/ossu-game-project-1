@@ -413,6 +413,17 @@ class Model:
         if self.scene is None:
             raise SceneNotInitialized()
 
+        collisions_sprite_corners = [
+            # scale up the dimensions
+            (x * 1.1, y * 1.1)
+            for x, y in self.player_sprite.get_adjusted_hit_box()
+        ]
+        collisions_sprite = arcade.Sprite(
+            center_x=self.player_sprite.center_x,
+            center_y=self.player_sprite.center_y,
+        )
+        collisions_sprite.set_hit_box(collisions_sprite_corners)
+
         collisions = arcade.check_for_collision_with_lists(
             self.player_sprite,
             [
