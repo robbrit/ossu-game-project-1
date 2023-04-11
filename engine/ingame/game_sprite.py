@@ -1,9 +1,9 @@
+import dataclasses
 import math
 from os import path
 from typing import (
     Dict,
     List,
-    NamedTuple,
 )
 
 import arcade
@@ -12,7 +12,8 @@ import arcade.texture
 from engine import spec
 
 
-class Animation(NamedTuple):
+@dataclasses.dataclass
+class Animation:
     """Wraps a set of information for a sprite animation."""
 
     spec: spec.AnimationSpec

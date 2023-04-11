@@ -1,10 +1,10 @@
 import collections
+import dataclasses
 import pathlib
 from typing import (
     Any,
     Dict,
     List,
-    NamedTuple,
     Optional,
     Tuple,
 )
@@ -12,52 +12,64 @@ from typing import (
 from engine import scripts
 
 
-class Asset(NamedTuple):
+@dataclasses.dataclass
+class Asset:
     """An asset for the game (audio, image, etc.)."""
 
     name: str
     path: str
 
 
-class Button(NamedTuple):
+@dataclasses.dataclass
+class Button:
     """An interactable GUI element."""
 
     selected_image_asset: str
     unselected_image_asset: str
     name: str
 
-    left: Optional[str]
-    right: Optional[str]
-    up: Optional[str]
-    down: Optional[str]
-
     center: Tuple[int, int]
     action: scripts.GameCallable
 
-    @classmethod
-    def create(cls, spec: Dict[str, Any]) -> "Button":
-        """Constructs a new Button from a dict."""
-        return Button(
-            selected_image_asset=spec["selected_image_asset"],  # type: ignore
-            unselected_image_asset=spec["unselected_image_asset"],  # type: ignore
-            name=spec["name"],  # type: ignore
-            left=spec.get("left"),  # type: ignore
-            right=spec.get("right"),  # type: ignore
-            up=spec.get("up"),  # type: ignore
-            down=spec.get("down"),  # type: ignore
-            center=tuple(spec["center"]),  # type: ignore
-            action=scripts.load_callable(spec["action"]),  # type: ignore
-        )
+    left: Optional[str] = None
+    right: Optional[str] = None
+    up: Optional[str] = None
+    down: Optional[str] = None
+
+    def __init__(
+        self,
+        selected_image_asset: str,
+        unselected_image_asset: str,
+        name: str,
+        center: Tuple[int, int],
+        action: str,
+        left: Optional[str] = None,
+        right: Optional[str] = None,
+        up: Optional[str] = None,
+        down: Optional[str] = None,
+    ):
+        self.selected_image_asset = selected_image_asset
+        self.unselected_image_asset = unselected_image_asset
+        self.name = name
+        self.center = center
+        self.left = left
+        self.right = right
+        self.up = up
+        self.down = down
+
+        self.action = scripts.load_callable(action)  # type: ignore
 
 
-class Image(NamedTuple):
+@dataclasses.dataclass
+class Image:
     """A basic image in a GUI."""
 
     image_asset: str
     center: Tuple[int, int]
 
 
-class GUISpec(NamedTuple):
+@dataclasses.dataclass
+class GUISpec:
     """An outline for the static elements within the GUI.
 
     This is a declarative spec, intending to lay out how a GUI will look in an easily
@@ -69,44 +81,32 @@ class GUISpec(NamedTuple):
     images: List[Image]
 
     cancel_action: Optional[scripts.GameCallable]
+    initial_selected_button: Optional[Button] = None
 
-    initial_selected_button: Optional[Button]
-
-    @classmethod
-    def create(
-        cls,
-        spec: Dict[str, Any],
+    def __init__(
+        self,
+        assets: Optional[List[Dict[str, Any]]],
+        buttons: Optional[List[Dict[str, Any]]],
+        images: Optional[List[Dict[str, Any]]],
         dimensions: Tuple[int, int],
-    ) -> "GUISpec":
-        """Constructs a new GUISpec from raw dict data."""
-        cancel_action = None
-        if "cancel_action" in spec:
-            cancel_action = scripts.load_callable(spec["cancel_action"])
+        cancel_action: Optional[str] = None,
+        initial_selected_button: Optional[str] = None,
+    ):
+        self.assets = [Asset(**asset) for asset in (assets or [])]
+        self.buttons = [Button(**button) for button in (buttons or [])]
+        self.images = [Image(**image) for image in (images or [])]
 
-        buttons = [Button.create(b) for b in spec.get("buttons", [])]
+        if cancel_action:
+            self.cancel_action = scripts.load_callable(cancel_action)
 
-        selected_button_name = spec.get("initial_selected_button")
-        selected_button = None
-        if selected_button_name is not None:
-            try:
-                selected_button = next(
-                    (b for b in buttons if b.name == selected_button_name)
-                )
-            except StopIteration as exc:
-                raise ValidationError(
-                    f"Initial select button {selected_button_name} does not exist."
-                ) from exc
+        if initial_selected_button:
+            self.initial_selected_button = next(
+                button
+                for button in self.buttons
+                if button.name == initial_selected_button
+            )
 
-        gui_spec = GUISpec(
-            assets=[Asset(**a) for a in spec.get("assets", [])],
-            buttons=buttons,
-            images=[Image(**b) for b in spec.get("images", [])],
-            cancel_action=cancel_action,
-            initial_selected_button=selected_button,
-        )
-
-        gui_spec.validate(dimensions)
-        return gui_spec
+        self.validate(dimensions)
 
     def validate(self, dimensions: Tuple[int, int]) -> None:
         """Validates the GUISpec."""

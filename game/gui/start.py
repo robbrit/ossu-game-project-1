@@ -16,7 +16,10 @@ class StartScreen(spec_gui.SpecGUI):
     def __init__(self, api: scripts.GameAPI):
         with open("assets/gui/start-screen.json") as infile:
             data = json.loads(infile.read())
-            spec = widgets.GUISpec.create(data, (core.SCREEN_WIDTH, core.SCREEN_HEIGHT))
+            spec = widgets.GUISpec(
+                dimensions=(core.SCREEN_WIDTH, core.SCREEN_HEIGHT),
+                **data,
+            )
             super().__init__(api, spec)
 
 
