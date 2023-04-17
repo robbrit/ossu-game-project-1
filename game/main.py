@@ -5,7 +5,10 @@ from engine import (
     scripts,
     spec,
 )
-from game.gui import start
+from game.gui import (
+    hud,
+    start,
+)
 
 STARTING_HP = 10
 
@@ -19,10 +22,15 @@ def run() -> None:
     def create_start_screen(api: scripts.GameAPI) -> scripts.GUI:
         return start.StartScreen(api)
 
+    def create_hud(api: scripts.GameAPI) -> scripts.GUI:
+        return hud.HUD(api)
+
     core.Core(
         initial_gui=create_start_screen,
+        ingame_gui=create_hud,
         game_spec=game_spec,
         initial_player_state={
-            "hp": 10,
+            "hp": STARTING_HP,
+            "max_hp": STARTING_HP,
         },
     ).run()

@@ -1,11 +1,15 @@
 from typing import (
+    Optional,
     Tuple,
 )
 
 import arcade
 import arcade.tilemap
 
-from engine import model
+from engine import (
+    model,
+    scripts,
+)
 
 
 class InGameView:
@@ -17,12 +21,24 @@ class InGameView:
     height: int
     game_model: model.Model
     camera: arcade.Camera
+    gui: Optional[scripts.GUI]
+    gui_camera: arcade.Camera
 
-    def __init__(self, game_model: model.Model, viewport_size: Tuple[int, int]):
+    def __init__(
+        self,
+        game_model: model.Model,
+        viewport_size: Tuple[int, int],
+        gui: Optional[scripts.GUI],
+    ):
         self.width = 0
         self.height = 0
         self.game_model = game_model
+        self.gui = gui
         self.camera = arcade.Camera(
+            viewport_size[0],
+            viewport_size[1],
+        )
+        self.gui_camera = arcade.Camera(
             viewport_size[0],
             viewport_size[1],
         )
@@ -36,6 +52,10 @@ class InGameView:
         """Renders the view."""
         self.camera.use()
         self.game_model.draw()
+
+        if self.gui is not None:
+            self.gui_camera.use()
+            self.gui.draw()
 
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the view."""
