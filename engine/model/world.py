@@ -16,7 +16,7 @@ from engine import (
     scripts,
     spec,
 )
-from engine.ingame import game_sprite
+from engine.model import game_sprite
 
 TILE_SCALING = 1
 
@@ -65,10 +65,9 @@ def _pull_script_args(prefix: str, properties: Dict[str, Any]) -> Dict[str, Any]
     }
 
 
-class Model:
+class World:
     """
-    This class represents the model layer. It manages maintenance of the state
-    of the world.
+    This class represents the world. It manages maintenance of the state of the world.
     """
 
     # TODO(rob): This class is getting big and incohesive. Some refactors that would

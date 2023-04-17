@@ -11,12 +11,12 @@ import arcade.tilemap
 
 from engine import (
     game_state,
-    model,
     scripts,
     spec,
 )
 from engine.gui import game_state as gui_game_state
 from engine.ingame import game_state as ingame_state
+from engine.model import world
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
@@ -32,23 +32,23 @@ class Core(arcade.Window):
     Main application class, wraps everything.
 
     The game uses an MVC pattern:
-    * Models - capture the state of the world in the game: players, regions, enemies,
+    * Worlds - capture the state of the world in the game: players, regions, enemies,
       etc.
     * Views - handle rendering anything.
     * Controllers - handles interacting with the user.
 
-    There's only one model, but the views and controllers are wrapped by GameState
+    There's only one world, but the views and controllers are wrapped by GameState
     objects. The game can be in one of two possible states:
-    * In a GUI - the model does not update, we render some sort of GUI, and all controls
+    * In a GUI - the world does not update, we render some sort of GUI, and all controls
       go to manipulating the GUI.
-    * In the game - the model updates and all controls go to managing the character.
+    * In the game - the world updates and all controls go to managing the character.
     """
 
     current_state: Optional[game_state.GameState]
     gui_state: gui_game_state.GuiState
     ingame_state: Optional[ingame_state.InGameState]
 
-    model: Optional[model.Model]
+    world: Optional[world.World]
     initial_gui: scripts.GUI
     ingame_gui: Optional[scripts.GUI]
     initial_player_state: Dict[str, Any]
@@ -73,7 +73,7 @@ class Core(arcade.Window):
         )
 
         self._spec = game_spec
-        self.model = None
+        self.world = None
         self.initial_gui = initial_gui(self)
         self.ingame_gui = ingame_gui(self) if ingame_gui else None
         self.initial_player_state = initial_player_state
@@ -87,12 +87,12 @@ class Core(arcade.Window):
 
     def start_game(self) -> None:
         """Switches to the "in game" state."""
-        if self.model is None:
-            self.model = model.Model(self, self._spec, self.initial_player_state)
+        if self.world is None:
+            self.world = world.World(self, self._spec, self.initial_player_state)
 
         if self.ingame_state is None:
             self.ingame_state = ingame_state.InGameState(
-                self.model,
+                self.world,
                 (self.width, self.height),
                 self.ingame_gui,
             )
@@ -102,10 +102,10 @@ class Core(arcade.Window):
 
     def change_region(self, name: str, start_location: str) -> None:
         """Changes the region of the game."""
-        if self.model is None:
+        if self.world is None:
             raise GameNotInitializedError()
 
-        self.model.load_region(name, start_location)
+        self.world.load_region(name, start_location)
 
     def show_gui(self, gui: scripts.GUI) -> None:
         """Switches to the "GUI" state, and displays a certain GUI."""
@@ -120,27 +120,27 @@ class Core(arcade.Window):
         script: Optional[scripts.Script],
     ) -> None:
         """Creates a sprite."""
-        if self.model is None:
+        if self.world is None:
             raise GameNotInitializedError()
 
         _spec = self._spec.sprites[spec_name]
-        self.model.create_sprite(_spec, name, start_location, script)
+        self.world.create_sprite(_spec, name, start_location, script)
 
     @property
     def player_state(self) -> Dict[str, Any]:
         """Gets the player's state."""
-        if self.model is None:
+        if self.world is None:
             raise GameNotInitializedError()
 
-        return self.model.player_state
+        return self.world.player_state
 
     @player_state.setter
     def player_state(self, value: Dict[str, Any]):
         """Sets the player's state."""
-        if self.model is None:
+        if self.world is None:
             raise GameNotInitializedError()
 
-        self.model.player_state = value
+        self.world.player_state = value
 
     def run(self):
         """Runs the game."""

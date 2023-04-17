@@ -5,9 +5,9 @@ from typing import (
 import arcade
 
 from engine import (
-    model,
     view,
 )
+from engine.model import world
 
 
 class InGameController:
@@ -16,12 +16,12 @@ class InGameController:
     the game and the user.
     """
 
-    _model: model.Model
+    _world: world.World
     _view: view.View
     _keys: Dict[int, bool]
 
-    def __init__(self, _model: model.Model, _view: view.View):
-        self._model = _model
+    def __init__(self, _world: world.World, _view: view.View):
+        self._world = _world
         self._view = _view
 
         self._keys = {}
@@ -41,10 +41,10 @@ class InGameController:
         # pylint: disable=unused-argument
         world_x, world_y = self._view.to_world_coords(screen_x, screen_y)
 
-        player_dx = world_x - self._model.player_sprite.center_x
-        player_dy = world_y - self._model.player_sprite.center_y
+        player_dx = world_x - self._world.player_sprite.center_x
+        player_dy = world_y - self._world.player_sprite.center_y
 
-        self._model.set_player_facing(player_dx, player_dy)
+        self._world.set_player_facing(player_dx, player_dy)
 
     def on_mouse_release(
         self,
@@ -58,10 +58,10 @@ class InGameController:
 
         if button == arcade.MOUSE_BUTTON_RIGHT:
             # We activate when the right mouse button is hit.
-            self._model.activate()
+            self._world.activate()
 
     def on_update(self, delta_time: float) -> None:
-        """Updates the model."""
+        """Updates the world."""
         # pylint: disable=unused-argument
         vx, vy = 0, 0
 
@@ -75,7 +75,7 @@ class InGameController:
         if self._right_key_pressed():
             vx += 1
 
-        self._model.set_player_speed(vx=vx, vy=vy)
+        self._world.set_player_speed(vx=vx, vy=vy)
 
     def _up_key_pressed(self) -> bool:
         return self._keys.get(arcade.key.UP) or self._keys.get(arcade.key.W) or False

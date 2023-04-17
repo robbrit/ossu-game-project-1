@@ -7,32 +7,32 @@ import arcade
 import arcade.tilemap
 
 from engine import (
-    model,
     scripts,
 )
+from engine.model import world
 
 
 class InGameView:
     """
-    Renders the model while the user is in the game.
+    Renders the world while the user is in the game.
     """
 
     width: int
     height: int
-    game_model: model.Model
+    game_world: world.World
     camera: arcade.Camera
     gui: Optional[scripts.GUI]
     gui_camera: arcade.Camera
 
     def __init__(
         self,
-        game_model: model.Model,
+        game_world: world.World,
         viewport_size: Tuple[int, int],
         gui: Optional[scripts.GUI],
     ):
         self.width = 0
         self.height = 0
-        self.game_model = game_model
+        self.game_world = game_world
         self.gui = gui
         self.camera = arcade.Camera(
             viewport_size[0],
@@ -45,13 +45,13 @@ class InGameView:
 
     def setup(self) -> None:
         """Sets up the view."""
-        self.width = self.game_model.width * self.game_model.tile_width
-        self.height = self.game_model.height * self.game_model.tile_height
+        self.width = self.game_world.width * self.game_world.tile_width
+        self.height = self.game_world.height * self.game_world.tile_height
 
     def on_draw(self) -> None:
         """Renders the view."""
         self.camera.use()
-        self.game_model.draw()
+        self.game_world.draw()
 
         if self.gui is not None:
             self.gui_camera.use()
@@ -70,7 +70,7 @@ class InGameView:
         )
 
     def _center_camera_to_player(self) -> None:
-        player = self.game_model.player_sprite
+        player = self.game_world.player_sprite
 
         v_width = self.camera.viewport_width
         v_height = self.camera.viewport_height
