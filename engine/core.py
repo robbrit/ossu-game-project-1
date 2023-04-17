@@ -32,16 +32,16 @@ class Core(arcade.Window):
     Main application class, wraps everything.
 
     The game uses an MVC pattern:
-    * Worlds - capture the state of the world in the game: players, regions, enemies,
+    * Model - capture the state of the world in the game: players, regions, enemies,
       etc.
     * Views - handle rendering anything.
     * Controllers - handles interacting with the user.
 
-    There's only one world, but the views and controllers are wrapped by GameState
+    There's only one model, but the views and controllers are wrapped by GameState
     objects. The game can be in one of two possible states:
-    * In a GUI - the world does not update, we render some sort of GUI, and all controls
+    * In a GUI - the model does not update, we render some sort of GUI, and all controls
       go to manipulating the GUI.
-    * In the game - the world updates and all controls go to managing the character.
+    * In the game - the model updates and all controls go to managing the character.
     """
 
     current_state: Optional[game_state.GameState]
