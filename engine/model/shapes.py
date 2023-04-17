@@ -51,6 +51,8 @@ class Polygon:
 
 @dataclasses.dataclass
 class Point:
+    """Represents a single 2D point."""
+
     x: float
     y: float
 
