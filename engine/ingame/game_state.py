@@ -1,4 +1,5 @@
 from typing import (
+    Optional,
     Tuple,
 )
 
@@ -6,6 +7,7 @@ from typing import (
 from engine import (
     controller,
     model,
+    scripts,
     view,
 )
 
@@ -26,9 +28,10 @@ class InGameState:
         self,
         game_model: model.Model,
         viewport_size: Tuple[int, int],
+        ingame_gui: Optional[scripts.GUI],
     ) -> None:
         self.game_model = game_model
-        self.view = game_view.InGameView(game_model, viewport_size)
+        self.view = game_view.InGameView(game_model, viewport_size, gui=ingame_gui)
         self.controller = game_controller.InGameController(game_model, self.view)
 
     def setup(self) -> None:

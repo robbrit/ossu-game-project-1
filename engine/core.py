@@ -50,6 +50,7 @@ class Core(arcade.Window):
 
     model: Optional[model.Model]
     initial_gui: scripts.GUI
+    ingame_gui: Optional[scripts.GUI]
     initial_player_state: Dict[str, Any]
     _spec: spec.GameSpec
 
@@ -58,6 +59,7 @@ class Core(arcade.Window):
         initial_gui: Callable[[scripts.GameAPI], scripts.GUI],
         game_spec: spec.GameSpec,
         initial_player_state: Dict[str, Any],
+        ingame_gui: Optional[Callable[[scripts.GameAPI], scripts.GUI]] = None,
     ):
         """Constructor.
 
@@ -73,6 +75,7 @@ class Core(arcade.Window):
         self._spec = game_spec
         self.model = None
         self.initial_gui = initial_gui(self)
+        self.ingame_gui = ingame_gui(self) if ingame_gui else None
         self.initial_player_state = initial_player_state
         self.gui_state = gui_game_state.GuiState(self, self.initial_gui)
         self.ingame_state = None
@@ -91,6 +94,7 @@ class Core(arcade.Window):
             self.ingame_state = ingame_state.InGameState(
                 self.model,
                 (self.width, self.height),
+                self.ingame_gui,
             )
             self.ingame_state.setup()
 
