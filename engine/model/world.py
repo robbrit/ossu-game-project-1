@@ -3,6 +3,7 @@ import numbers
 from typing import (
     Any,
     Dict,
+    List,
     Optional,
     Set,
     Tuple,
@@ -16,7 +17,10 @@ from engine import (
     scripts,
     spec,
 )
-from engine.model import game_sprite
+from engine.model import (
+    game_sprite,
+    script_zone,
+)
 
 TILE_SCALING = 1
 
@@ -74,8 +78,6 @@ class World:
     # clean it up:
     # - Merge the ScriptedObject stuff and a lot of the sprite stuff into a single
     #   ScriptedSprite class that inherits from Sprite.
-    # - Create a TiledObjectSprite class that wraps the _create_object_sprite stuff.
-    #   This could inherit from ScriptedSprite.
     # - Make RegionState a bit smarter, have it manage serialization of itself.
     # - Create a PlayerSprite object that wraps all the player-specific stuff.
 
@@ -190,8 +192,11 @@ class World:
         self.scene.add_sprite_list("Solid Objects", use_spatial_hash=True)
 
         sprites = []
-        solid_objects = []
+        solid_objects: List[arcade.Sprite] = []
         script: Optional[scripts.Script] = None
+        sprite: arcade.Sprite
+
+        world_pixel_height = tilemap.tile_height * tilemap.height
 
         for obj in tilemap.object_lists.get(SCRIPTED_OBJECTS, []):
             if obj.properties is None:
@@ -200,7 +205,7 @@ class World:
             if obj.name is None:
                 raise ValueError("Missing name attribute for scripted object.")
 
-            sprite = self._create_object_sprite(obj, tilemap)
+            sprite = script_zone.ScriptZone(obj, world_pixel_height)
 
             if obj.properties.get("solid", False):
                 solid_objects.append(sprite)
@@ -327,50 +332,6 @@ class World:
 
         self.player_sprite.center_x = start[0].shape[0]  # type: ignore
         self.player_sprite.center_y = start[0].shape[1]  # type: ignore
-
-    def _create_object_sprite(
-        self,
-        obj: arcade.TiledObject,
-        tilemap: arcade.TileMap,
-    ) -> arcade.Sprite:
-        # Find the bounding rectangle for all the points.
-        min_x, min_y = float("inf"), float("inf")
-        max_x, max_y = float("-inf"), float("-inf")
-
-        pixel_height = tilemap.height * tilemap.tile_height
-
-        # TODO(rob): Should probably ensure that shape is a point list.
-        shape: arcade.PointList
-        shape = obj.shape  # type: ignore
-
-        for x, y in shape:
-            # The y coordinates come in as negative values, and they're relative to the
-            # top of the map. They need to be translated to values from the bottom.
-            y = pixel_height + y
-            min_x = min(x, min_x)
-            max_x = max(x, max_x)
-            min_y = min(y, min_y)
-            max_y = max(y, max_y)
-
-        width = max_x - min_x
-        height = max_y - min_y
-
-        center_x = min_x + width / 2
-        center_y = min_y + height / 2
-
-        # Hit boxes in arcade need to be relative to the center.
-        hit_box = [((x - center_x), (pixel_height + y - center_y)) for x, y in shape]
-
-        sprite = arcade.Sprite(
-            center_x=center_x,
-            center_y=center_y,
-            hit_box_algorithm="Simple",
-        )
-        sprite.set_hit_box(hit_box)
-        sprite.properties = {
-            "name": obj.name,
-        }
-        return sprite
 
     def _load_object_script(self, tiled_obj: arcade.TiledObject) -> scripts.Script:
         properties = tiled_obj.properties or {}
