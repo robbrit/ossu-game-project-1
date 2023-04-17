@@ -1,3 +1,5 @@
+import dataclasses
+import numbers
 from typing import (
     Protocol,
     Sequence,
@@ -47,10 +49,43 @@ class Polygon:
         self.center_y = total_y / len(points)
 
 
+@dataclasses.dataclass
+class Point:
+    """Represents a single 2D point."""
+
+    x: float
+    y: float
+
+    @property
+    def center_x(self) -> float:
+        """Gets the X coordinate of the center point."""
+        return self.x
+
+    @property
+    def center_y(self) -> float:
+        """Gets the Y coordinate of the center point."""
+        return self.y
+
+    @property
+    def points(self) -> Sequence[Tuple[float, float]]:
+        """Gets the sequence of points making up this shape."""
+        return [(self.x, self.y)]
+
+
 def tiled_object_shape(obj: arcade.TiledObject) -> Shape:
     """Gets the shape for the given Tiled object."""
 
-    # TODO(rob): Support points/lines.
+    shape_iter = iter(obj.shape)
+    item = next(shape_iter)
+
+    if isinstance(item, numbers.Number):
+        # The shape is a sequence of numbers, which gives us a point.
+        if len(obj.shape) != 2:
+            raise ValueError("Only 2D points are supported.")
+
+        return Point(obj.shape[0], obj.shape[1])
+
+    # Now blindly assume it's a polygon.
     shape: Sequence[Tuple[float, float]]
     shape = obj.shape  # type: ignore
 
