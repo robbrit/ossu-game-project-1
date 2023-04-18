@@ -58,7 +58,8 @@ class GameAPI(Protocol):
 GameCallable = Callable[[GameAPI], None]
 
 
-def _load_symbol(path: str):
+def load_symbol(path: str) -> Type[Any]:
+    """Loads a Python something from a path."""
     mod_name, class_name = path.rsplit(".", 1)
 
     # TODO(rob): Determine if this is insecure.
@@ -71,7 +72,7 @@ def load_callable(path: str) -> GameCallable:
 
     Note that this doesn't check the arguments/return type.
     """
-    obj = _load_symbol(path)
+    obj = load_symbol(path)
     if not callable(obj):
         raise ValueError(f"Object {path} is not callable.")
     return obj
@@ -204,7 +205,7 @@ class ObjectScript(Script):
 def load_script_class(path: str) -> Type[Script]:
     """Loads a script class at path."""
 
-    cls = _load_symbol(path)
+    cls = load_symbol(path)
     if not issubclass(cls, Script):
         raise TypeError("A script class must inherit from Script.")
 
