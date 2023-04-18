@@ -1,71 +1,28 @@
 # Model Design
 
-Key Object Types:
+The model combines together the state of the world. Regions, scripts, game
+objects are all captured in this layer.
 
-- Regions
-- Entities
-- Game State
+Right now the code contains an object called "World", which is synonymous with
+"Model". This will change later, the model will be the top-level piece and will
+wrap multiple objects, including the world.
 
 ## Regions
 
-A region contains the tile layout, and zones.
+A region contains the tile layout, and zones. It is defined purely by the Tiled
+map editor's output in JSON format.
 
-### Tiles
+Some details on the maps:
 
-- Use Tiled format.
-- 32x32 pixels for a tile.
-
-### Initial Entities
-
-List of entities in the zone when the zone is first loaded. Only happens in the
-first load of the region, later loads will simply reload the game state.
-
-### Zones
-
-Named zones, cover a certain subset of the region.
+- They use 32x32 pixels for tiles.
+- Solid terrain is in a tile layer called "Wall Tiles". Any occupied space in
+  this layer is impassable.
+- An optional object layer named "Scripted Objects" can contain a set of objects
+  that bind to some sort of scriptable logic. See the
+  [scripts docs](scripts.md#scripted-objects) for more details.
+- A required "Key Points" layer contains a set of entrypoints to the region that
+  can be referenced by other scripts.
 
 ## Scripts
 
 See [scripts](scripts.md).
-
-## Entities
-
-All entities have the following properties:
-
-- Position (x, y)
-- Orientation (enum)
-- Sprite (sprite)
-- State Variables (any)
-
-### Player
-
-See [player docs](player.md).
-
-### NPCs
-
-Properties:
-
-- Creature Type (enum)
-- Behavior override (script)
-
-#### Creature Types
-
-Properties:
-
-- Behavior (script)
-
-### Doodads
-
-Properties:
-
-- Doodad Type (enum)
-- Solid (bool)
-
-## Persistence
-
-Storage:
-
-- Region state
-  - Non-player entity states
-- Player state
-- Script states
