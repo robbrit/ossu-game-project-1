@@ -368,6 +368,9 @@ class World:
         self._handle_collisions()
         self.sec_passed += delta_time
 
+        for script in self.scripted_objects.values():
+            script.script.on_tick(delta_time)
+
     def _handle_collisions(self) -> None:
         """Handles any collisions between different objects."""
         if self.scene is None:
