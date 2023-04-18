@@ -59,6 +59,7 @@ GameCallable = Callable[[GameAPI], None]
 
 
 def load_symbol(path: str) -> Type[Any]:
+    """Loads a Python something from a path."""
     mod_name, class_name = path.rsplit(".", 1)
 
     # TODO(rob): Determine if this is insecure.
