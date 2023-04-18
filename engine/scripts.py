@@ -81,6 +81,10 @@ def load_callable(path: str) -> GameCallable:
 class ScriptOwner(Protocol):
     """Defines an owner for a script."""
 
+    @property
+    def location(self) -> Tuple[float, float]:
+        """Gets the location of the script owner in world coordinates."""
+
 
 class Entity(Protocol):
     """Defines something in the game: a player, a monster, etc."""
@@ -104,7 +108,7 @@ class Script:
     def on_start(self, owner: ScriptOwner) -> None:
         """Triggered when the owner is loaded for the first time."""
 
-    def on_tick(self, game_time: float) -> None:
+    def on_tick(self, game_time: float, delta_time: float) -> None:
         """Triggered on every clock tick."""
 
     def on_collide(self, owner: ScriptOwner, other: Entity) -> None:
@@ -189,7 +193,7 @@ class ObjectScript(Script):
     def on_start(self, owner: ScriptOwner) -> None:
         self._on_start(self.api, **self._on_start_args)
 
-    def on_tick(self, game_time: float) -> None:
+    def on_tick(self, game_time: float, delta_time: float) -> None:
         self._on_tick(self.api, **self._on_tick_args)
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:

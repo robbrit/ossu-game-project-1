@@ -4,6 +4,7 @@ from os import path
 from typing import (
     Dict,
     List,
+    Tuple,
 )
 
 import arcade
@@ -117,3 +118,11 @@ class GameSprite(arcade.Sprite):
             return "up" if self.facing_y > 0 else "down"
 
         return "right" if self.facing_x > 0 else "left"
+
+    @property
+    def location(self) -> Tuple[float, float]:
+        """Gets the location of this sprite.
+
+        This is so that `GameSprite` adheres to the `ScriptOwner` protocol.
+        """
+        return (self.center_x, self.center_y)
