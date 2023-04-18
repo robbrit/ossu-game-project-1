@@ -1,4 +1,3 @@
-import datetime
 import importlib
 from typing import (
     Any,
@@ -104,7 +103,7 @@ class Script:
     def on_start(self, owner: ScriptOwner) -> None:
         """Triggered when the owner is loaded for the first time."""
 
-    def on_tick(self, game_time: datetime.timedelta) -> None:
+    def on_tick(self, game_time: float) -> None:
         """Triggered on every clock tick."""
 
     def on_collide(self, owner: ScriptOwner, other: Entity) -> None:
@@ -156,6 +155,8 @@ class ObjectScript(Script):
     _on_collide_args: Dict[str, Any]
     _on_start: GameCallable
     _on_start_args: Dict[str, Any]
+    _on_tick: GameCallable
+    _on_tick_args: Dict[str, Any]
 
     # TODO(rob): Fill in all the other functions.
 
@@ -168,6 +169,8 @@ class ObjectScript(Script):
         on_collide_args: Dict[str, Any],
         on_start: Optional[str],
         on_start_args: Dict[str, Any],
+        on_tick: Optional[str],
+        on_tick_args: Dict[str, Any],
     ):
         self.api = api
         self._on_activate = load_callable(on_activate) if on_activate else self._dummy
@@ -176,12 +179,17 @@ class ObjectScript(Script):
         self._on_collide_args = on_collide_args
         self._on_start = load_callable(on_start) if on_start else self._dummy
         self._on_start_args = on_start_args
+        self._on_tick = load_callable(on_tick) if on_tick else self._dummy
+        self._on_tick_args = on_tick_args
 
     def set_api(self, api: GameAPI) -> None:
         self.api = api
 
     def on_start(self, owner: ScriptOwner) -> None:
         self._on_start(self.api, **self._on_start_args)
+
+    def on_tick(self, game_time: float) -> None:
+        self._on_tick(self.api, **self._on_tick_args)
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
         self._on_activate(self.api, **self._on_activate_args)
