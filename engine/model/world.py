@@ -353,6 +353,8 @@ class World:
                 on_collide_args=_pull_script_args("on_collide_", properties),
                 on_start=properties.get("on_start"),
                 on_start_args=_pull_script_args("on_start_", properties),
+                on_tick=properties.get("on_tick"),
+                on_tick_args=_pull_script_args("on_tick_", properties),
             )
 
         return obj
@@ -369,7 +371,7 @@ class World:
         self.sec_passed += delta_time
 
         for script in self.scripted_objects.values():
-            script.script.on_tick(delta_time)
+            script.script.on_tick(self.sec_passed)
 
     def _handle_collisions(self) -> None:
         """Handles any collisions between different objects."""

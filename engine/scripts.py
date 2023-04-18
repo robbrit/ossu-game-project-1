@@ -1,4 +1,3 @@
-import datetime
 import importlib
 from typing import (
     Any,
@@ -104,7 +103,7 @@ class Script:
     def on_start(self, owner: ScriptOwner) -> None:
         """Triggered when the owner is loaded for the first time."""
 
-    def on_tick(self, game_time: datetime.timedelta) -> None:
+    def on_tick(self, game_time: float) -> None:
         """Triggered on every clock tick."""
 
     def on_collide(self, owner: ScriptOwner, other: Entity) -> None:
@@ -189,7 +188,7 @@ class ObjectScript(Script):
     def on_start(self, owner: ScriptOwner) -> None:
         self._on_start(self.api, **self._on_start_args)
 
-    def on_tick(self, delta_time: float) -> None:
+    def on_tick(self, game_time: float) -> None:
         self._on_tick(self.api, **self._on_tick_args)
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
