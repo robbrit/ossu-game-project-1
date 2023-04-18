@@ -267,6 +267,17 @@
                  "id":4,
                  "name":"Monster Spawn 1",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"script",
+                         "type":"string",
+                         "value":"engine.builtin.Spawner"
+                        }, 
+                        {
+                         "name":"script_spawner_cls",
+                         "type":"string",
+                         "value":"game.creatures.forest.Rat"
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":0,

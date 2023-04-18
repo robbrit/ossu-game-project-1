@@ -209,7 +209,8 @@ class World:
             if obj.name is None:
                 raise ValueError("Missing name attribute for scripted object.")
 
-            sprite = script_zone.ScriptZone(obj, world_pixel_height)
+            zone = script_zone.ScriptZone(obj, world_pixel_height)
+            sprite = zone
 
             if obj.properties.get("solid", False):
                 solid_objects.append(sprite)
@@ -220,12 +221,12 @@ class World:
             script.state = region_state.object_states.get(obj.name, {})
 
             if is_first_load:
-                script.on_start(obj)
+                script.on_start(zone)
 
             self.scripted_objects[obj.name] = ScriptedObject(
                 name=obj.name,
                 sprite=sprite,
-                owner=obj,
+                owner=zone,
                 script=script,
             )
 
@@ -380,7 +381,7 @@ class World:
         self.sec_passed += delta_time
 
         for script in self.scripted_objects.values():
-            script.script.on_tick(self.sec_passed)
+            script.script.on_tick(self.sec_passed, delta_time)
 
     def _handle_collisions(self) -> None:
         """Handles any collisions between different objects."""
