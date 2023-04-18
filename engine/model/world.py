@@ -39,6 +39,10 @@ class SceneNotInitialized(Exception):
     """Raised when methods are called on the model before the scene was initialized."""
 
 
+class NoScript(Exception):
+    """Raised when we attempt to load a script on an object that doesn't have one."""
+
+
 @dataclasses.dataclass
 class ScriptedObject:
     """Ties a world object to a script."""
@@ -212,7 +216,7 @@ class World:
 
             sprites.append(sprite)
 
-            script = self._load_object_script(obj)
+            script = self._script_from_tiled_object(obj)
             script.state = region_state.object_states.get(obj.name, {})
 
             if is_first_load:
@@ -233,12 +237,10 @@ class World:
                 raise ValueError("NPC must have name set.")
 
             sprite_spec = self._spec.sprites[obj.properties["spec"]]
-            if "script" in obj.properties:
-                script_cls = scripts.load_script_class(obj.properties["script"])
-                script = script_cls()
-                script.set_api(self.api)
+            try:
+                script = self._load_script(obj.properties)
                 script.state = region_state.object_states.get(obj.name, {})
-            else:
+            except NoScript:
                 script = None
 
             shape: Tuple[float, float]
@@ -288,6 +290,9 @@ class World:
         if self.scene is None:
             raise SceneNotInitialized()
 
+        if not script:
+            raise NotImplementedError("Non-scripted sprites are not supported.")
+
         sprite = game_sprite.GameSprite(sprite_spec)
         sprite.properties = {
             "name": name,
@@ -295,20 +300,16 @@ class World:
         sprite.center_x = start_location[0]
         sprite.center_y = start_location[1]
 
-        if script:
-            self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
-            self.scripted_objects[name] = ScriptedObject(
-                name=name,
-                sprite=sprite,
-                owner=sprite,
-                script=script,
-            )
+        self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
+        self.scripted_objects[name] = ScriptedObject(
+            name=name,
+            sprite=sprite,
+            owner=sprite,
+            script=script,
+        )
 
-            if is_first_load:
-                script.on_start(sprite)
-        else:
-            # TODO(rob): Handle non-scripted sprites.
-            raise NotImplementedError("Non-scripted sprites are not supported yet.")
+        if is_first_load:
+            script.on_start(sprite)
 
         return sprite
 
@@ -333,16 +334,16 @@ class World:
         self.player_sprite.center_x = start[0].shape[0]  # type: ignore
         self.player_sprite.center_y = start[0].shape[1]  # type: ignore
 
-    def _load_object_script(self, tiled_obj: arcade.TiledObject) -> scripts.Script:
+    def _script_from_tiled_object(
+        self,
+        tiled_obj: arcade.TiledObject,
+    ) -> scripts.Script:
         properties = tiled_obj.properties or {}
 
-        obj: scripts.Script
-        if "script" in properties:
-            cls = scripts.load_script_class(properties["script"])
-            obj = cls()
-            obj.set_api(self.api)
-        else:
-            obj = scripts.ObjectScript(
+        try:
+            return self._load_script(properties)
+        except NoScript:
+            return scripts.ObjectScript(
                 self.api,
                 on_activate=properties.get("on_activate"),
                 on_activate_args=_pull_script_args(
@@ -357,6 +358,14 @@ class World:
                 on_tick_args=_pull_script_args("on_tick_", properties),
             )
 
+    def _load_script(self, properties: Dict[str, Any]) -> scripts.Script:
+        if not "script" in properties:
+            raise NoScript()
+
+        cls = scripts.load_script_class(properties["script"])
+        args = _pull_script_args("script_", properties)
+        obj = cls(**args)
+        obj.set_api(self.api)
         return obj
 
     def on_update(self, delta_time: float) -> None:
