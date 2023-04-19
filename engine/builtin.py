@@ -3,11 +3,11 @@
 import random
 from typing import (
     Any,
+    Callable,
     Dict,
     List,
     Optional,
     Tuple,
-    Type,
 )
 
 from engine import scripts
@@ -39,33 +39,56 @@ DEFAULT_SPAWN_RATE_PER_SEC = 0.20
 DEFAULT_SPAWN_COOLDOWN_SECS = 10.0
 
 
-class Spawner(scripts.Script, scripts.SavesAPI):
+class Spawner(scripts.SavesAPI, scripts.Script):
     """Class that handles spawning of creatures."""
 
-    spawner_cls: Type[game_sprite.GameSprite]
+    sprite_spec: str
+    name: str
+    spawn_script: Callable[[None], scripts.Script]
     location: Optional[Tuple[float, float]]
     num_spawns: int
     spawns: List[game_sprite.GameSprite]
     last_spawn: float
     spawn_rate_per_sec: float
     spawn_cooldown_secs: float
+    id_counter: int
 
     def __init__(
         self,
-        spawner_cls: str,
+        sprite_spec: str,
+        name: str,
+        spawn_script: str,
         num_spawns: int = DEFAULT_NUM_SPAWNS,
         spawn_rate_per_sec: float = DEFAULT_SPAWN_RATE_PER_SEC,
         spawn_cooldown_secs: float = DEFAULT_SPAWN_COOLDOWN_SECS,
     ):
+        """Constructs a new spawner.
+
+        Args:
+            sprite_spec: the name of the sprite spec within the game spec.
+            name: the name of this spawner. Must be unique to this region.
+            spawn_script: the path to a callable that creates a Script object
+                          for these sprites.
+            num_spawns: the maximum number of spawns that this spawner can have
+                        active at a time.
+            spawn_rate_per_sec: probability of spawning a creature per second.
+            spawn_cooldown_secs: wait this many seconds before spawning.
+        """
         super().__init__()
 
-        self.spawner_cls = scripts.load_symbol(spawner_cls)
+        self.sprite_spec = sprite_spec
+        # TODO(rob): Validate that the name is unique throughout the region.
+        self.name = name
+        self.spawn_script = scripts.load_script_class(spawn_script)
         self.location = None
         self.num_spawns = num_spawns
         self.spawns = []
         self.last_spawn = float("-inf")
         self.spawn_rate_per_sec = spawn_rate_per_sec
         self.spawn_cooldown_secs = spawn_cooldown_secs
+        self.id_counter = 0
+
+        # TODO(rob): A set of args for the spawn script could be useful.
 
     def on_start(self, owner: scripts.ScriptOwner):
         """Triggered the first time this spawn is created."""
@@ -86,6 +109,8 @@ class Spawner(scripts.Script, scripts.SavesAPI):
         if self._can_spawn(game_time) and random.random() < probability:
             self._spawn()
 
+        # TODO(rob): Skim through spawns and remove any dead ones.
+
     @property
     def state(self) -> Dict[str, Any]:
         """Gets the state of this spawner."""
@@ -98,4 +123,12 @@ class Spawner(scripts.Script, scripts.SavesAPI):
         """Sets the state of this spawner."""
 
     def _spawn(self):
-        print("Spawn")
+        self.id_counter += 1
+
+        sprite = self.api.create_sprite(
+            spec_name=self.sprite_spec,
+            name=f"{self.name}_spawn{self.id_counter}",
+            start_location=self.location,
+            script=self.spawn_script(),
+        )
+        self.spawns.append(sprite)

@@ -274,9 +274,19 @@
                          "value":"engine.builtin.Spawner"
                         }, 
                         {
-                         "name":"script_spawner_cls",
+                         "name":"script_name",
+                         "type":"string",
+                         "value":"region2.rat_spawner1"
+                        }, 
+                        {
+                         "name":"script_spawn_script",
                          "type":"string",
                          "value":"game.creatures.forest.Rat"
+                        }, 
+                        {
+                         "name":"script_sprite_spec",
+                         "type":"string",
+                         "value":"forest.rat"
                         }],
                  "rotation":0,
                  "visible":true,

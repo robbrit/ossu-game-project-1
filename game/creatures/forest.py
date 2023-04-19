@@ -1,4 +1,8 @@
-class Rat:
+from engine import scripts
+
+
+class Rat(scripts.Script):
     """A rat creature."""
 
-    # TODO(rob): Fill this in as a scriptable object.
+    def on_tick(self, game_time: float, delta_time: float) -> None:
+        """Handles game ticks."""
