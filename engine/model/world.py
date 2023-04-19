@@ -116,6 +116,9 @@ class World:
 
     _spec: spec.GameSpec
 
+    in_update: bool
+    objects_to_add: Dict[str, ScriptedObject]
+
     def __init__(
         self,
         api: scripts.GameAPI,
@@ -134,6 +137,9 @@ class World:
         self.scripted_objects = {}
         self.active_region = ""
         self.regions_loaded = set()
+
+        self.in_update = False
+        self.objects_to_add = {}
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -302,12 +308,18 @@ class World:
         sprite.center_y = start_location[1]
 
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
-        self.scripted_objects[name] = ScriptedObject(
+
+        obj = ScriptedObject(
             name=name,
             sprite=sprite,
             owner=sprite,
             script=script,
         )
+
+        if self.in_update:
+            self.objects_to_add[name] = obj
+        else:
+            self.scripted_objects[name] = obj
 
         if is_first_load:
             script.on_start(sprite)
@@ -374,6 +386,8 @@ class World:
         if self.physics_engine is None:
             raise SceneNotInitialized()
 
+        self.in_update = True
+
         self.player_sprite.on_update(delta_time)
         self._prevent_oob()
         self.physics_engine.update()
@@ -382,6 +396,11 @@ class World:
 
         for script in self.scripted_objects.values():
             script.script.on_tick(self.sec_passed, delta_time)
+
+        self.scripted_objects.update(self.objects_to_add)
+        self.objects_to_add = {}
+
+        self.in_update = False
 
     def _handle_collisions(self) -> None:
         """Handles any collisions between different objects."""
