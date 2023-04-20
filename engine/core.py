@@ -2,6 +2,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Optional,
     Tuple,
 )
@@ -125,6 +126,13 @@ class Core(arcade.Window):
 
         _spec = self._spec.sprites[spec_name]
         self.world.create_sprite(_spec, name, start_location, script)
+
+    def get_key_points(self, name: Optional[str] = None) -> Iterable[scripts.KeyPoint]:
+        """Queries for key points in the current region."""
+        if self.world is None:
+            raise GameNotInitializedError()
+
+        return self.world.get_key_points(name)
 
     @property
     def player_state(self) -> Dict[str, Any]:

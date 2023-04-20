@@ -20,6 +20,7 @@ from engine import (
 from engine.model import (
     game_sprite,
     script_zone,
+    shapes,
 )
 
 TILE_SCALING = 1
@@ -312,6 +313,9 @@ class World:
         if is_first_load:
             script.on_start(sprite)
 
+        script.set_api(self.api)
+        script.set_owner(sprite)
+
         return sprite
 
     def _reset_player(self, start_location: str, tilemap: arcade.TileMap):
@@ -378,15 +382,21 @@ class World:
 
         self.player_sprite.on_update(delta_time)
         self._prevent_oob()
-        self.physics_engine.update()
-        self._handle_collisions()
-        self.sec_passed += delta_time
 
         for script in self.scripted_objects.values():
             script.script.on_tick(self.sec_passed, delta_time)
+            script.sprite.on_update(delta_time)
+
+            # Physics engine doesn't handle moving non-player sprites.
+            script.sprite.center_x += script.sprite.change_x
+            script.sprite.center_y += script.sprite.change_y
 
         self.scripted_objects.update(self.objects_to_add)
         self.objects_to_add = {}
+
+        self.physics_engine.update()
+        self._handle_collisions()
+        self.sec_passed += delta_time
 
         self.in_update = False
 
@@ -506,6 +516,31 @@ class World:
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
             script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+
+    def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
+        """Queries for key points in the active region."""
+
+        tilemap = self.tilemaps[self.active_region]
+
+        key_points = []
+
+        for point in tilemap.object_lists[KEY_POINTS]:
+            if point.name is None:
+                continue
+
+            if name is not None and name not in point.name:
+                continue
+
+            shape = shapes.tiled_object_shape(point)
+            key_points.append(
+                scripts.KeyPoint(
+                    name=point.name,
+                    location=(shape.center_x, shape.center_y),
+                    properties=point.properties or {},
+                )
+            )
+
+        return key_points
 
     @property
     def width(self) -> int:
