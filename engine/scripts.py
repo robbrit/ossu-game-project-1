@@ -1,8 +1,10 @@
+import dataclasses
 import importlib
 from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Optional,
     Protocol,
     Type,
@@ -25,6 +27,15 @@ class GUI(Protocol):
         """Sets the UI manager for this GUI."""
 
 
+@dataclasses.dataclass
+class KeyPoint:
+    """Represents a point of interest in the map."""
+
+    name: str
+    location: Tuple[float, float]
+    properties: Dict[str, Any]
+
+
 class GameAPI(Protocol):
     """A protocol for how game objects will interact with the engine."""
 
@@ -45,6 +56,9 @@ class GameAPI(Protocol):
         script: "Optional[Script]",
     ) -> None:
         """Creates a sprite."""
+
+    def get_key_points(self, name: Optional[str] = None) -> Iterable[KeyPoint]:
+        """Queries for key points within the active region."""
 
     @property
     def player_state(self) -> Dict[str, Any]:
@@ -85,6 +99,14 @@ class ScriptOwner(Protocol):
     def location(self) -> Tuple[float, float]:
         """Gets the location of the script owner in world coordinates."""
 
+    @property
+    def speed(self) -> Tuple[float, float]:
+        """Gets the speed of the script owner."""
+
+    @speed.setter
+    def speed(self, value: Tuple[float, float]) -> None:
+        """Sets the speed of the script owner."""
+
 
 class Entity(Protocol):
     """Defines something in the game: a player, a monster, etc."""
@@ -104,6 +126,9 @@ class Script:
 
         Can safely be ignored for scripts that don't need it.
         """
+
+    def set_owner(self, owner: ScriptOwner):
+        """Sets the owner of this script."""
 
     def on_start(self, owner: ScriptOwner) -> None:
         """Triggered when the owner is loaded for the first time."""
@@ -136,14 +161,21 @@ class Script:
 class SavesAPI:
     """Script mixin to save the API object."""
 
-    api: Optional[GameAPI]
-
-    def __init__(self):
-        self.api = None
+    api: Optional[GameAPI] = None
 
     def set_api(self, api: GameAPI):
         """Sets the API for this script."""
         self.api = api
+
+
+class SavesOwner:
+    """Script mixin to save the owner object."""
+
+    owner: Optional[ScriptOwner] = None
+
+    def set_owner(self, owner: ScriptOwner):
+        """Sets the owner for this script."""
+        self.owner = owner
 
 
 class ObjectScript(Script):

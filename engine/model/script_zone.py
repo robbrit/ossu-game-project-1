@@ -47,3 +47,13 @@ class ScriptZone(arcade.Sprite):
     def location(self) -> Tuple[float, float]:
         """Gets the location of this script zone."""
         return (self._shape.center_x, self._shape.center_y)
+
+    @property
+    def speed(self) -> Tuple[float, float]:
+        """Gets the speed of the script owner."""
+        return (0.0, 0.0)
+
+    @speed.setter
+    def speed(self, value: Tuple[float, float]) -> None:
+        """Sets the speed of the script owner."""
+        # Deliberately does nothing. Zones don't move.

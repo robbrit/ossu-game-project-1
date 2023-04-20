@@ -107,7 +107,13 @@ class GameSprite(arcade.Sprite):
         animation = "walk" if moving else "idle"
         direction = self._get_direction()
 
-        self.set_animation(f"{animation}-{direction}")
+        try:
+            self.set_animation(f"{animation}-{direction}")
+        except KeyError:
+            # This is possibly becase they don't have directional animations. If they
+            # don't, just use the base animation.
+            self.set_animation(animation)
+
         self.update_animation(delta_time)
 
     def _get_direction(self) -> str:
@@ -126,3 +132,18 @@ class GameSprite(arcade.Sprite):
         This is so that `GameSprite` adheres to the `ScriptOwner` protocol.
         """
         return (self.center_x, self.center_y)
+
+    @property
+    def speed(self) -> Tuple[float, float]:
+        """Gets the speed of the script owner."""
+        return (self.change_x, self.change_y)
+
+    @speed.setter
+    def speed(self, value: Tuple[float, float]) -> None:
+        """Sets the speed of the script owner."""
+        self.change_x, self.change_y = value
+        self.facing_x, self.facing_y = value
+
+        if self.facing_x == 0.0 and self.facing_y == 0.0:
+            # Face down when not moving.
+            self.facing_y = -1.0

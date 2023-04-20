@@ -71,19 +71,19 @@
                     "num_frames": 1
                 },
                 "walk-left": {
-                    "frame_speed": 0.3,
+                    "frame_speed": 0.6,
                     "num_frames": 2
                 },
                 "walk-right": {
-                    "frame_speed": 0.3,
+                    "frame_speed": 0.6,
                     "num_frames": 2
                 },
                 "walk-up": {
-                    "frame_speed": 0.3,
+                    "frame_speed": 0.6,
                     "num_frames": 2
                 },
                 "walk-down": {
-                    "frame_speed": 0.3,
+                    "frame_speed": 0.6,
                     "num_frames": 2
                 }
             }
