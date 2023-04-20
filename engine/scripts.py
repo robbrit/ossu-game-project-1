@@ -214,3 +214,15 @@ def load_script_class(path: str) -> Type[Script]:
         raise TypeError("A script class must inherit from Script.")
 
     return cls
+
+
+def extract_script_args(prefix: str, properties: Dict[str, Any]) -> Dict[str, Any]:
+    """Extracts a set of arguments from a dict that has a certain prefix.
+
+    The prefix is stripped from the keys in the result.
+    """
+    return {
+        key.removeprefix(prefix): value
+        for key, value in properties.items()
+        if key.startswith(prefix)
+    }

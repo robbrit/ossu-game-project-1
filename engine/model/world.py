@@ -61,18 +61,6 @@ class RegionState:
     object_states: Dict[str, Dict[str, Any]] = dataclasses.field(default_factory=dict)
 
 
-def _pull_script_args(prefix: str, properties: Dict[str, Any]) -> Dict[str, Any]:
-    """Extracts a set of arguments from a dict that has a certain prefix.
-
-    The prefix is stripped from the keys in the result.
-    """
-    return {
-        key.removeprefix(prefix): value
-        for key, value in properties.items()
-        if key.startswith(prefix)
-    }
-
-
 class World:
     """
     This class represents the world. It manages maintenance of the state of the world.
@@ -359,16 +347,16 @@ class World:
             return scripts.ObjectScript(
                 self.api,
                 on_activate=properties.get("on_activate"),
-                on_activate_args=_pull_script_args(
+                on_activate_args=scripts.extract_script_args(
                     "on_activate_",
                     properties,
                 ),
                 on_collide=properties.get("on_collide"),
-                on_collide_args=_pull_script_args("on_collide_", properties),
+                on_collide_args=scripts.extract_script_args("on_collide_", properties),
                 on_start=properties.get("on_start"),
-                on_start_args=_pull_script_args("on_start_", properties),
+                on_start_args=scripts.extract_script_args("on_start_", properties),
                 on_tick=properties.get("on_tick"),
-                on_tick_args=_pull_script_args("on_tick_", properties),
+                on_tick_args=scripts.extract_script_args("on_tick_", properties),
             )
 
     def _load_script(self, properties: Dict[str, Any]) -> scripts.Script:
@@ -376,7 +364,7 @@ class World:
             raise NoScript()
 
         cls = scripts.load_script_class(properties["script"])
-        args = _pull_script_args("script_", properties)
+        args = scripts.extract_script_args("script_", properties)
         obj = cls(**args)
         obj.set_api(self.api)
         return obj

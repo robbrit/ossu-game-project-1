@@ -45,6 +45,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
     sprite_spec: str
     name: str
     spawn_script: Callable[[None], scripts.Script]
+    spawn_script_kwargs: Dict[str, Any]
     location: Optional[Tuple[float, float]]
     num_spawns: int
     spawns: List[game_sprite.GameSprite]
@@ -61,6 +62,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
         num_spawns: int = DEFAULT_NUM_SPAWNS,
         spawn_rate_per_sec: float = DEFAULT_SPAWN_RATE_PER_SEC,
         spawn_cooldown_secs: float = DEFAULT_SPAWN_COOLDOWN_SECS,
+        **kwargs,
     ):
         """Constructs a new spawner.
 
@@ -73,6 +75,10 @@ class Spawner(scripts.SavesAPI, scripts.Script):
                         active at a time.
             spawn_rate_per_sec: probability of spawning a creature per second.
             spawn_cooldown_secs: wait this many seconds before spawning.
+
+        Additional kwargs:
+            spawn_script_X: kwargs passed to the spawn_script callable when it
+                            is called.
         """
         super().__init__()
 
@@ -80,6 +86,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
         # TODO(rob): Validate that the name is unique throughout the region.
         self.name = name
         self.spawn_script = scripts.load_script_class(spawn_script)
+        self.spawn_script_kwargs = scripts.extract_script_args("spawn_script_", kwargs)
         self.location = None
         self.num_spawns = num_spawns
         self.spawns = []
@@ -129,6 +136,6 @@ class Spawner(scripts.SavesAPI, scripts.Script):
             spec_name=self.sprite_spec,
             name=f"{self.name}_spawn{self.id_counter}",
             start_location=self.location,
-            script=self.spawn_script(),
+            script=self.spawn_script(**self.spawn_script_kwargs),
         )
         self.spawns.append(sprite)
