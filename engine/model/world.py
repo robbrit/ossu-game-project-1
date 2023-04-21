@@ -355,6 +355,11 @@ class World:
                     "on_activate_",
                     properties,
                 ),
+                on_hit=properties.get("on_hit"),
+                on_hit_args=scripts.extract_script_args(
+                    "on_hit_",
+                    properties,
+                ),
                 on_collide=properties.get("on_collide"),
                 on_collide_args=scripts.extract_script_args("on_collide_", properties),
                 on_start=properties.get("on_start"),
@@ -516,6 +521,11 @@ class World:
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
             script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+
+    def hit(self) -> None:
+        """Hit whatever is in front of the player."""
+        if self.scene is None:
+            raise SceneNotInitialized()
 
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""

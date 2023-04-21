@@ -144,6 +144,9 @@ class Script:
 
         Note that this requires the owner to be rectangular."""
 
+    def on_hit(self, owner: ScriptOwner, player: Player) -> None:
+        """Triggered when the player hit the owner."""
+
     def on_event(self, event_name: str, data: Any) -> None:
         """Triggered when a custom event is fired."""
 
@@ -188,6 +191,8 @@ class ObjectScript(Script):
     api: GameAPI
     _on_activate: GameCallable
     _on_activate_args: Dict[str, Any]
+    _on_hit: GameCallable
+    _on_hit_args: Dict[str, Any]
     _on_collide: GameCallable
     _on_collide_args: Dict[str, Any]
     _on_start: GameCallable
@@ -202,6 +207,8 @@ class ObjectScript(Script):
         api: GameAPI,
         on_activate: Optional[str],
         on_activate_args: Dict[str, Any],
+        on_hit: Optional[str],
+        on_hit_args: Dict[str, Any],
         on_collide: Optional[str],
         on_collide_args: Dict[str, Any],
         on_start: Optional[str],
@@ -212,6 +219,8 @@ class ObjectScript(Script):
         self.api = api
         self._on_activate = load_callable(on_activate) if on_activate else self._dummy
         self._on_activate_args = on_activate_args
+        self._on_hit = load_callable(on_hit) if on_hit else self._dummy
+        self._on_hit_args = on_hit_args
         self._on_collide = load_callable(on_collide) if on_collide else self._dummy
         self._on_collide_args = on_collide_args
         self._on_start = load_callable(on_start) if on_start else self._dummy
@@ -230,6 +239,9 @@ class ObjectScript(Script):
 
     def on_activate(self, owner: ScriptOwner, player: Player) -> None:
         self._on_activate(self.api, **self._on_activate_args)
+
+    def on_hit(self, owner: ScriptOwner, player: Player) -> None:
+        self._on_hit(self.api, **self._on_hit_args)
 
     def on_collide(self, owner: ScriptOwner, other: Entity) -> None:
         self._on_collide(self.api, **self._on_collide_args)
