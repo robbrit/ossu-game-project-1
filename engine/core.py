@@ -133,7 +133,7 @@ class Core(arcade.Window):
         if self.world is None:
             raise GameNotInitializedError()
 
-        return self._spec.sprites.get(name, None)        
+        return self._spec.sprites.get(name, None)
 
     @property
     def player_state(self) -> Dict[str, Any]:
