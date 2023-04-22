@@ -527,6 +527,36 @@ class World:
         if self.scene is None:
             raise SceneNotInitialized()
 
+        # Do a little bit of math to figure out where to place the hitbox.
+        facing = pmath.Vec2(self.player_sprite.facing_x, self.player_sprite.facing_y)
+
+        hitbox_center = facing.normalize().scale(HITBOX_DISTANCE)
+
+        hitbox_corners = [
+            (-HITBOX_DISTANCE, -HITBOX_DISTANCE),
+            (HITBOX_DISTANCE, -HITBOX_DISTANCE),
+            (HITBOX_DISTANCE, HITBOX_DISTANCE),
+            (-HITBOX_DISTANCE, HITBOX_DISTANCE),
+        ]
+        hitbox_sprite = arcade.Sprite(
+            center_x=hitbox_center.x + self.player_sprite.center_x,
+            center_y=hitbox_center.y + self.player_sprite.center_y,
+        )
+        hitbox_sprite.set_hit_box(hitbox_corners)
+
+        objects = arcade.check_for_collision_with_list(
+            hitbox_sprite,
+            self.scene.get_sprite_list(SCRIPTED_OBJECTS),
+        )
+
+        if not objects:
+            return
+
+        for obj in objects:
+            name = obj.properties["name"]
+            script_obj = self.scripted_objects[name]
+            script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""
 
