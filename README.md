@@ -38,16 +38,23 @@ python main.py
 
 ## Coding
 
+Remember that the project is here to help people learn what it's like on a real
+industry project. This means we'll follow patterns that are closer to how a
+company would run an internal repo rather than how open-source projects often
+work.
+
 ### Contributing
 
 To contribute:
 
+- Join the [OSSU Discord server](https://discord.gg/wuytwK5s9h) and ping me
+  (@Rob) to get access to the project.
 - Grab an unclaimed issue in the [issues](https://github.com/robbrit/ossu-game-project-1/issues)
   section.
 - If you need clarification, just ask.
 - If you have an idea, feel free to create an issue for it, but get buy-in from
   @robbrit before spending a lot of time on it.
-- Fork the repo to start working on your change.
+- Create a branch following the pattern `<your Github username>/<description of change>`.
 - When you're done, send a pull request.
 
 Before sending it though, ensure:
@@ -56,6 +63,14 @@ Before sending it though, ensure:
 - You're using [mypy](https://mypy-lang.org/) type annotations.
 - You're following the style guide as defined below.
 - You specify which issue you're completing.
+
+What not to do:
+
+- Use forks. The Github Actions that we use to validate code quality don't seem
+  to run correctly on forks.
+- Start coding before reaching out. We'd prefer to chat with you and have you
+  join the conversation as part of a team rather than just some anonymous
+  contributor.
 
 ### Formatting
 
