@@ -72,6 +72,15 @@ What not to do:
   join the conversation as part of a team rather than just some anonymous
   contributor.
 
+#### PRs from forks
+
+If you've done a PR from a fork, it's pretty easy to get your changes back into
+the main repo. When you create the PR from the fork, instead of choosing
+`robbrit:main` as the branch you want to merge to, type the name of a new branch
+(following the branch naming guidelines above) and then do it from there. That
+should be able to merge without any issues, and then you can create a PR from
+that into `main`.
+
 ### Formatting
 
 We're using black to format the code. Why? Because I don't like to argue about
