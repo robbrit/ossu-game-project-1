@@ -7,8 +7,10 @@ from typing import (
     Protocol,
     Type,
     Tuple,
+    Iterable,
 )
 
+from arcade import Sprite
 from arcade import gui
 
 
@@ -45,6 +47,9 @@ class GameAPI(Protocol):
         script: "Optional[Script]",
     ) -> None:
         """Creates a sprite."""
+
+    def get_sprites(self, name: str) -> Iterable[Sprite]:
+        """Gets all sprites with the given name."""
 
     @property
     def player_state(self) -> Dict[str, Any]:
