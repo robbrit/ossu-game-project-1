@@ -5,10 +5,12 @@ from typing import (
     Iterable,
     Optional,
     Tuple,
+    Iterable,
 )
 
 import arcade
 import arcade.tilemap
+from arcade import Sprite
 
 from engine import (
     game_state,
@@ -133,6 +135,13 @@ class Core(arcade.Window):
             raise GameNotInitializedError()
 
         return self.world.get_key_points(name)
+
+    def get_sprites(self, name: str) -> Iterable[Sprite]:
+        """Gets all sprites with the given name."""
+        if self.world is None:
+            raise GameNotInitializedError()
+
+        return self._spec.sprites.get(name, None)
 
     @property
     def player_state(self) -> Dict[str, Any]:
