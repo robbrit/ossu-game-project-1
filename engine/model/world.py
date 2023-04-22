@@ -555,7 +555,7 @@ class World:
         for obj in objects:
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
-            script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+            script_obj.script.on_hit(script_obj.owner, self.player_sprite)
 
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""
