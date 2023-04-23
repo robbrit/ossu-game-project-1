@@ -5,7 +5,6 @@ from typing import (
     Iterable,
     Optional,
     Tuple,
-    Iterable,
 )
 
 import arcade
