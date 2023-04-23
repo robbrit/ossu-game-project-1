@@ -9,7 +9,6 @@ from typing import (
     Protocol,
     Type,
     Tuple,
-    Iterable,
 )
 
 import arcade
