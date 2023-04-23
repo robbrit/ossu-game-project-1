@@ -3,6 +3,7 @@ import numbers
 from typing import (
     Any,
     Dict,
+    Iterable,
     List,
     Optional,
     Set,
@@ -355,6 +356,11 @@ class World:
                     "on_activate_",
                     properties,
                 ),
+                on_hit=properties.get("on_hit"),
+                on_hit_args=scripts.extract_script_args(
+                    "on_hit_",
+                    properties,
+                ),
                 on_collide=properties.get("on_collide"),
                 on_collide_args=scripts.extract_script_args("on_collide_", properties),
                 on_start=properties.get("on_start"),
@@ -482,8 +488,8 @@ class World:
         self.player_sprite.facing_x = facing_x
         self.player_sprite.facing_y = facing_y
 
-    def activate(self) -> None:
-        """Activates whatever is in front of the player."""
+    def _objs_in_front_of_player(self) -> Iterable[ScriptedObject]:
+        """get scripted obj in front of the player."""
         if self.scene is None:
             raise SceneNotInitialized()
 
@@ -508,14 +514,30 @@ class World:
             hitbox_sprite,
             self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
+        return objects
 
-        if not objects:
+
+
+
+    def activate(self) -> None:
+        """Activates whatever is in front of the player."""
+        if not self._objs_in_front_of_player():
             return
 
-        for obj in objects:
+        for obj in self._objs_in_front_of_player():
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
             script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+
+    def hit(self) -> None:
+        """Hit whatever is in front of the player."""
+        if not self._objs_in_front_of_player():
+            return
+
+        for obj in self._objs_in_front_of_player():
+            name = obj.properties["name"]
+            script_obj = self.scripted_objects[name]
+            script_obj.script.on_hit(script_obj.owner, self.player_sprite)
 
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""
