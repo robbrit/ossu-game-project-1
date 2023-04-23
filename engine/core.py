@@ -10,7 +10,6 @@ from typing import (
 
 import arcade
 import arcade.tilemap
-from arcade import Sprite
 
 from engine import (
     game_state,
@@ -136,12 +135,17 @@ class Core(arcade.Window):
 
         return self.world.get_key_points(name)
 
-    def get_sprites(self, name: str) -> Iterable[Sprite]:
+    def get_sprites(self, name: Optional[str] = None) -> Iterable[arcade.Sprite]:
         """Gets all sprites with the given name."""
         if self.world is None:
             raise GameNotInitializedError()
 
-        return self._spec.sprites.get(name, None)
+        matching_sprites = []
+        for name in self.world.scripted_objects:
+            if name.startswith(name):
+                matching_sprites.append(self.world.scripted_objects[name].sprite)
+
+        return matching_sprites
 
     @property
     def player_state(self) -> Dict[str, Any]:
