@@ -140,9 +140,9 @@ class Core(arcade.Window):
             raise GameNotInitializedError()
 
         matching_sprites = []
-        for n in self.world.scripted_objects.items():
-            if name.startswith(n):
-                matching_sprites.append(self.world.scripted_objects[n])
+        for sprite_name in self.world.scripted_objects.items():
+            if sprite_name.startswith(name):
+                matching_sprites.append(self.world.scripted_objects[sprite_name])
 
         return matching_sprites
 
