@@ -139,12 +139,14 @@ class Core(arcade.Window):
         if self.world is None:
             raise GameNotInitializedError()
 
-        matching_sprites = []
-        for sprite_name in self.world.scripted_objects.items():
-            if sprite_name.startswith(name):
-                matching_sprites.append(self.world.scripted_objects[sprite_name])
-
-        return matching_sprites
+        if name is None:
+            return []
+        else:
+            return [
+                sprite.sprite
+                for sprite_name, sprite in self.world.scripted_objects.items()
+                if name in sprite_name
+            ]
 
     @property
     def player_state(self) -> Dict[str, Any]:
