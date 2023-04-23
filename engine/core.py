@@ -141,12 +141,12 @@ class Core(arcade.Window):
 
         if name is None:
             return []
-        else:
-            return [
-                sprite.sprite
-                for sprite_name, sprite in self.world.scripted_objects.items()
-                if name in sprite_name
-            ]
+
+        return [
+            sprite.sprite
+            for sprite_name, sprite in self.world.scripted_objects.items()
+            if name in sprite_name
+        ]
 
     @property
     def player_state(self) -> Dict[str, Any]:
