@@ -20,6 +20,7 @@ from engine import (
 from engine.model import (
     game_sprite,
     script_zone,
+    shapes,
 )
 
 TILE_SCALING = 1
@@ -59,18 +60,6 @@ class RegionState:
 
     # Mapping from scripted object names to their state.
     object_states: Dict[str, Dict[str, Any]] = dataclasses.field(default_factory=dict)
-
-
-def _pull_script_args(prefix: str, properties: Dict[str, Any]) -> Dict[str, Any]:
-    """Extracts a set of arguments from a dict that has a certain prefix.
-
-    The prefix is stripped from the keys in the result.
-    """
-    return {
-        key.removeprefix(prefix): value
-        for key, value in properties.items()
-        if key.startswith(prefix)
-    }
 
 
 class World:
@@ -116,6 +105,9 @@ class World:
 
     _spec: spec.GameSpec
 
+    in_update: bool
+    objects_to_add: Dict[str, ScriptedObject]
+
     def __init__(
         self,
         api: scripts.GameAPI,
@@ -134,6 +126,9 @@ class World:
         self.scripted_objects = {}
         self.active_region = ""
         self.regions_loaded = set()
+
+        self.in_update = False
+        self.objects_to_add = {}
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -209,7 +204,8 @@ class World:
             if obj.name is None:
                 raise ValueError("Missing name attribute for scripted object.")
 
-            sprite = script_zone.ScriptZone(obj, world_pixel_height)
+            zone = script_zone.ScriptZone(obj, world_pixel_height)
+            sprite = zone
 
             if obj.properties.get("solid", False):
                 solid_objects.append(sprite)
@@ -220,12 +216,12 @@ class World:
             script.state = region_state.object_states.get(obj.name, {})
 
             if is_first_load:
-                script.on_start(obj)
+                script.on_start(zone)
 
             self.scripted_objects[obj.name] = ScriptedObject(
                 name=obj.name,
                 sprite=sprite,
-                owner=obj,
+                owner=zone,
                 script=script,
             )
 
@@ -301,15 +297,24 @@ class World:
         sprite.center_y = start_location[1]
 
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
-        self.scripted_objects[name] = ScriptedObject(
+
+        obj = ScriptedObject(
             name=name,
             sprite=sprite,
             owner=sprite,
             script=script,
         )
 
+        if self.in_update:
+            self.objects_to_add[name] = obj
+        else:
+            self.scripted_objects[name] = obj
+
         if is_first_load:
             script.on_start(sprite)
+
+        script.set_api(self.api)
+        script.set_owner(sprite)
 
         return sprite
 
@@ -346,16 +351,16 @@ class World:
             return scripts.ObjectScript(
                 self.api,
                 on_activate=properties.get("on_activate"),
-                on_activate_args=_pull_script_args(
+                on_activate_args=scripts.extract_script_args(
                     "on_activate_",
                     properties,
                 ),
                 on_collide=properties.get("on_collide"),
-                on_collide_args=_pull_script_args("on_collide_", properties),
+                on_collide_args=scripts.extract_script_args("on_collide_", properties),
                 on_start=properties.get("on_start"),
-                on_start_args=_pull_script_args("on_start_", properties),
+                on_start_args=scripts.extract_script_args("on_start_", properties),
                 on_tick=properties.get("on_tick"),
-                on_tick_args=_pull_script_args("on_tick_", properties),
+                on_tick_args=scripts.extract_script_args("on_tick_", properties),
             )
 
     def _load_script(self, properties: Dict[str, Any]) -> scripts.Script:
@@ -363,7 +368,7 @@ class World:
             raise NoScript()
 
         cls = scripts.load_script_class(properties["script"])
-        args = _pull_script_args("script_", properties)
+        args = scripts.extract_script_args("script_", properties)
         obj = cls(**args)
         obj.set_api(self.api)
         return obj
@@ -373,14 +378,27 @@ class World:
         if self.physics_engine is None:
             raise SceneNotInitialized()
 
+        self.in_update = True
+
         self.player_sprite.on_update(delta_time)
         self._prevent_oob()
+
+        for script in self.scripted_objects.values():
+            script.script.on_tick(self.sec_passed, delta_time)
+            script.sprite.on_update(delta_time)
+
+            # Physics engine doesn't handle moving non-player sprites.
+            script.sprite.center_x += script.sprite.change_x
+            script.sprite.center_y += script.sprite.change_y
+
+        self.scripted_objects.update(self.objects_to_add)
+        self.objects_to_add = {}
+
         self.physics_engine.update()
         self._handle_collisions()
         self.sec_passed += delta_time
 
-        for script in self.scripted_objects.values():
-            script.script.on_tick(self.sec_passed)
+        self.in_update = False
 
     def _handle_collisions(self) -> None:
         """Handles any collisions between different objects."""
@@ -498,6 +516,31 @@ class World:
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
             script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+
+    def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
+        """Queries for key points in the active region."""
+
+        tilemap = self.tilemaps[self.active_region]
+
+        key_points = []
+
+        for point in tilemap.object_lists[KEY_POINTS]:
+            if point.name is None:
+                continue
+
+            if name is not None and name not in point.name:
+                continue
+
+            shape = shapes.tiled_object_shape(point)
+            key_points.append(
+                scripts.KeyPoint(
+                    name=point.name,
+                    location=(shape.center_x, shape.center_y),
+                    properties=point.properties or {},
+                )
+            )
+
+        return key_points
 
     @property
     def width(self) -> int:
