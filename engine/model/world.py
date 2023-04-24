@@ -516,7 +516,6 @@ class World:
         )
         if not objects:
             return []
-            
         for obj in objects:
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
