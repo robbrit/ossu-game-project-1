@@ -311,30 +311,29 @@
         {
          "draworder":"topdown",
          "id":7,
-         "locked":true,
          "name":"NPCs",
          "objects":[
                 {
                  "class":"",
                  "height":0,
                  "id":8,
-                 "name":"IntroCharacter",
+                 "name":"CoryCotton",
                  "point":true,
                  "properties":[
                         {
                          "name":"script",
                          "type":"string",
-                         "value":"game.regions.region1.IntroCharacter"
+                         "value":"game.regions.region1.CoryCotton"
+                        }, 
+                        {
+                         "name":"solid",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
                          "name":"spec",
                          "type":"string",
                          "value":"region1.intro_character"
-                        },
-                        {
-                         "name":"solid",
-                         "type":"bool",
-                         "value":true
                         }],
                  "rotation":0,
                  "visible":true,
