@@ -19,13 +19,14 @@ from engine import (
 )
 from engine.model import (
     game_sprite,
+    physics,
     script_zone,
     shapes,
 )
 
 TILE_SCALING = 1
 
-PLAYER_MOVEMENT_SPEED = 5
+PLAYER_MOVEMENT_SPEED = 250
 
 # The distance in pixels from the center of the player object that we use for testing
 # activions.
@@ -80,7 +81,7 @@ class World:
     player_state: Dict[str, Any]
 
     scene: Optional[arcade.Scene]
-    physics_engine: Optional[arcade.PhysicsEngineSimple]
+    physics_engine: Optional[physics.Engine]
 
     sec_passed: float
 
@@ -172,9 +173,16 @@ class World:
 
         self._reset_player(start_location, tilemap)
 
-        self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite,
+        physics_objs: List[arcade.Sprite] = [self.player_sprite]
+        physics_objs.extend(obj.sprite for obj in self.scripted_objects.values())
+
+        self.physics_engine = physics.Engine(
+            physics_objs,
             tilemap.sprite_lists[region_spec.wall_layer],
+            map_size=(
+                self.width * self.tile_width,
+                self.height * self.tile_height,
+            ),
         )
 
     def _load_scripted_objects(
@@ -188,10 +196,8 @@ class World:
 
         self.scripted_objects = {}
         self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
-        self.scene.add_sprite_list("Solid Objects", use_spatial_hash=True)
 
         sprites = []
-        solid_objects: List[arcade.Sprite] = []
         script: Optional[scripts.Script] = None
         sprite: arcade.Sprite
 
@@ -206,10 +212,7 @@ class World:
 
             zone = script_zone.ScriptZone(obj, world_pixel_height)
             sprite = zone
-
-            if obj.properties.get("solid", False):
-                solid_objects.append(sprite)
-
+            sprite.properties["solid"] = obj.properties.get("solid", False)
             sprites.append(sprite)
 
             script = self._script_from_tiled_object(obj)
@@ -252,12 +255,9 @@ class World:
                 script,
                 is_first_load=is_first_load,
             )
-
-            if obj.properties.get("solid", False):
-                solid_objects.append(sprite)
+            sprite.properties["solid"] = obj.properties.get("solid", False)
 
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).extend(sprites)
-        self.scene.get_sprite_list("Solid Objects").extend(solid_objects)
 
     def create_sprite(
         self,
@@ -380,86 +380,28 @@ class World:
 
         self.in_update = True
 
-        self.player_sprite.on_update(delta_time)
-        self._prevent_oob()
-
         for script in self.scripted_objects.values():
             script.script.on_tick(self.sec_passed, delta_time)
-            script.sprite.on_update(delta_time)
 
-            # Physics engine doesn't handle moving non-player sprites.
-            script.sprite.center_x += script.sprite.change_x
-            script.sprite.center_y += script.sprite.change_y
+        self.physics_engine.update(delta_time, on_collide=self._handle_collision)
 
         self.scripted_objects.update(self.objects_to_add)
+        self.physics_engine.add_sprites(
+            obj.sprite for obj in self.objects_to_add.values()
+        )
         self.objects_to_add = {}
 
-        self.physics_engine.update()
-        self._handle_collisions()
         self.sec_passed += delta_time
-
         self.in_update = False
 
-    def _handle_collisions(self) -> None:
-        """Handles any collisions between different objects."""
-        if self.scene is None:
-            raise SceneNotInitialized()
+    def _handle_collision(self, sprite1: arcade.Sprite, sprite2: arcade.Sprite) -> None:
+        obj1 = self.scripted_objects.get(sprite1.properties.get("name", ""))
+        if obj1:
+            obj1.script.on_collide(obj1.owner, sprite2)
 
-        collisions = arcade.check_for_collision_with_lists(
-            self.player_sprite,
-            [
-                self.scene.get_sprite_list(SCRIPTED_OBJECTS),
-            ],
-        )
-
-        for collision in collisions:
-            obj = self.scripted_objects[collision.properties["name"]]
-            obj.script.on_collide(obj.owner, self.player_sprite)
-
-    def _prevent_oob(self) -> None:
-        """Prevents the player from going out-of-bounds."""
-        if self.scene is None:
-            raise SceneNotInitialized()
-
-        map_width = self.width * self.tile_width
-        map_height = self.height * self.tile_height
-
-        vx = self.player_sprite.change_x
-        vy = self.player_sprite.change_y
-
-        new_x = self.player_sprite.center_x + vx
-        new_y = self.player_sprite.center_y + vy
-        new_vx = None
-        new_vy = None
-
-        if (new_x <= 0 and vx < 0) or (new_x >= map_width and vx > 0):
-            new_vx = 0
-
-        if (new_y <= 0 and vy < 0) or (new_y >= map_height and vy > 0):
-            new_vy = 0
-
-        # Stops movement in only one direction, by checking x and y separately.
-        collisions_x = arcade.get_sprites_at_point(
-            (
-                new_x,
-                self.player_sprite.center_y,
-            ),
-            self.scene.get_sprite_list("Solid Objects"),
-        )
-        if collisions_x:
-            new_vx = 0
-
-        collisions_y = arcade.get_sprites_at_point(
-            (
-                self.player_sprite.center_x,
-                new_y,
-            ),
-            self.scene.get_sprite_list("Solid Objects"),
-        )
-        if collisions_y:
-            new_vy = 0
-
-        self.set_player_speed(new_vx, new_vy)
+        obj2 = self.scripted_objects.get(sprite2.properties.get("name", ""))
+        if obj2:
+            obj2.script.on_collide(obj2.owner, sprite1)
 
     def set_player_speed(
         self,
