@@ -523,9 +523,6 @@ class World:
             script_obj = self.scripted_objects[name]
         return [script_obj]
 
-
-
-
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
         for obj in self._objs_in_front_of_player():
