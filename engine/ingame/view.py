@@ -34,6 +34,7 @@ class InGameView:
         self.height = 0
         self.game_world = game_world
         self.gui = gui
+        self.camera_position = (0, 0)
         self.camera = arcade.Camera(
             viewport_size[0],
             viewport_size[1],
@@ -60,6 +61,8 @@ class InGameView:
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the view."""
         # pylint: disable=unused-argument
+        if self.camera.viewport_width < self. or self.camera.viewport_height < self.window_size[1]:
+            self.on_resize()
         self._center_camera_to_player()
 
     def to_world_coords(self, screen_x: int, screen_y: int) -> Tuple[int, int]:
@@ -93,3 +96,19 @@ class InGameView:
         player_centered = screen_center_x, screen_center_y
 
         self.camera.move_to(player_centered)
+
+    def on_resize(self) -> None:
+        """self.camera_pos is used to store the position of the camera.
+        When the window is resized, on_resize is called and the position of
+        the camera is adjusted so that it is centered in the screen.
+        The arcade.set_viewport method is then called with the adjusted
+        camera position and the new screen size to update the viewport."""
+        if self.camera.viewport_width < arcade.Window.get_size()[0]:
+            self.camera_position[0] = (arcade.Window.get_size()[0] - self.width) / 2
+        if self.camera.viewport_height < arcade.Window.get_size()[1]:
+            self.camera_position[1] = (arcade.Window.get_size()[1] - self.height) / 2
+
+        arcade.set_viewport(
+            self.camera_position[0], self.camera.viewport_width + self.camera_position[0],
+            self.camera_position[1], self.camera.viewport_height + self.camera_position[1],
+        )
