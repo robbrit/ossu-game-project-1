@@ -514,30 +514,27 @@ class World:
             hitbox_sprite,
             self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
-        return objects
+
+        if not objects:
+            return []
+
+        for obj in objects:
+            name = obj.properties["name"]
+            script_obj = self.scripted_objects[name]
+        return [script_obj]
 
 
 
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
-        if not self._objs_in_front_of_player():
-            return
-
         for obj in self._objs_in_front_of_player():
-            name = obj.properties["name"]
-            script_obj = self.scripted_objects[name]
-            script_obj.script.on_activate(script_obj.owner, self.player_sprite)
+            obj.script.on_activate(obj.owner, self.player_sprite)
 
     def hit(self) -> None:
         """Hit whatever is in front of the player."""
-        if not self._objs_in_front_of_player():
-            return
-
         for obj in self._objs_in_front_of_player():
-            name = obj.properties["name"]
-            script_obj = self.scripted_objects[name]
-            script_obj.script.on_hit(script_obj.owner, self.player_sprite)
+            obj.script.on_hit(obj.owner, self.player_sprite)
 
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""
