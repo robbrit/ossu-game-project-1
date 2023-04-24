@@ -110,10 +110,10 @@ class World:
     objects_to_add: Dict[str, ScriptedObject]
 
     def __init__(
-        self,
-        api: scripts.GameAPI,
-        game_spec: spec.GameSpec,
-        initial_player_state: Dict[str, Any],
+            self,
+            api: scripts.GameAPI,
+            game_spec: spec.GameSpec,
+            initial_player_state: Dict[str, Any],
     ):
         self.api = api
         self._spec = game_spec
@@ -179,10 +179,10 @@ class World:
         )
 
     def _load_scripted_objects(
-        self,
-        tilemap: arcade.TileMap,
-        region_state: RegionState,
-        is_first_load: bool,
+            self,
+            tilemap: arcade.TileMap,
+            region_state: RegionState,
+            is_first_load: bool,
     ) -> None:
         if self.scene is None:
             raise SceneNotInitialized()
@@ -261,11 +261,11 @@ class World:
         self.scene.get_sprite_list("Solid Objects").extend(solid_objects)
 
     def create_sprite(
-        self,
-        sprite_spec: spec.GameSpriteSpec,
-        name: str,
-        start_location: Tuple[float, float],
-        script: Optional[scripts.Script],
+            self,
+            sprite_spec: spec.GameSpriteSpec,
+            name: str,
+            start_location: Tuple[float, float],
+            script: Optional[scripts.Script],
     ) -> arcade.Sprite:
         """Adds a sprite to the model."""
         return self._create_sprite(
@@ -277,12 +277,12 @@ class World:
         )
 
     def _create_sprite(
-        self,
-        sprite_spec: spec.GameSpriteSpec,
-        name: str,
-        start_location: Tuple[float, float],
-        script: Optional[scripts.Script],
-        is_first_load: bool,
+            self,
+            sprite_spec: spec.GameSpriteSpec,
+            name: str,
+            start_location: Tuple[float, float],
+            script: Optional[scripts.Script],
+            is_first_load: bool,
     ) -> arcade.Sprite:
         if self.scene is None:
             raise SceneNotInitialized()
@@ -341,8 +341,8 @@ class World:
         self.player_sprite.center_y = start[0].shape[1]  # type: ignore
 
     def _script_from_tiled_object(
-        self,
-        tiled_obj: arcade.TiledObject,
+            self,
+            tiled_obj: arcade.TiledObject,
     ) -> scripts.Script:
         properties = tiled_obj.properties or {}
 
@@ -468,9 +468,9 @@ class World:
         self.set_player_speed(new_vx, new_vy)
 
     def set_player_speed(
-        self,
-        vx: Optional[int] = None,
-        vy: Optional[int] = None,
+            self,
+            vx: Optional[int] = None,
+            vy: Optional[int] = None,
     ) -> None:
         """Sets the player's speed.
 
@@ -514,7 +514,6 @@ class World:
             hitbox_sprite,
             self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
-
         if not objects:
             return []
 
