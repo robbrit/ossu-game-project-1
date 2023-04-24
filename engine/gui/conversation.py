@@ -9,6 +9,8 @@ from arcade import gui
 from engine import scripts
 
 CONVERSATION_PADDING = 10
+CONVERSATION_Y = 200
+CONVERSATION_HEIGHT = 180
 SCREEN_HEIGHT = 600
 CHOICES_OFFSET = 650
 CHOICE_HEIGHT = 30
@@ -97,11 +99,14 @@ class GUI:
 
     def _reset_widgets(self) -> None:
         self.manager.clear()
+        # Dirty hack to get the UI manager to reset correctly.
+        self.manager.children[0] = []
 
         self.manager.add(
             gui.UITextArea(
                 x=CONVERSATION_PADDING,
-                y=CONVERSATION_PADDING,
+                y=CONVERSATION_Y,
+                height=CONVERSATION_HEIGHT,
                 text=self.current.text,
             ),
             index=0,
