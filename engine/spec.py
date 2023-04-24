@@ -4,6 +4,8 @@ from typing import (
     Dict,
 )
 
+from engine.gui import widgets
+
 
 @dataclasses.dataclass
 class AnimationSpec:
@@ -65,13 +67,16 @@ class GameSpec:
     world: WorldSpec
     player_spec: GameSpriteSpec
     sprites: Dict[str, GameSpriteSpec]
+    guis: Dict[str, widgets.GUISpec]
 
     def __init__(
         self,
         world: Dict[str, Any],
         player_spec: Dict[str, Any],
         sprites: Dict[str, Any],
+        guis: Dict[str, Any],
     ):
         self.world = WorldSpec(**world)
         self.player_spec = GameSpriteSpec(**player_spec)
         self.sprites = {name: GameSpriteSpec(**spec) for name, spec in sprites.items()}
+        self.guis = {name: widgets.GUISpec(**spec) for name, spec in guis.items()}
