@@ -514,17 +514,13 @@ class World:
             hitbox_sprite,
             self.scene.get_sprite_list(SCRIPTED_OBJECTS),
         )
-
         if not objects:
             return []
-
+            
         for obj in objects:
             name = obj.properties["name"]
             script_obj = self.scripted_objects[name]
         return [script_obj]
-
-
-
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
