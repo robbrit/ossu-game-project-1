@@ -134,6 +134,20 @@ class Core(arcade.Window):
 
         return self.world.get_key_points(name)
 
+    def get_sprites(self, name: Optional[str] = None) -> Iterable[arcade.Sprite]:
+        """Gets all sprites with the given name."""
+        if self.world is None:
+            raise GameNotInitializedError()
+
+        if name is None:
+            return [sprite.sprite for sprite in self.world.scripted_objects.values()]
+
+        return [
+            sprite.sprite
+            for sprite_name, sprite in self.world.scripted_objects.items()
+            if name in sprite_name
+        ]
+
     @property
     def player_state(self) -> Dict[str, Any]:
         """Gets the player's state."""
