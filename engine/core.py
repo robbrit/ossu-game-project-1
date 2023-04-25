@@ -140,7 +140,7 @@ class Core(arcade.Window):
             raise GameNotInitializedError()
 
         if name is None:
-            return []
+            return [sprite.sprite for sprite in self.world.scripted_objects.values()]
 
         return [
             sprite.sprite
