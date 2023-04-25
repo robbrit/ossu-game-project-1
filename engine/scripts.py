@@ -61,7 +61,8 @@ class GameAPI(Protocol):
     def get_key_points(self, name: Optional[str] = None) -> Iterable[KeyPoint]:
         """Queries for key points within the active region."""
 
-    def get_sprites(self, name: str) -> Iterable[arcade.Sprite]:
+
+    def get_sprites(self, name: Optional[str] = None) -> Iterable[arcade.Sprite]:
         """Gets all sprites with the given name."""
 
     @property
