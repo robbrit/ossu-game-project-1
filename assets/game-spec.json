@@ -34,7 +34,6 @@
         },
         "initial_region": "Region1"
     },
-
     "sprites": {
         "region1.intro_character": {
             "width": 32,
@@ -89,7 +88,6 @@
             }
         }
     },
-
     "player_spec": {
         "width": 32,
         "height": 32,
@@ -128,6 +126,66 @@
                 "frame_speed": 0.3,
                 "num_frames": 2
             }
+        }
+    },
+    "guis": {
+        "start-screen": {
+            "assets": [
+                {
+                    "name": "start-button",
+                    "path": "assets/gui/start-button.png"
+                },
+                {
+                    "name": "start-selected-button",
+                    "path": "assets/gui/start-selected-button.png"
+                },
+                {
+                    "name": "load-button",
+                    "path": "assets/gui/load-button.png"
+                },
+                {
+                    "name": "load-selected-button",
+                    "path": "assets/gui/load-selected-button.png"
+                },
+                {
+                    "name": "ossu-logo",
+                    "path": "assets/gui/ossu.png"
+                }
+            ],
+            "buttons": [
+                {
+                    "selected_image_asset": "start-selected-button",
+                    "unselected_image_asset": "start-button",
+                    "name": "start-button",
+                    "down": "load-button",
+                    "center": [
+                        400,
+                        290
+                    ],
+                    "action": "engine.builtin.resume_game"
+                },
+                {
+                    "selected_image_asset": "load-selected-button",
+                    "unselected_image_asset": "load-button",
+                    "name": "load-button",
+                    "up": "start-button",
+                    "center": [
+                        400,
+                        180
+                    ],
+                    "action": "engine.builtin.resume_game"
+                }
+            ],
+            "images": [
+                {
+                    "image_asset": "ossu-logo",
+                    "center": [
+                        500,
+                        500
+                    ]
+                }
+            ],
+            "initial_selected_button": "start-button"
         }
     }
 }

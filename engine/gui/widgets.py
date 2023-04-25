@@ -88,7 +88,6 @@ class GUISpec:
         assets: Optional[List[Dict[str, Any]]],
         buttons: Optional[List[Dict[str, Any]]],
         images: Optional[List[Dict[str, Any]]],
-        dimensions: Tuple[int, int],
         cancel_action: Optional[str] = None,
         initial_selected_button: Optional[str] = None,
     ):
@@ -105,8 +104,6 @@ class GUISpec:
                 for button in self.buttons
                 if button.name == initial_selected_button
             )
-
-        self.validate(dimensions)
 
     def validate(self, dimensions: Tuple[int, int]) -> None:
         """Validates the GUISpec."""
