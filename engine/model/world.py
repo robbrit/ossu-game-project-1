@@ -99,7 +99,7 @@ class World:
     _spec: spec.GameSpec
 
     in_update: bool
-    sprites_to_add: Dict[str, game_sprite.GameSprite]
+    _sprites_to_add: Dict[str, game_sprite.GameSprite]
 
     def __init__(
         self,
@@ -124,7 +124,7 @@ class World:
         self.regions_loaded = set()
 
         self.in_update = False
-        self.sprites_to_add = {}
+        self._sprites_to_add = {}
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -293,7 +293,7 @@ class World:
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
 
         if self.in_update:
-            self.sprites_to_add[name] = sprite
+            self._sprites_to_add[name] = sprite
         else:
             self._game_sprites[name] = sprite
 
@@ -379,9 +379,9 @@ class World:
 
         self.physics_engine.update(delta_time, on_collide=self._handle_collision)
 
-        self._game_sprites.update(self.sprites_to_add)
-        self.physics_engine.add_sprites(self.sprites_to_add.values())
-        self.sprites_to_add = {}
+        self._game_sprites.update(self._sprites_to_add)
+        self.physics_engine.add_sprites(self._sprites_to_add.values())
+        self._sprites_to_add = {}
 
         self.sec_passed += delta_time
         self.in_update = False
