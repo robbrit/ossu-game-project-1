@@ -12,6 +12,7 @@ import arcade
 import arcade.texture
 
 from engine import (
+    scripts,
     spec,
 )
 
@@ -92,9 +93,11 @@ class GameSprite(arcade.Sprite):
     This includes support for animations, facing directions, etc.
     """
 
-    # The spec for this sprite.
-    _spec: spec.GameSpriteSpec
-    animations: Optional[Animations]
+    name: str
+
+    _spec: Optional[spec.GameSpriteSpec]
+    animations: Optional[Animations] = None
+    script: Optional[scripts.Script] = None
 
     # X and Y directions that the character is facing.
     facing_x: float
@@ -102,13 +105,29 @@ class GameSprite(arcade.Sprite):
 
     def __init__(
         self,
-        sprite_spec: spec.GameSpriteSpec,
+        name: str,
+        sprite_spec: Optional[spec.GameSpriteSpec] = None,
+        size: Optional[Tuple[float, float]] = None,
+        script: Optional[scripts.Script] = None,
     ):
-        super().__init__(image_width=sprite_spec.width, image_height=sprite_spec.height)
+        width, height = 0.0, 0.0
+        if size is not None:
+            width, height = size
+        elif sprite_spec is not None:
+            width, height = sprite_spec.width, sprite_spec.height
+
+        super().__init__(
+            image_width=width,
+            image_height=height,
+        )
+        self.name = name
         self.set_facing(x=1.0, y=1.0)
         self._spec = sprite_spec
-        self.animations = Animations(sprite_spec)
-        self.texture = self.animations.texture
+        self.script = script
+
+        if sprite_spec is not None:
+            self.animations = Animations(sprite_spec)
+            self.texture = self.animations.texture
 
     def set_facing(self, x: float, y: float) -> None:
         """Sets the facing direction for the sprite."""
