@@ -16,7 +16,7 @@ class RatState(enum.Enum):
 
 
 RAT_IDLE_SECS = 5
-RAT_SPEED = 2
+RAT_SPEED = 80
 RAT_PROXIMITY = 5
 
 
