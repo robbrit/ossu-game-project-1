@@ -48,16 +48,6 @@ class NoScript(Exception):
 
 
 @dataclasses.dataclass
-class ScriptedObject:
-    """Ties a world object to a script."""
-
-    name: str
-    sprite: game_sprite.GameSprite
-    owner: scripts.ScriptOwner
-    script: scripts.Script
-
-
-@dataclasses.dataclass
 class RegionState:
     """Stores the state of a region."""
 
@@ -72,10 +62,10 @@ class World:
 
     # TODO(rob): This class is getting big and incohesive. Some refactors that would
     # clean it up:
-    # - Merge the ScriptedObject stuff and a lot of the sprite stuff into a single
-    #   ScriptedSprite class that inherits from Sprite.
     # - Make RegionState a bit smarter, have it manage serialization of itself.
     # - Create a PlayerSprite object that wraps all the player-specific stuff.
+    # - Make as much as possible private; things outside this class are starting to poke
+    #   into it which adds extra coupling.
 
     api: scripts.GameAPI
 
@@ -104,12 +94,12 @@ class World:
     region_states: Dict[str, RegionState]
     regions_loaded: Set[str]
 
-    scripted_objects: Dict[str, ScriptedObject]
+    _game_sprites: Dict[str, game_sprite.GameSprite]
 
     _spec: spec.GameSpec
 
     in_update: bool
-    objects_to_add: Dict[str, ScriptedObject]
+    sprites_to_add: Dict[str, game_sprite.GameSprite]
 
     def __init__(
         self,
@@ -129,12 +119,12 @@ class World:
 
         self.tilemaps = {}
         self.region_states = {}
-        self.scripted_objects = {}
+        self._game_sprites = {}
         self.active_region = ""
         self.regions_loaded = set()
 
         self.in_update = False
-        self.objects_to_add = {}
+        self.sprites_to_add = {}
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -154,8 +144,9 @@ class World:
         if self.active_region != "":
             self.region_states[self.active_region] = RegionState(
                 object_states={
-                    name: obj.script.state
-                    for name, obj in self.scripted_objects.items()
+                    sprite.name: sprite.script.state
+                    for sprite in self._game_sprites.values()
+                    if sprite.script is not None
                 },
             )
 
@@ -179,7 +170,7 @@ class World:
         self._reset_player(start_location, tilemap)
 
         physics_objs: List[game_sprite.GameSprite] = [self.player_sprite]
-        physics_objs.extend(obj.sprite for obj in self.scripted_objects.values())
+        physics_objs.extend(self._game_sprites.values())
 
         self.physics_engine = physics.Engine(
             physics_objs,
@@ -199,7 +190,7 @@ class World:
         if self.scene is None:
             raise SceneNotInitialized()
 
-        self.scripted_objects = {}
+        self._game_sprites = {}
         self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
 
         sprites = []
@@ -228,12 +219,7 @@ class World:
             if is_first_load:
                 script.on_start(sprite)
 
-            self.scripted_objects[obj.name] = ScriptedObject(
-                name=obj.name,
-                sprite=sprite,
-                owner=sprite,
-                script=script,
-            )
+            self._game_sprites[obj.name] = sprite
 
         for obj in tilemap.object_lists.get(NPCS, []):
             if obj.properties is None:
@@ -306,17 +292,10 @@ class World:
 
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).append(sprite)
 
-        obj = ScriptedObject(
-            name=name,
-            sprite=sprite,
-            owner=sprite,
-            script=script,
-        )
-
         if self.in_update:
-            self.objects_to_add[name] = obj
+            self.sprites_to_add[name] = sprite
         else:
-            self.scripted_objects[name] = obj
+            self._game_sprites[name] = sprite
 
         if is_first_load:
             script.on_start(sprite)
@@ -393,16 +372,16 @@ class World:
 
         self.in_update = True
 
-        for script in self.scripted_objects.values():
-            script.script.on_tick(self.sec_passed, delta_time)
+        for sprite in self._game_sprites.values():
+            if sprite.script is None:
+                continue
+            sprite.script.on_tick(self.sec_passed, delta_time)
 
         self.physics_engine.update(delta_time, on_collide=self._handle_collision)
 
-        self.scripted_objects.update(self.objects_to_add)
-        self.physics_engine.add_sprites(
-            obj.sprite for obj in self.objects_to_add.values()
-        )
-        self.objects_to_add = {}
+        self._game_sprites.update(self.sprites_to_add)
+        self.physics_engine.add_sprites(self.sprites_to_add.values())
+        self.sprites_to_add = {}
 
         self.sec_passed += delta_time
         self.in_update = False
@@ -412,13 +391,13 @@ class World:
         sprite1: game_sprite.GameSprite,
         sprite2: game_sprite.GameSprite,
     ) -> None:
-        obj1 = self.scripted_objects.get(sprite1.name)
-        if obj1:
-            obj1.script.on_collide(obj1.owner, sprite2)
+        obj1 = self._game_sprites.get(sprite1.name)
+        if obj1 and obj1.script is not None:
+            obj1.script.on_collide(obj1, sprite2)
 
-        obj2 = self.scripted_objects.get(sprite2.name)
-        if obj2:
-            obj2.script.on_collide(obj2.owner, sprite1)
+        obj2 = self._game_sprites.get(sprite2.name)
+        if obj2 and obj2.script is not None:
+            obj2.script.on_collide(obj2, sprite1)
 
     def set_player_speed(
         self,
@@ -441,7 +420,7 @@ class World:
         self.player_sprite.facing_x = facing_x
         self.player_sprite.facing_y = facing_y
 
-    def _objs_in_front_of_player(self) -> Iterable[ScriptedObject]:
+    def _objs_in_front_of_player(self) -> Iterable[game_sprite.GameSprite]:
         """get scripted obj in front of the player."""
         if self.scene is None:
             raise SceneNotInitialized()
@@ -463,28 +442,27 @@ class World:
         )
         hitbox_sprite.set_hit_box(hitbox_corners)
 
-        objects = cast(
+        return cast(
             List[game_sprite.GameSprite],
             arcade.check_for_collision_with_list(
                 hitbox_sprite,
                 self.scene.get_sprite_list(SCRIPTED_OBJECTS),
             ),
         )
-        if not objects:
-            return []
-        for obj in objects:
-            script_obj = self.scripted_objects[obj.name]
-        return [script_obj]
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
         for obj in self._objs_in_front_of_player():
-            obj.script.on_activate(obj.owner, self.player_sprite)
+            if obj.script is None:
+                continue
+            obj.script.on_activate(obj, self.player_sprite)
 
     def hit(self) -> None:
         """Hit whatever is in front of the player."""
         for obj in self._objs_in_front_of_player():
-            obj.script.on_hit(obj.owner, self.player_sprite)
+            if obj.script is None:
+                continue
+            obj.script.on_hit(obj, self.player_sprite)
 
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""
@@ -510,6 +488,18 @@ class World:
             )
 
         return key_points
+
+    def get_sprites(self, name: Optional[str]) -> Iterable[game_sprite.GameSprite]:
+        """Queries for sprites in the active region.
+
+        Args:
+            name: If set, acts as a substring filter for names.
+        """
+
+        if name is None:
+            return self._game_sprites.values()
+
+        return (sprite for sprite in self._game_sprites.values() if name in sprite.name)
 
     @property
     def width(self) -> int:
