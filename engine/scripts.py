@@ -112,6 +112,14 @@ class ScriptOwner(Protocol):
     def speed(self, value: Tuple[float, float]) -> None:
         """Sets the speed of the script owner."""
 
+    @property
+    def facing(self) -> Tuple[float, float]:
+        """Gets the facing direction of the script owner."""
+
+    @facing.setter
+    def facing(self, value: Tuple[float, float]) -> None:
+        """Sets the facing direction of the script owner."""
+
 
 class Entity(Protocol):
     """Defines something in the game: a player, a monster, etc."""

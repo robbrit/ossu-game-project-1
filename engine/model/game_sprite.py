@@ -37,14 +37,11 @@ class GameSprite(arcade.Sprite):
     # How much time we we've spent in the current animation.
     time_index: float
 
-    # X and Y directions that the character is facing.
-    facing_x: float
-    facing_y: float
-
     def __init__(self, sprite_spec: spec.GameSpriteSpec):
         super().__init__(image_width=sprite_spec.width, image_height=sprite_spec.height)
 
-        self.set_facing(x=1.0, y=1.0)
+        # self.set_facing(x=1.0, y=1.0)
+        self.facing = (1.0, 1.0)
 
         self._spec = sprite_spec
         self.animations = {
@@ -142,6 +139,15 @@ class GameSprite(arcade.Sprite):
     def speed(self, value: Tuple[float, float]) -> None:
         """Sets the speed of the script owner."""
         self.change_x, self.change_y = value
+
+    @property
+    def facing(self) -> Tuple[float, float]:
+        """Gets the facing direction of the script owner."""
+        return (self.facing_x, self.facing_y)
+
+    @facing.setter
+    def facing(self, value: Tuple[float, float]) -> None:
+        """Sets the facing direction of the script owner."""
         self.facing_x, self.facing_y = value
 
         if self.facing_x == 0.0 and self.facing_y == 0.0:

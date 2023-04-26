@@ -71,6 +71,7 @@ class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
 
         delta = self._vec_to_waypoint(next_waypoint_idx).normalize().scale(RAT_SPEED)
         self.owner.speed = (delta.x, delta.y)
+        self.owner.facing = (delta.x, delta.y)
         self.state = RatState.MOVING
 
     def _handle_moving(self, game_time: float) -> None:
