@@ -2,6 +2,7 @@ import dataclasses
 import numbers
 from typing import (
     Any,
+    cast,
     Dict,
     Iterable,
     List,
@@ -51,7 +52,7 @@ class ScriptedObject:
     """Ties a world object to a script."""
 
     name: str
-    sprite: arcade.Sprite
+    sprite: game_sprite.GameSprite
     owner: scripts.ScriptOwner
     script: scripts.Script
 
@@ -120,7 +121,10 @@ class World:
         self._spec = game_spec
         self.sec_passed = 0.0
 
-        self.player_sprite = game_sprite.GameSprite(game_spec.player_spec)
+        self.player_sprite = game_sprite.GameSprite(
+            name="player",
+            sprite_spec=game_spec.player_spec,
+        )
         self.player_state = initial_player_state
 
         self.tilemaps = {}
@@ -174,7 +178,7 @@ class World:
 
         self._reset_player(start_location, tilemap)
 
-        physics_objs: List[arcade.Sprite] = [self.player_sprite]
+        physics_objs: List[game_sprite.GameSprite] = [self.player_sprite]
         physics_objs.extend(obj.sprite for obj in self.scripted_objects.values())
 
         self.physics_engine = physics.Engine(
@@ -200,7 +204,7 @@ class World:
 
         sprites = []
         script: Optional[scripts.Script] = None
-        sprite: arcade.Sprite
+        sprite: game_sprite.GameSprite
 
         world_pixel_height = tilemap.tile_height * tilemap.height
 
@@ -211,21 +215,23 @@ class World:
             if obj.name is None:
                 raise ValueError("Missing name attribute for scripted object.")
 
-            zone = script_zone.ScriptZone(obj, world_pixel_height)
-            sprite = zone
-            sprite.properties["solid"] = obj.properties.get("solid", False)
-            sprites.append(sprite)
-
             script = self._script_from_tiled_object(obj)
             script.state = region_state.object_states.get(obj.name, {})
 
+            sprite = script_zone.ScriptZone(
+                obj,
+                world_pixel_height,
+                script,
+            )
+            sprites.append(sprite)
+
             if is_first_load:
-                script.on_start(zone)
+                script.on_start(sprite)
 
             self.scripted_objects[obj.name] = ScriptedObject(
                 name=obj.name,
                 sprite=sprite,
-                owner=zone,
+                owner=sprite,
                 script=script,
             )
 
@@ -283,17 +289,18 @@ class World:
         start_location: Tuple[float, float],
         script: Optional[scripts.Script],
         is_first_load: bool,
-    ) -> arcade.Sprite:
+    ) -> game_sprite.GameSprite:
         if self.scene is None:
             raise SceneNotInitialized()
 
         if not script:
             raise NotImplementedError("Non-scripted sprites are not supported.")
 
-        sprite = game_sprite.GameSprite(sprite_spec)
-        sprite.properties = {
-            "name": name,
-        }
+        sprite = game_sprite.GameSprite(
+            name=name,
+            sprite_spec=sprite_spec,
+            script=script,
+        )
         sprite.center_x = start_location[0]
         sprite.center_y = start_location[1]
 
@@ -400,12 +407,16 @@ class World:
         self.sec_passed += delta_time
         self.in_update = False
 
-    def _handle_collision(self, sprite1: arcade.Sprite, sprite2: arcade.Sprite) -> None:
-        obj1 = self.scripted_objects.get(sprite1.properties.get("name", ""))
+    def _handle_collision(
+        self,
+        sprite1: game_sprite.GameSprite,
+        sprite2: game_sprite.GameSprite,
+    ) -> None:
+        obj1 = self.scripted_objects.get(sprite1.name)
         if obj1:
             obj1.script.on_collide(obj1.owner, sprite2)
 
-        obj2 = self.scripted_objects.get(sprite2.properties.get("name", ""))
+        obj2 = self.scripted_objects.get(sprite2.name)
         if obj2:
             obj2.script.on_collide(obj2.owner, sprite1)
 
@@ -452,15 +463,17 @@ class World:
         )
         hitbox_sprite.set_hit_box(hitbox_corners)
 
-        objects = arcade.check_for_collision_with_list(
-            hitbox_sprite,
-            self.scene.get_sprite_list(SCRIPTED_OBJECTS),
+        objects = cast(
+            List[game_sprite.GameSprite],
+            arcade.check_for_collision_with_list(
+                hitbox_sprite,
+                self.scene.get_sprite_list(SCRIPTED_OBJECTS),
+            ),
         )
         if not objects:
             return []
         for obj in objects:
-            name = obj.properties["name"]
-            script_obj = self.scripted_objects[name]
+            script_obj = self.scripted_objects[obj.name]
         return [script_obj]
 
     def activate(self) -> None:

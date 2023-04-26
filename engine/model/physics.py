@@ -7,17 +7,19 @@ from typing import (
 
 import arcade
 
+from engine.model import game_sprite
+
 
 class Engine:
     """Our implementation of a physics engine."""
 
-    moveable_sprites: List[arcade.Sprite]
+    moveable_sprites: List[game_sprite.GameSprite]
     wall_sprite_list: arcade.SpriteList
     map_size: Tuple[float, float]
 
     def __init__(
         self,
-        moveable_sprites: Iterable[arcade.Sprite],
+        moveable_sprites: Iterable[game_sprite.GameSprite],
         wall_sprite_list: arcade.SpriteList,
         map_size: Tuple[float, float],
     ):
@@ -37,14 +39,14 @@ class Engine:
         self.wall_sprite_list = wall_sprite_list
         self.map_size = map_size
 
-    def add_sprites(self, sprites: Iterable[arcade.Sprite]) -> None:
+    def add_sprites(self, sprites: Iterable[game_sprite.GameSprite]) -> None:
         """Adds a number of sprites to the engine."""
         self.moveable_sprites.extend(sprites)
 
     def update(
         self,
         delta_time: float,
-        on_collide: Callable[[arcade.Sprite, arcade.Sprite], None],
+        on_collide: Callable[[game_sprite.GameSprite, game_sprite.GameSprite], None],
     ) -> None:
         """Updates all objects in the physics engine."""
 
@@ -56,7 +58,7 @@ class Engine:
     def _move_sprites(
         self,
         delta_time: float,
-        on_collide: Callable[[arcade.Sprite, arcade.Sprite], None],
+        on_collide: Callable[[game_sprite.GameSprite, game_sprite.GameSprite], None],
     ) -> None:
         collisions = set()
 
@@ -99,11 +101,11 @@ class Engine:
         for idx1, idx2 in collisions:
             on_collide(self.moveable_sprites[idx1], self.moveable_sprites[idx2])
 
-    def _collides_with_wall(self, sprite: arcade.Sprite) -> bool:
+    def _collides_with_wall(self, sprite: game_sprite.GameSprite) -> bool:
         collisions = arcade.check_for_collision_with_list(sprite, self.wall_sprite_list)
         return len(collisions) > 0
 
-    def _is_oob(self, sprite: arcade.Sprite) -> bool:
+    def _is_oob(self, sprite: game_sprite.GameSprite) -> bool:
         if sprite.center_x < 0 or sprite.center_x >= self.map_size[0]:
             return True
 
