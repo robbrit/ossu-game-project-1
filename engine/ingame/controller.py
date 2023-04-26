@@ -60,6 +60,10 @@ class InGameController:
             # We activate when the right mouse button is hit.
             self._world.activate()
 
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            # We attack when the left mouse button is hit.
+            self._world.hit()
+
     def on_update(self, delta_time: float) -> None:
         """Updates the world."""
         # pylint: disable=unused-argument
