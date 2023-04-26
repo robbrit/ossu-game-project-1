@@ -4,13 +4,16 @@ from os import path
 from typing import (
     Dict,
     List,
+    Optional,
     Tuple,
 )
 
 import arcade
 import arcade.texture
 
-from engine import spec
+from engine import (
+    spec,
+)
 
 
 @dataclasses.dataclass
@@ -21,32 +24,19 @@ class Animation:
     textures: List[arcade.texture.Texture]
 
 
-class GameSprite(arcade.Sprite):
-    """Wraps the various code related to sprites in our game.
-
-    This includes support for animations, facing directions, etc.
-    """
+class Animations:
+    """Wraps all the details for animations."""
 
     # Mapping from animation name to the animation details.
     animations: Dict[str, Animation]
     # Name of the animation that is currently selected.
     current_animation: str
-    # The spec for this sprite.
-    _spec: spec.GameSpriteSpec
-
     # How much time we we've spent in the current animation.
     time_index: float
 
-    # X and Y directions that the character is facing.
-    facing_x: float
-    facing_y: float
+    texture: arcade.Texture
 
     def __init__(self, sprite_spec: spec.GameSpriteSpec):
-        super().__init__(image_width=sprite_spec.width, image_height=sprite_spec.height)
-
-        self.set_facing(x=1.0, y=1.0)
-
-        self._spec = sprite_spec
         self.animations = {
             name: Animation(
                 spec=animation_spec,
@@ -62,10 +52,13 @@ class GameSprite(arcade.Sprite):
         }
         self._reset_animation(sprite_spec.initial_animation)
 
-    def set_facing(self, x: float, y: float) -> None:
-        """Sets the facing direction for the sprite."""
-        self.facing_x = x
-        self.facing_y = y
+    def _reset_animation(self, name: str) -> None:
+        self.current_animation = name
+
+        current_animation = self.animations[name]
+
+        self.time_index = 0.0
+        self.texture = current_animation.textures[0]
 
     def set_animation(self, name: str) -> None:
         """Changes the current animation for the sprite.
@@ -81,15 +74,7 @@ class GameSprite(arcade.Sprite):
 
         self._reset_animation(name)
 
-    def _reset_animation(self, name: str) -> None:
-        self.current_animation = name
-
-        current_animation = self.animations[name]
-
-        self.time_index = 0.0
-        self.texture = current_animation.textures[0]
-
-    def update_animation(self, delta_time: float = 1 / 60):
+    def update(self, delta_time: float):
         """Progresses the animation by a certain time step."""
         current_animation = self.animations[self.current_animation]
         sequence_duration = (
@@ -100,21 +85,63 @@ class GameSprite(arcade.Sprite):
 
         self.texture = current_animation.textures[current_frame]
 
-    def on_update(self, delta_time: float = 1 / 60):
-        """Updates the sprite by a certain time step."""
-        moving = self.change_x != 0 or self.change_y != 0
 
-        animation = "walk" if moving else "idle"
+class GameSprite(arcade.Sprite):
+    """Wraps the various code related to sprites in our game.
+
+    This includes support for animations, facing directions, etc.
+    """
+
+    # The spec for this sprite.
+    _spec: spec.GameSpriteSpec
+    animations: Optional[Animations]
+
+    # X and Y directions that the character is facing.
+    facing_x: float
+    facing_y: float
+
+    def __init__(
+        self,
+        sprite_spec: spec.GameSpriteSpec,
+    ):
+        super().__init__(image_width=sprite_spec.width, image_height=sprite_spec.height)
+        self.set_facing(x=1.0, y=1.0)
+        self._spec = sprite_spec
+        self.animations = Animations(sprite_spec)
+        self.texture = self.animations.texture
+
+    def set_facing(self, x: float, y: float) -> None:
+        """Sets the facing direction for the sprite."""
+        self.facing_x = x
+        self.facing_y = y
+
+    def on_update(self, delta_time: float = 1 / 60) -> None:
+        """Updates the sprite by a certain time step."""
+        self._update_animation(delta_time)
+
+    def _update_animation(self, delta_time: float) -> None:
+        if self.animations is None:
+            return
+
+        animation = self._animation_state()
         direction = self._get_direction()
 
         try:
-            self.set_animation(f"{animation}-{direction}")
+            self.animations.set_animation(f"{animation}-{direction}")
         except KeyError:
             # This is possibly becase they don't have directional animations. If they
             # don't, just use the base animation.
-            self.set_animation(animation)
+            self.animations.set_animation(animation)
 
-        self.update_animation(delta_time)
+        self.animations.update(delta_time)
+        self.texture = self.animations.texture
+
+    def _animation_state(self) -> str:
+        """Determines which 'animation state' we're in."""
+        if self.change_x != 0 or self.change_y != 0:
+            return "walk"
+
+        return "idle"
 
     def _get_direction(self) -> str:
         # TODO(rob): Should probably do an enum for facing direction.

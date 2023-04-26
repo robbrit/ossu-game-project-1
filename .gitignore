@@ -8,3 +8,4 @@ assets/regions/main.tiled-project
 assets/regions/main.tiled-session
 
 *.pyc
+.vscode
