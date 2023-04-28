@@ -3,3 +3,6 @@ lint:
 
 mypy:
 	mypy main.py
+
+test:
+	python -m unittest
