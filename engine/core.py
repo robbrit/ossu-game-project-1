@@ -31,6 +31,7 @@ class GameNotInitializedError(Exception):
 class Core(arcade.Window):
     """
     Main application class, wraps everything.
+    Implements scripts.GameAPI.
 
     The game uses an MVC pattern:
     * Model - capture the state of the world in the game: players, regions, enemies,
