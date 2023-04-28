@@ -97,7 +97,6 @@ class Core(arcade.Window):
                 (self.width, self.height),
                 self.ingame_gui,
             )
-            self.ingame_state.setup()
 
         self.current_state = self.ingame_state
 

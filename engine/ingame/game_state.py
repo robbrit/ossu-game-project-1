@@ -35,7 +35,6 @@ class InGameState:
 
     def setup(self) -> None:
         """Sets up the in-game state."""
-        self.view.setup()
 
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the game."""

@@ -17,8 +17,6 @@ class InGameView:
     Renders the world while the user is in the game.
     """
 
-    width: int
-    height: int
     game_world: world.World
     camera: arcade.Camera
     gui: Optional[scripts.GUI]
@@ -30,8 +28,6 @@ class InGameView:
         viewport_size: Tuple[int, int],
         gui: Optional[scripts.GUI],
     ):
-        self.width = 0
-        self.height = 0
         self.game_world = game_world
         self.gui = gui
         self.camera = arcade.Camera(
@@ -43,10 +39,18 @@ class InGameView:
             viewport_size[1],
         )
 
+    @property
+    def world_width(self) -> int:
+        """Returns the width of the world."""
+        return self.game_world.width * self.game_world.tile_width
+
+    @property
+    def world_height(self) -> int:
+        """Returns the height of the world."""
+        return self.game_world.height * self.game_world.tile_height
+
     def setup(self) -> None:
         """Sets up the view."""
-        self.width = self.game_world.width * self.game_world.tile_width
-        self.height = self.game_world.height * self.game_world.tile_height
 
     def on_draw(self) -> None:
         """Renders the view."""
@@ -76,14 +80,14 @@ class InGameView:
         v_height = self.camera.viewport_height
 
         screen_center_x = min(
-            self.width - v_width,
+            self.world_width - v_width,
             max(
                 0,
                 player.center_x - v_width / 2,
             ),
         )
         screen_center_y = min(
-            self.height - v_height,
+            self.world_height - v_height,
             max(
                 0,
                 player.center_y - v_height / 2,
