@@ -5,6 +5,7 @@ from typing import (
 import arcade
 
 from engine import (
+    scripts,
     view,
 )
 from engine.model import world
@@ -19,12 +20,20 @@ class InGameController:
     _world: world.World
     _view: view.View
     _keys: Dict[int, bool]
+    api: scripts.GameAPI
+    menu_gui: scripts.GUI
 
-    def __init__(self, _world: world.World, _view: view.View):
+    def __init__(self, _world: world.World, _view: view.View, menu_gui: scripts.GUI):
         self._world = _world
         self._view = _view
 
         self._keys = {}
+        self.menu_gui = menu_gui
+
+    def setup(self, api: scripts.GameAPI):
+        """Setups the api."""
+        self.api = api
+        return
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         """Handles when a key is pressed."""
@@ -35,6 +44,9 @@ class InGameController:
         """Handles when a key is released."""
         # pylint: disable=unused-argument
         self._keys[symbol] = False
+
+        if symbol == arcade.key.ESCAPE:
+            self.api.show_gui(self.menu_gui)
 
     def on_mouse_motion(self, screen_x: int, screen_y: int, dx: int, dy: int) -> None:
         """Handles when the mouse is moved."""

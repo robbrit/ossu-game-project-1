@@ -28,14 +28,20 @@ class InGameState:
         game_world: world.World,
         viewport_size: Tuple[int, int],
         ingame_gui: Optional[scripts.GUI],
+        menu_gui: scripts.GUI,
     ) -> None:
         self.game_world = game_world
         self.view = game_view.InGameView(game_world, viewport_size, gui=ingame_gui)
-        self.controller = game_controller.InGameController(game_world, self.view)
+        self.controller = game_controller.InGameController(
+            game_world,
+            self.view,
+            menu_gui,
+        )
 
     def setup(self) -> None:
         """Sets up the in-game state."""
         self.view.setup()
+        self.controller.setup()
 
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the game."""
