@@ -190,11 +190,11 @@
         "ingame-menu": {
            "assets": [
                 {
-                    "name": "start-button",
+                    "name": "exit-button",
                     "path": "assets/gui/start-button.png"
                 },
                 {
-                    "name": "start-selected-button",
+                    "name": "exit-selected-button",
                     "path": "assets/gui/start-selected-button.png"
                 },
                 {
@@ -204,16 +204,15 @@
             ],
             "buttons": [
                 {
-                    "selected_image_asset": "start-selected-button",
-                    "unselected_image_asset": "start-button",
-                    "name": "start-button",
-                    "down": "load-button",
+                    "selected_image_asset": "exit-selected-button",
+                    "unselected_image_asset": "exit-button",
+                    "name": "exit-button",
                     "center": [
                         400,
                         290
                     ],
                     "action": "engine.builtin.exit_game"
-                },
+                }
             ],
             "images": [
                 {

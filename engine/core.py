@@ -100,6 +100,7 @@ class Core(arcade.Window):
                 (self.width, self.height),
                 self.ingame_gui,
                 self.menu_gui,
+                self,
             )
             self.ingame_state.setup()
 

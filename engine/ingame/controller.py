@@ -4,6 +4,7 @@ from typing import (
 
 import arcade
 
+
 from engine import (
     scripts,
     view,
