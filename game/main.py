@@ -26,9 +26,13 @@ def run() -> None:
     def create_hud(api: scripts.GameAPI) -> scripts.GUI:
         return hud.HUD(api)
 
+    def create_ingame_menu(api: scripts.GameAPI) -> scripts.GUI:
+        return spec_gui.SpecGUI(api, game_spec.guis["ingame-menu"])
+
     core.Core(
         initial_gui=create_start_screen,
         ingame_gui=create_hud,
+        ingame_menu_gui=create_ingame_menu,
         game_spec=game_spec,
         initial_player_state={
             "hp": STARTING_HP,

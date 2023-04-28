@@ -186,6 +186,45 @@
                 }
             ],
             "initial_selected_button": "start-button"
+        },
+        "ingame-menu": {
+           "assets": [
+                {
+                    "name": "start-button",
+                    "path": "assets/gui/start-button.png"
+                },
+                {
+                    "name": "start-selected-button",
+                    "path": "assets/gui/start-selected-button.png"
+                },
+                {
+                    "name": "ossu-logo",
+                    "path": "assets/gui/ossu.png"
+                }
+            ],
+            "buttons": [
+                {
+                    "selected_image_asset": "start-selected-button",
+                    "unselected_image_asset": "start-button",
+                    "name": "start-button",
+                    "down": "load-button",
+                    "center": [
+                        400,
+                        290
+                    ],
+                    "action": "engine.builtin.exit_game"
+                },
+            ],
+            "images": [
+                {
+                    "image_asset": "ossu-logo",
+                    "center": [
+                        500,
+                        500
+                    ]
+                }
+            ],
+            "initial_selected_button": "exit-button"
         }
     }
 }

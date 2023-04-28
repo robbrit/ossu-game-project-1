@@ -33,7 +33,6 @@ class InGameController:
     def setup(self, api: scripts.GameAPI):
         """Setups the api."""
         self.api = api
-        return
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         """Handles when a key is pressed."""
