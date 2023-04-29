@@ -189,29 +189,47 @@
         },
         "ingame-menu": {
            "assets": [
-                {
-                    "name": "exit-button",
-                    "path": "assets/gui/exit-button.png"
-                },
-                {
-                    "name": "exit-selected-button",
-                    "path": "assets/gui/exit-button-selected.png"
-                }
+               {
+                   "name": "resume-button",
+                   "path": "assets/gui/resume-button.png"
+               },
+               {
+                   "name": "resume-button-selected",
+                   "path": "assets/gui/resume-button-selected.png"
+               },
+               {
+                   "name": "exit-button",
+                   "path": "assets/gui/exit-button.png"
+               },
+               {
+                   "name": "exit-button-selected",
+                   "path": "assets/gui/exit-button-selected.png"
+               }
             ],
             "buttons": [
                 {
-                    "selected_image_asset": "exit-selected-button",
+                    "selected_image_asset": "resume-button-selected",
+                    "unselected_image_asset": "resume-button",
+                    "name": "resume-button",
+                    "center": [
+                        400,
+                        290
+                    ],
+                    "action": "engine.builtin.resume_game"
+                },
+                {
+                    "selected_image_asset": "exit-button-selected",
                     "unselected_image_asset": "exit-button",
                     "name": "exit-button",
                     "center": [
                         400,
-                        290
+                        180
                     ],
                     "action": "engine.builtin.exit_game"
                 }
             ],
             "images": [],
-            "initial_selected_button": "exit-button"
+            "initial_selected_button": "resume-button"
         }
     }
 }
