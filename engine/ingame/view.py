@@ -32,6 +32,7 @@ class InGameView:
     ):
         self.game_world = game_world
         self.gui = gui
+        self.camera_position = (0, 0)
         self.camera = arcade.Camera(
             viewport_size[0],
             viewport_size[1],
