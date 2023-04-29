@@ -2,17 +2,9 @@ from typing import (
     Protocol,
 )
 
-from engine import (
-    scripts,
-)
-
 
 class Controller(Protocol):
     """Protocol to define standard methods for controllers."""
-
-    def setup(self, api: scripts.GameAPI):
-        """Setups the api."""
-        return
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         """Handles when the user presses a key down."""

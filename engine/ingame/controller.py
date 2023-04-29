@@ -4,7 +4,6 @@ from typing import (
 
 import arcade
 
-
 from engine import (
     scripts,
     view,
@@ -24,15 +23,18 @@ class InGameController:
     api: scripts.GameAPI
     menu_gui: scripts.GUI
 
-    def __init__(self, _world: world.World, _view: view.View, menu_gui: scripts.GUI):
+    def __init__(
+        self,
+        _world: world.World,
+        _view: view.View,
+        menu_gui: scripts.GUI,
+        api: scripts.GameAPI,
+    ):
         self._world = _world
         self._view = _view
 
         self._keys = {}
         self.menu_gui = menu_gui
-
-    def setup(self, api: scripts.GameAPI):
-        """Setups the api."""
         self.api = api
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:

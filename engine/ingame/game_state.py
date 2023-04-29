@@ -37,13 +37,12 @@ class InGameState:
             game_world,
             self.view,
             menu_gui,
+            api,
         )
-        self.api = api
 
     def setup(self) -> None:
         """Sets up the in-game state."""
         self.view.setup()
-        self.controller.setup(self.api)
 
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the game."""
