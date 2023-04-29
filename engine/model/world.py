@@ -501,6 +501,10 @@ class World:
 
         return (sprite for sprite in self._game_sprites.values() if name in sprite.name)
 
+    def remove_sprite(self, name: str) -> None:
+        """Removes a sprite by name."""
+        self._game_sprites.pop(name, None)
+
     @property
     def width(self) -> int:
         """Gets the width of the map in number of tiles."""
