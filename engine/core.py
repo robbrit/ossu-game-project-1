@@ -140,6 +140,13 @@ class Core(arcade.Window):
 
         return self.world.get_sprites(name)
 
+    def remove_sprite(self, name: str) -> None:
+        """Removes a sprite by name."""
+        if self.world is None:
+            raise GameNotInitializedError()
+
+        self.world.remove_sprite(name)
+
     @property
     def player_state(self) -> Dict[str, Any]:
         """Gets the player's state."""
