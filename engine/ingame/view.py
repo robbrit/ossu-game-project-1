@@ -32,7 +32,6 @@ class InGameView:
     ):
         self.game_world = game_world
         self.gui = gui
-        self.camera_position = [0, 0]
         self.camera = arcade.Camera(
             viewport_size[0],
             viewport_size[1],
@@ -67,10 +66,7 @@ class InGameView:
     def on_update(self, delta_time: float) -> None:
         """Triggers an update for the view."""
         # pylint: disable=unused-argument
-        if self.world_width < self.camera.viewport_width or self.world_height < self.camera.viewport_height:
-            self.on_resize()
-        else:
-            self._center_camera_to_player()
+        self._center_camera_to_player()
 
     def to_world_coords(self, screen_x: int, screen_y: int) -> Tuple[int, int]:
         """Converts from screen coordinates to world coordinates."""
@@ -85,31 +81,28 @@ class InGameView:
         v_width = self.camera.viewport_width
         v_height = self.camera.viewport_height
 
-        screen_center_x = min(
-            self.world_width - v_width,
-            max(
-                0,
-                player.center_x - v_width / 2,
-            ),
-        )
-        screen_center_y = min(
-            self.world_height - v_height,
-            max(
-                0,
-                player.center_y - v_height / 2,
-            ),
-        )
+        if self.world_width < v_width or self.world_height < v_height:
+            camera_position = Vec2(
+                (self.world_width - v_width) / 2,
+                (self.world_height - v_height) / 2
+            )
+            self.camera.move(camera_position)
+        else:
+            screen_center_x = min(
+                self.world_width - v_width,
+                max(
+                    0,
+                    player.center_x - v_width / 2,
+                ),
+            )
+            screen_center_y = min(
+                self.world_height - v_height,
+                max(
+                    0,
+                    player.center_y - v_height / 2,
+                ),
+            )
 
-        player_centered = screen_center_x, screen_center_y
+            player_centered = screen_center_x, screen_center_y
 
-        self.camera.move_to(player_centered)
-
-    def on_resize(self) -> None:
-        """When the world map is smaller than the viewport, center the map on the window."""
-        if self.world_width < self.camera.viewport_width:
-            self.camera_position[0] = (self.world_width - self.camera.viewport_width) / 2
-        if self.world_height < self.camera.viewport_height:
-            self.camera_position[1] = (self.world_height - self.camera.viewport_height) / 2
-
-        pos = Vec2(self.camera_position[0], self.camera_position[1])
-        self.camera.move(pos)
+            self.camera.move_to(player_centered)
