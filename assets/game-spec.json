@@ -191,15 +191,11 @@
            "assets": [
                 {
                     "name": "exit-button",
-                    "path": "assets/gui/start-button.png"
+                    "path": "assets/gui/exit-button.png"
                 },
                 {
                     "name": "exit-selected-button",
-                    "path": "assets/gui/start-selected-button.png"
-                },
-                {
-                    "name": "ossu-logo",
-                    "path": "assets/gui/ossu.png"
+                    "path": "assets/gui/exit-button-selected.png"
                 }
             ],
             "buttons": [
@@ -214,15 +210,7 @@
                     "action": "engine.builtin.exit_game"
                 }
             ],
-            "images": [
-                {
-                    "image_asset": "ossu-logo",
-                    "center": [
-                        500,
-                        500
-                    ]
-                }
-            ],
+            "images": [],
             "initial_selected_button": "exit-button"
         }
     }
