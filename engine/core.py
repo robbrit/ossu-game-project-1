@@ -60,7 +60,7 @@ class Core(arcade.Window):
     def __init__(
         self,
         initial_gui: Callable[[scripts.GameAPI], scripts.GUI],
-        ingame_menu_gui: Callable[[scripts.GameAPI], scripts.GUI],
+        menu_gui: Callable[[scripts.GameAPI], scripts.GUI],
         game_spec: spec.GameSpec,
         initial_player_state: Dict[str, Any],
         ingame_gui: Optional[Callable[[scripts.GameAPI], scripts.GUI]] = None,
@@ -80,7 +80,7 @@ class Core(arcade.Window):
         self.world = None
         self.initial_gui = initial_gui(self)
         self.ingame_gui = ingame_gui(self) if ingame_gui else None
-        self.menu_gui = ingame_menu_gui(self)
+        self.menu_gui = menu_gui(self)
         self.initial_player_state = initial_player_state
         self.gui_state = gui_game_state.GuiState(self, self.initial_gui)
         self.ingame_state = None
