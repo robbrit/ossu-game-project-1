@@ -103,7 +103,6 @@ class Core(arcade.Window):
                 self.menu_gui,
                 self,
             )
-            self.ingame_state.setup()
 
         self.current_state = self.ingame_state
 
