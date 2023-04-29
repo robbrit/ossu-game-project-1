@@ -65,6 +65,9 @@ class GameAPI(Protocol):
     def get_sprites(self, name: Optional[str] = None) -> Iterable[arcade.Sprite]:
         """Gets all sprites with the given name."""
 
+    def remove_sprite(self, name: str) -> None:
+        """Removes a sprite by name."""
+
     @property
     def player_state(self) -> Dict[str, Any]:
         """Gets the player's state."""
