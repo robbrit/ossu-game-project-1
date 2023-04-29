@@ -28,10 +28,17 @@ class InGameState:
         game_world: world.World,
         viewport_size: Tuple[int, int],
         ingame_gui: Optional[scripts.GUI],
+        menu_gui: scripts.GUI,
+        api: scripts.GameAPI,
     ) -> None:
         self.game_world = game_world
         self.view = game_view.InGameView(game_world, viewport_size, gui=ingame_gui)
-        self.controller = game_controller.InGameController(game_world, self.view)
+        self.controller = game_controller.InGameController(
+            game_world,
+            self.view,
+            menu_gui,
+            api,
+        )
 
     def setup(self) -> None:
         """Sets up the in-game state."""
