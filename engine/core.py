@@ -159,7 +159,7 @@ class Core(arcade.Window):
         if self.world is None:
             raise GameNotInitializedError()
 
-        return self.world.player_state
+        return self.world.player_sprite.state
 
     @player_state.setter
     def player_state(self, value: Dict[str, Any]):
@@ -167,7 +167,7 @@ class Core(arcade.Window):
         if self.world is None:
             raise GameNotInitializedError()
 
-        self.world.player_state = value
+        self.world.player_sprite.state = value
 
     @property
     def current_time_secs(self) -> float:
