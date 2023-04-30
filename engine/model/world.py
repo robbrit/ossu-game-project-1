@@ -64,14 +64,12 @@ class World:
     # TODO(rob): This class is getting big and incohesive. Some refactors that would
     # clean it up:
     # - Make RegionState a bit smarter, have it manage serialization of itself.
-    # - Move all the player-specific stuff into PlayerSprite.
     # - Make as much as possible private; things outside this class are starting to poke
     #   into it which adds extra coupling.
 
     api: scripts.GameAPI
 
-    player_sprite: player_sprite.PlayerSprite
-    player_state: Dict[str, Any]
+    _player_sprite: player_sprite.PlayerSprite
 
     scene: Optional[arcade.Scene]
     physics_engine: Optional[physics.Engine]
@@ -112,12 +110,11 @@ class World:
         self._spec = game_spec
         self.sec_passed = 0.0
 
-        self.player_sprite = player_sprite.PlayerSprite(
+        self._player_sprite = player_sprite.PlayerSprite(
             api=api,
-            name="player",
             sprite_spec=game_spec.player_spec,
+            initial_state=initial_player_state,
         )
-        self.player_state = initial_player_state
 
         self.tilemaps = {}
         self.region_states = {}
@@ -167,11 +164,11 @@ class World:
         self.scene = arcade.Scene.from_tilemap(tilemap)
         self._load_scripted_objects(tilemap, region_state, is_first_load)
 
-        self.scene.add_sprite("Player", self.player_sprite)
+        self.scene.add_sprite("Player", self._player_sprite)
 
         self._reset_player(start_location, tilemap)
 
-        physics_objs: List[game_sprite.GameSprite] = [self.player_sprite]
+        physics_objs: List[game_sprite.GameSprite] = [self._player_sprite]
         physics_objs.extend(self._game_sprites.values())
 
         self.physics_engine = physics.Engine(
@@ -325,8 +322,8 @@ class World:
         if not isinstance(x, numbers.Number) or not isinstance(y, numbers.Number):
             raise TypeError("Start location must be a point.")
 
-        self.player_sprite.center_x = start[0].shape[0]  # type: ignore
-        self.player_sprite.center_y = start[0].shape[1]  # type: ignore
+        self._player_sprite.center_x = start[0].shape[0]  # type: ignore
+        self._player_sprite.center_y = start[0].shape[1]  # type: ignore
 
     def _script_from_tiled_object(
         self,
@@ -412,15 +409,14 @@ class World:
         direction.
         """
         if vx is not None:
-            self.player_sprite.change_x = vx * PLAYER_MOVEMENT_SPEED
+            self._player_sprite.change_x = vx * PLAYER_MOVEMENT_SPEED
 
         if vy is not None:
-            self.player_sprite.change_y = vy * PLAYER_MOVEMENT_SPEED
+            self._player_sprite.change_y = vy * PLAYER_MOVEMENT_SPEED
 
     def set_player_facing(self, facing_x: float, facing_y: float) -> None:
         """Sets the direction the player is facing."""
-        self.player_sprite.facing_x = facing_x
-        self.player_sprite.facing_y = facing_y
+        self._player_sprite.set_facing(facing_x, facing_y)
 
     def _objs_in_front_of_player(self) -> Iterable[game_sprite.GameSprite]:
         """get scripted obj in front of the player."""
@@ -428,7 +424,7 @@ class World:
             raise SceneNotInitialized()
 
         # Do a little bit of math to figure out where to place the hitbox.
-        facing = pmath.Vec2(self.player_sprite.facing_x, self.player_sprite.facing_y)
+        facing = pmath.Vec2(self._player_sprite.facing_x, self._player_sprite.facing_y)
 
         hitbox_center = facing.normalize().scale(HITBOX_DISTANCE)
 
@@ -439,8 +435,8 @@ class World:
             (-HITBOX_DISTANCE, HITBOX_DISTANCE),
         ]
         hitbox_sprite = arcade.Sprite(
-            center_x=hitbox_center.x + self.player_sprite.center_x,
-            center_y=hitbox_center.y + self.player_sprite.center_y,
+            center_x=hitbox_center.x + self._player_sprite.center_x,
+            center_y=hitbox_center.y + self._player_sprite.center_y,
         )
         hitbox_sprite.set_hit_box(hitbox_corners)
 
@@ -454,18 +450,18 @@ class World:
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
-        self.player_sprite.on_activate()
+        self._player_sprite.on_activate()
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
                 continue
-            obj.script.on_activate(obj, self.player_sprite)
+            obj.script.on_activate(obj, self._player_sprite)
 
     def hit(self) -> None:
         """Hit whatever is in front of the player."""
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
                 continue
-            obj.script.on_hit(obj, self.player_sprite)
+            obj.script.on_hit(obj, self._player_sprite)
 
     def get_key_points(self, name: Optional[str]) -> List[scripts.KeyPoint]:
         """Queries for key points in the active region."""
@@ -532,6 +528,11 @@ class World:
     def game_time_sec(self) -> float:
         """Gets the in-game time in seconds."""
         return self.sec_passed
+
+    @property
+    def player_sprite(self) -> player_sprite.PlayerSprite:
+        """Gets the player sprite."""
+        return self._player_sprite
 
     def draw(self) -> None:
         """Renders the model."""
