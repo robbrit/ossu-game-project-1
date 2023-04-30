@@ -22,6 +22,7 @@ from engine import (
 from engine.model import (
     game_sprite,
     physics,
+    player_sprite,
     script_zone,
     shapes,
 )
@@ -63,13 +64,13 @@ class World:
     # TODO(rob): This class is getting big and incohesive. Some refactors that would
     # clean it up:
     # - Make RegionState a bit smarter, have it manage serialization of itself.
-    # - Create a PlayerSprite object that wraps all the player-specific stuff.
+    # - Move all the player-specific stuff into PlayerSprite.
     # - Make as much as possible private; things outside this class are starting to poke
     #   into it which adds extra coupling.
 
     api: scripts.GameAPI
 
-    player_sprite: game_sprite.GameSprite
+    player_sprite: player_sprite.PlayerSprite
     player_state: Dict[str, Any]
 
     scene: Optional[arcade.Scene]
@@ -111,7 +112,8 @@ class World:
         self._spec = game_spec
         self.sec_passed = 0.0
 
-        self.player_sprite = game_sprite.GameSprite(
+        self.player_sprite = player_sprite.PlayerSprite(
+            api=api,
             name="player",
             sprite_spec=game_spec.player_spec,
         )
@@ -452,6 +454,7 @@ class World:
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
+        self.player_sprite.on_activate()
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
                 continue
