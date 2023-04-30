@@ -7,7 +7,7 @@ ACTIVATE_ANIMATION_LENGTH = 0.25
 class PlayerSprite(game_sprite.GameSprite):
     """Represents the player in the game."""
 
-    _last_activate: int
+    _last_activate: float
     _api: scripts.GameAPI
 
     def __init__(self, api: scripts.GameAPI, *args, **kwargs):

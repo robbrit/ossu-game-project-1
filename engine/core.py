@@ -172,6 +172,9 @@ class Core(arcade.Window):
     @property
     def current_time_secs(self) -> float:
         """Gets the current time in seconds."""
+        if self.world is None:
+            raise GameNotInitializedError()
+
         return self.world.game_time_sec
 
     def run(self):
