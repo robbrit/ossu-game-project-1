@@ -110,6 +110,22 @@
                 "frame_speed": 1,
                 "num_frames": 1
             },
+            "activate-left": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "activate-right": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "activate-up": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
+            "activate-down": {
+                "frame_speed": 1,
+                "num_frames": 1
+            },
             "walk-left": {
                 "frame_speed": 0.3,
                 "num_frames": 3
@@ -188,23 +204,23 @@
             "initial_selected_button": "start-button"
         },
         "ingame-menu": {
-           "assets": [
-               {
-                   "name": "resume-button",
-                   "path": "assets/gui/resume-button.png"
-               },
-               {
-                   "name": "resume-button-selected",
-                   "path": "assets/gui/resume-button-selected.png"
-               },
-               {
-                   "name": "exit-button",
-                   "path": "assets/gui/exit-button.png"
-               },
-               {
-                   "name": "exit-button-selected",
-                   "path": "assets/gui/exit-button-selected.png"
-               }
+            "assets": [
+                {
+                    "name": "resume-button",
+                    "path": "assets/gui/resume-button.png"
+                },
+                {
+                    "name": "resume-button-selected",
+                    "path": "assets/gui/resume-button-selected.png"
+                },
+                {
+                    "name": "exit-button",
+                    "path": "assets/gui/exit-button.png"
+                },
+                {
+                    "name": "exit-button-selected",
+                    "path": "assets/gui/exit-button-selected.png"
+                }
             ],
             "buttons": [
                 {

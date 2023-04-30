@@ -169,6 +169,11 @@ class Core(arcade.Window):
 
         self.world.player_state = value
 
+    @property
+    def current_time_secs(self) -> float:
+        """Gets the current time in seconds."""
+        return self.world.game_time_sec
+
     def run(self):
         """Runs the game."""
         self.setup()

@@ -61,7 +61,6 @@ class GameAPI(Protocol):
     def get_key_points(self, name: Optional[str] = None) -> Iterable[KeyPoint]:
         """Queries for key points within the active region."""
 
-
     def get_sprites(self, name: Optional[str] = None) -> Iterable[arcade.Sprite]:
         """Gets all sprites with the given name."""
 
@@ -75,6 +74,10 @@ class GameAPI(Protocol):
     @player_state.setter
     def player_state(self, value: Dict[str, Any]) -> None:
         """Sets the player's state."""
+
+    @property
+    def current_time_secs(self) -> float:
+        """Gets the current time in seconds."""
 
 
 GameCallable = Callable[[GameAPI], None]
