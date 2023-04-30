@@ -81,21 +81,21 @@ class InGameView:
         v_width = self.camera.viewport_width
         v_height = self.camera.viewport_height
 
-        if self.world_width < v_width or self.world_height < v_height:
-            camera_position = Vec2(
-                (self.world_width - v_width) / 2,
-                (self.world_height - v_height) / 2
-            )
-            self.camera.move(camera_position)
+        if self.world_width < v_width:
+            camera_x = (self.world_width - v_width) / 2
         else:
-            screen_center_x = min(
+            camera_x = min(
                 self.world_width - v_width,
                 max(
                     0,
                     player.center_x - v_width / 2,
                 ),
             )
-            screen_center_y = min(
+
+        if self.world_height < v_height:
+            camera_y = (self.world_height - v_height) / 2
+        else:
+            camera_y = min(
                 self.world_height - v_height,
                 max(
                     0,
@@ -103,6 +103,4 @@ class InGameView:
                 ),
             )
 
-            player_centered = screen_center_x, screen_center_y
-
-            self.camera.move_to(player_centered)
+        self.camera.move_to(Vec2(camera_x, camera_y))
