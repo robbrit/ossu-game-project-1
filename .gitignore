@@ -4,8 +4,11 @@ lib
 lib64
 Scripts
 
+assets/gui/menu-button-template.svg
 assets/regions/main.tiled-project
 assets/regions/main.tiled-session
 
 *.pyc
 .vscode
+.idea/*
+

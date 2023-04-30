@@ -1,6 +1,7 @@
 """This module defines a set of built-in scripts to be used from maps."""
 
 import random
+import sys
 from typing import (
     Any,
     Callable,
@@ -29,6 +30,11 @@ def transition_region(api: scripts.GameAPI, region: str, start_location: str) ->
 def resume_game(api: scripts.GameAPI) -> None:
     """Starts/resumes the game."""
     api.start_game()
+
+
+def exit_game() -> None:
+    """Exits the game."""
+    sys.exit(0)
 
 
 # Maximum number of spawns a spawner can have.
