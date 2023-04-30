@@ -3,7 +3,7 @@ from typing import (
     Tuple,
 )
 
-from pyglet.math import Vec2
+from pyglet import math as pmath
 
 import arcade
 import arcade.tilemap
@@ -103,4 +103,4 @@ class InGameView:
                 ),
             )
 
-        self.camera.move_to(Vec2(camera_x, camera_y))
+        self.camera.move_to(pmath.Vec2(camera_x, camera_y))
