@@ -37,6 +37,8 @@ class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
                        The actual values of N don't matter, so long as they are
                        unique.
         """
+        super(scripts.Script, self).__init__()
+
         # TODO(rob): The wandering logic can probably be put into a class.
         waypoint_args = [
             int(index)

@@ -9,7 +9,7 @@ class PlayerSpriteTest(unittest.TestCase):
         api = mock.Mock()
         api.current_time_secs = 17.0
 
-        player = player_sprite.PlayerSprite(api, sprite_spec=None, initial_state={})
+        player = player_sprite.PlayerSprite(api, sprite_spec=None, initial_data={})
         self.assertEqual(player._animation_state(), "idle")
 
         player.on_activate()

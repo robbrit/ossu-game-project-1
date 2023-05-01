@@ -17,19 +17,19 @@ class PlayerSprite(game_sprite.GameSprite):
 
     _last_activate: float
     _api: scripts.GameAPI
-    _state: Dict[str, Any]
+    _data: Dict[str, Any]
 
     def __init__(
         self,
         api: scripts.GameAPI,
         sprite_spec: spec.GameSpriteSpec,
-        initial_state: Dict[str, Any],
+        initial_data: Dict[str, Any],
     ):
         super().__init__(name="player", sprite_spec=sprite_spec)
 
         self._last_activate = 0
         self._api = api
-        self._state = initial_state
+        self._data = initial_data
 
     def _animation_state(self) -> str:
         next_activate = self._last_activate + ACTIVATE_ANIMATION_LENGTH
@@ -42,11 +42,18 @@ class PlayerSprite(game_sprite.GameSprite):
         self._last_activate = self._api.current_time_secs
 
     @property
-    def state(self) -> Dict[str, Any]:
-        """Gets the state of the player."""
-        return self._state
+    def data(self) -> Dict[str, Any]:
+        """Gets the data for the player."""
+        return self._data
 
-    @state.setter
-    def state(self, value: Dict[str, Any]) -> None:
-        """Sets the state of the player."""
-        self._state = value
+    @data.setter
+    def data(self, value: Dict[str, Any]) -> None:
+        """Sets the data for the player."""
+        self._data = value
+
+    @property
+    def state(self) -> game_sprite.SpriteState:
+        """Gets the state of the player."""
+        base = super().state
+        base.data = self._data
+        return base

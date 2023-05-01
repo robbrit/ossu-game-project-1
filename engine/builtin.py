@@ -7,8 +7,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    Optional,
-    Tuple,
 )
 
 from engine import scripts
@@ -52,7 +50,6 @@ class Spawner(scripts.SavesAPI, scripts.Script):
     name: str
     spawn_script: Callable[[None], scripts.Script]
     spawn_script_kwargs: Dict[str, Any]
-    location: Optional[Tuple[float, float]]
     num_spawns: int
     spawns: List[game_sprite.GameSprite]
     last_spawn: float
@@ -93,7 +90,6 @@ class Spawner(scripts.SavesAPI, scripts.Script):
         self.name = name
         self.spawn_script = scripts.load_script_class(spawn_script)
         self.spawn_script_kwargs = scripts.extract_script_args("spawn_script_", kwargs)
-        self.location = None
         self.num_spawns = num_spawns
         self.spawns = []
         self.last_spawn = float("-inf")
@@ -105,7 +101,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
 
     def on_start(self, owner: scripts.ScriptOwner):
         """Triggered the first time this spawn is created."""
-        self.location = owner.location
+        self._state["location"] = owner.location
 
     def _can_spawn(self, now: float) -> bool:
         return (
@@ -124,24 +120,13 @@ class Spawner(scripts.SavesAPI, scripts.Script):
 
         # TODO(rob): Skim through spawns and remove any dead ones.
 
-    @property
-    def state(self) -> Dict[str, Any]:
-        """Gets the state of this spawner."""
-        # TODO(rob): Need some way to reference any existing spawns so that when we
-        # reload, we can rebuild those references.
-        return {}
-
-    @state.setter
-    def state(self, state: Dict[str, Any]) -> None:
-        """Sets the state of this spawner."""
-
     def _spawn(self):
         self.id_counter += 1
 
         sprite = self.api.create_sprite(
             spec_name=self.sprite_spec,
             name=f"{self.name}_spawn{self.id_counter}",
-            start_location=self.location,
+            start_location=self._state.get("location"),
             script=self.spawn_script(**self.spawn_script_kwargs),
         )
         self.spawns.append(sprite)

@@ -2,6 +2,7 @@ import dataclasses
 import math
 from os import path
 from typing import (
+    Any,
     Dict,
     List,
     Optional,
@@ -85,6 +86,15 @@ class Animations:
         current_frame = math.floor(self.time_index / current_animation.spec.frame_speed)
 
         self.texture = current_animation.textures[current_frame]
+
+
+@dataclasses.dataclass
+class SpriteState:
+    """Wraps any persistable state for a sprite."""
+
+    location: Tuple[float, float]
+    facing: Tuple[float, float]
+    data: Dict[str, Any]
 
 
 class GameSprite(arcade.Sprite):
@@ -193,3 +203,12 @@ class GameSprite(arcade.Sprite):
         if self.facing_x == 0.0 and self.facing_y == 0.0:
             # Face down when not moving.
             self.facing_y = -1.0
+
+    @property
+    def state(self) -> SpriteState:
+        """Gets the state of this sprite."""
+        return SpriteState(
+            location=(self.center_x, self.center_y),
+            facing=(self.facing_x, self.facing_y),
+            data=self.script.state if self.script is not None else {},
+        )

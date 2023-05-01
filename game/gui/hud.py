@@ -30,7 +30,7 @@ class HUD:
 
     def draw(self) -> None:
         """Renders the overlay."""
-        state = self.api.player_state
+        state = self.api.player_data
 
         current_hp = state["hp"]
         max_hp = state["max_hp"]
