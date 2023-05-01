@@ -53,7 +53,16 @@ class RegionState:
     """Stores the state of a region."""
 
     # Mapping from scripted object names to their state.
-    object_states: Dict[str, Dict[str, Any]] = dataclasses.field(default_factory=dict)
+    sprite_states: Dict[str, game_sprite.SpriteState]
+
+
+@dataclasses.dataclass
+class WorldState:
+    """Stores a persistable state of the world."""
+
+    active_region: str
+    player_state: game_sprite.SpriteState
+    region_states: Dict[str, RegionState]
 
 
 class World:
@@ -104,7 +113,7 @@ class World:
         self,
         api: scripts.GameAPI,
         game_spec: spec.GameSpec,
-        initial_player_state: Dict[str, Any],
+        initial_player_data: Dict[str, Any],
     ):
         self.api = api
         self._spec = game_spec
@@ -113,7 +122,7 @@ class World:
         self._player_sprite = player_sprite.PlayerSprite(
             api=api,
             sprite_spec=game_spec.player_spec,
-            initial_state=initial_player_state,
+            initial_data=initial_player_data,
         )
 
         self.tilemaps = {}
@@ -141,12 +150,8 @@ class World:
     def load_region(self, region_name: str, start_location: str) -> None:
         """Loads a region by name."""
         if self.active_region != "":
-            self.region_states[self.active_region] = RegionState(
-                object_states={
-                    sprite.name: sprite.script.state
-                    for sprite in self._game_sprites.values()
-                    if sprite.script is not None
-                },
+            self.region_states[self.active_region] = self._region_state(
+                self.active_region
             )
 
         self.active_region = region_name
@@ -154,7 +159,7 @@ class World:
         region_spec = self._spec.world.regions[region_name]
 
         if region_name not in self.region_states:
-            region_state = RegionState()
+            region_state = RegionState(sprite_states={})
         else:
             region_state = self.region_states[region_name]
 
@@ -206,7 +211,8 @@ class World:
                 raise ValueError("Missing name attribute for scripted object.")
 
             script = self._script_from_tiled_object(obj)
-            script.state = region_state.object_states.get(obj.name, {})
+            if obj.name in region_state.sprite_states:
+                script.state = region_state.sprite_states[obj.name].data
 
             sprite = script_zone.ScriptZone(
                 obj,
@@ -230,7 +236,8 @@ class World:
             sprite_spec = self._spec.sprites[obj.properties["spec"]]
             try:
                 script = self._load_script(obj.properties)
-                script.state = region_state.object_states.get(obj.name, {})
+                if obj.name in region_state.sprite_states:
+                    script.state = region_state.sprite_states[obj.name].data
             except NoScript:
                 script = None
 
@@ -538,3 +545,29 @@ class World:
         """Renders the model."""
         if self.scene is not None:
             self.scene.draw()
+
+    def _region_state(self, name: str) -> RegionState:
+        if name != self.active_region:
+            return self.region_states[name]
+
+        return RegionState(
+            sprite_states={
+                sprite.name: sprite.state for sprite in self._game_sprites.values()
+            },
+        )
+
+    @property
+    def state(self) -> WorldState:
+        """Gets the state of the world."""
+        state = WorldState(
+            active_region=self.active_region,
+            region_states=self.region_states,
+            player_state=self.player_sprite.state,
+        )
+
+        if self.active_region != "":
+            state.region_states[self.active_region] = self._region_state(
+                self.active_region
+            )
+
+        return state

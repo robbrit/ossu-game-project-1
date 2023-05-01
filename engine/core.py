@@ -154,20 +154,20 @@ class Core(arcade.Window):
         self.world.remove_sprite(name)
 
     @property
-    def player_state(self) -> Dict[str, Any]:
-        """Gets the player's state."""
+    def player_data(self) -> Dict[str, Any]:
+        """Gets the player's data."""
         if self.world is None:
             raise GameNotInitializedError()
 
-        return self.world.player_sprite.state
+        return self.world.player_sprite.data
 
-    @player_state.setter
-    def player_state(self, value: Dict[str, Any]):
-        """Sets the player's state."""
+    @player_data.setter
+    def player_data(self, value: Dict[str, Any]):
+        """Sets the player's data."""
         if self.world is None:
             raise GameNotInitializedError()
 
-        self.world.player_sprite.state = value
+        self.world.player_sprite.data = value
 
     @property
     def current_time_secs(self) -> float:

@@ -68,12 +68,12 @@ class GameAPI(Protocol):
         """Removes a sprite by name."""
 
     @property
-    def player_state(self) -> Dict[str, Any]:
-        """Gets the player's state."""
+    def player_data(self) -> Dict[str, Any]:
+        """Gets the player's data."""
 
-    @player_state.setter
-    def player_state(self, value: Dict[str, Any]) -> None:
-        """Sets the player's state."""
+    @player_data.setter
+    def player_data(self, value: Dict[str, Any]) -> None:
+        """Sets the player's data."""
 
     @property
     def current_time_secs(self) -> float:
@@ -131,6 +131,9 @@ class Script:
     """Base class for all scripts."""
 
     _state: Dict[str, Any]
+
+    def __init__(self):
+        self._state = {}
 
     def set_api(self, api: GameAPI):
         """Called after construction to set the API object for the script.
@@ -227,6 +230,7 @@ class ObjectScript(Script):
         on_tick: Optional[str],
         on_tick_args: Dict[str, Any],
     ):
+        super().__init__()
         self.api = api
         self._on_activate = load_callable(on_activate) if on_activate else self._dummy
         self._on_activate_args = on_activate_args
