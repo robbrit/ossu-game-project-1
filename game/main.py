@@ -11,6 +11,7 @@ from game.gui import (
 )
 
 STARTING_HP = 10
+STARTING_GOLD = 50
 
 
 def run() -> None:
@@ -36,5 +37,6 @@ def run() -> None:
         initial_player_state={
             "hp": STARTING_HP,
             "max_hp": STARTING_HP,
+            "gold": STARTING_GOLD,
         },
     ).run()
