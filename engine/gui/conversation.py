@@ -98,6 +98,7 @@ class GUI:
         self._reset_widgets()
 
     def _resume_game(self, event: gui.UIOnClickEvent) -> None:
+        # pylint: disable=unused-argument
         self.api.start_game()
 
     def _reset_widgets(self) -> None:
