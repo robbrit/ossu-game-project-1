@@ -81,7 +81,6 @@ class Engine:
                     sprite.center_y = original_positions[i][1]
 
         # Now check against other moving sprites.
-        # TODO(rob): do axes independently for sprite-sprite collisions.
         sprites_to_revert = set()
 
         for i, sprite1 in enumerate(self.moveable_sprites):

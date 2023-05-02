@@ -62,7 +62,6 @@ class LouisMckayChat(conversation.GUI):
             conversation.Conversation(
                 title="Louis Mckay",
                 text="Welcome to my shop.",
-                # TODO(rob): Create a "shop" GUI that we can plug in here.
                 choices=[],
             )
         )

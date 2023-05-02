@@ -173,7 +173,6 @@ class GameSprite(arcade.Sprite):
         return "idle"
 
     def _get_direction(self) -> str:
-        # TODO(rob): Should probably do an enum for facing direction.
         afx, afy = abs(self.facing_x), abs(self.facing_y)
 
         if afy > afx:

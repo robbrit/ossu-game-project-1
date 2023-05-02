@@ -138,8 +138,6 @@ class GUI:
 
         title = self.current.title or self.root.title
         if title is not None:
-            # TODO(rob): Programmatically get the height of the window to figure out
-            # where to put the title.
             self.manager.add(
                 gui.UILabel(
                     x=CONVERSATION_PADDING,
