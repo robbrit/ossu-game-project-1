@@ -18,7 +18,6 @@ def run() -> None:
     with open("assets/game-spec.json") as infile:
         data = json.loads(infile.read())
         game_spec = spec.GameSpec(**data)
-        # TODO(rob): Re-enable spec validation.
 
     def create_start_screen(api: scripts.GameAPI) -> scripts.GUI:
         return spec_gui.SpecGUI(api, game_spec.guis["start-screen"])

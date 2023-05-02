@@ -86,7 +86,6 @@ class Spawner(scripts.SavesAPI, scripts.Script):
         super().__init__()
 
         self.sprite_spec = sprite_spec
-        # TODO(rob): Validate that the name is unique throughout the region.
         self.name = name
         self.spawn_script = scripts.load_script_class(spawn_script)
         self.spawn_script_kwargs = scripts.extract_script_args("spawn_script_", kwargs)
@@ -96,8 +95,6 @@ class Spawner(scripts.SavesAPI, scripts.Script):
         self.spawn_rate_per_sec = spawn_rate_per_sec
         self.spawn_cooldown_secs = spawn_cooldown_secs
         self.id_counter = 0
-
-        # TODO(rob): A set of args for the spawn script could be useful.
 
     def on_start(self, owner: scripts.ScriptOwner):
         """Triggered the first time this spawn is created."""
@@ -117,8 +114,6 @@ class Spawner(scripts.SavesAPI, scripts.Script):
 
         if self._can_spawn(game_time) and random.random() < probability:
             self._spawn()
-
-        # TODO(rob): Skim through spawns and remove any dead ones.
 
     def _spawn(self):
         self.id_counter += 1

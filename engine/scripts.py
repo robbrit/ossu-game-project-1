@@ -87,7 +87,6 @@ def load_symbol(path: str) -> Type[Any]:
     """Loads a Python something from a path."""
     mod_name, class_name = path.rsplit(".", 1)
 
-    # TODO(rob): Determine if this is insecure.
     mod = importlib.import_module(mod_name)
     return getattr(mod, class_name)
 
@@ -213,8 +212,6 @@ class ObjectScript(Script):
     _on_start_args: Dict[str, Any]
     _on_tick: GameCallable
     _on_tick_args: Dict[str, Any]
-
-    # TODO(rob): Fill in all the other functions.
 
     def __init__(
         self,

@@ -243,8 +243,6 @@ class World:
 
             shape: Tuple[float, float]
             # Do some hackery to get the type checker to be happy.
-            # TODO(rob): We should probably ensure that the shape is a point and not
-            # a rectangle or something.
             shape = obj.shape  # type: ignore
 
             sprite = self._create_sprite(

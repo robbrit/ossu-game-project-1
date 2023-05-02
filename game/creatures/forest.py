@@ -39,7 +39,6 @@ class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
         """
         super(scripts.Script, self).__init__()
 
-        # TODO(rob): The wandering logic can probably be put into a class.
         waypoint_args = [
             int(index)
             for index in scripts.extract_script_args("waypoint_", kwargs).keys()
