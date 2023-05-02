@@ -97,6 +97,9 @@ class GUI:
 
         self._reset_widgets()
 
+    def _resume_game(self, event: gui.UIOnClickEvent) -> None:
+        self.api.start_game()
+
     def _reset_widgets(self) -> None:
         self.manager.clear()
         # Dirty hack to get the UI manager to reset correctly.
@@ -116,15 +119,21 @@ class GUI:
             button = _ChoiceButton(
                 index=i,
                 x=CHOICES_OFFSET,
-                y=i * CHOICE_HEIGHT + CONVERSATION_PADDING,
+                y=(i + 1) * CHOICE_HEIGHT + CONVERSATION_PADDING,
                 height=CHOICE_HEIGHT,
                 text=choice.text,
             )
             button.on_click = self._choice_picked
             self.manager.add(button, index=0)
 
-        # TODO(rob): At the bottom of the choices, put an Exit button that quits out
-        # of the conversation.
+        exit_button = gui.UIFlatButton(
+            x=CHOICES_OFFSET,
+            y=CONVERSATION_PADDING,
+            height=CHOICE_HEIGHT,
+            text="Bye!",
+        )
+        exit_button.on_click = self._resume_game
+        self.manager.add(exit_button, index=0)
 
         title = self.current.title or self.root.title
         if title is not None:

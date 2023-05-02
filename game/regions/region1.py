@@ -17,11 +17,6 @@ class LouisMckay(scripts.SavesAPI, scripts.Script):
 
 class CoryCottonChat(conversation.GUI):
     def __init__(self):
-        bye = conversation.Choice(
-            text="Bye!",
-            action=builtin.resume_game,
-        )
-
         holden = conversation.Choice(
             text="Holden",
             link=conversation.Conversation(
@@ -41,10 +36,10 @@ class CoryCottonChat(conversation.GUI):
                     "There's a forest to the west. It's dangerous, be sure to pick up some way to "
                     "defend yourself if you want to go out there."
                 ),
-                choices=[holden, bye],
+                choices=[holden],
             ),
         )
-        holden.link.choices = [forest, bye]
+        holden.link.choices = [forest]
 
         super().__init__(
             conversation.Conversation(
@@ -56,7 +51,6 @@ class CoryCottonChat(conversation.GUI):
                 choices=[
                     holden,
                     forest,
-                    bye,
                 ],
             )
         )
@@ -69,11 +63,6 @@ class LouisMckayChat(conversation.GUI):
                 title="Louis Mckay",
                 text="Welcome to my shop.",
                 # TODO(rob): Create a "shop" GUI that we can plug in here.
-                choices=[
-                    conversation.Choice(
-                        text="Bye!",
-                        action=builtin.resume_game,
-                    ),
-                ],
+                choices=[],
             )
         )
