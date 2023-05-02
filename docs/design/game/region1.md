@@ -25,6 +25,4 @@
     - goes to sleep at 9pm
   - Louis Mckay (m)
     - shopkeeper in building 1, lives upstairs
-    - TODO(rob): add an upstairs to shop
-    - TODO(rob): add a stairs graphic
   - TODO(rob): the other 9 characters
