@@ -1,0 +1,144 @@
+{ "compressionlevel":-1,
+ "height":10,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":10,
+         "id":1,
+         "name":"Ground Tiles",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":10,
+         "id":3,
+         "name":"Ground Overlay",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 9, 10, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":10,
+         "id":2,
+         "name":"Wall Tiles",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"Key Points",
+         "objects":[
+                {
+                 "class":"",
+                 "height":0,
+                 "id":1,
+                 "name":"Stairs Entry",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":336.13296398892,
+                 "y":52.7601108033241
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":5,
+         "name":"Scripted Objects",
+         "objects":[
+                {
+                 "class":"",
+                 "height":26.3182,
+                 "id":2,
+                 "name":"Stairs Down",
+                 "properties":[
+                        {
+                         "name":"on_collide",
+                         "type":"string",
+                         "value":"engine.builtin.transition_region"
+                        }, 
+                        {
+                         "name":"on_collide_region",
+                         "type":"string",
+                         "value":"Region1Building1"
+                        }, 
+                        {
+                         "name":"on_collide_start_location",
+                         "type":"string",
+                         "value":"Stairs Entry"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":29.8333,
+                 "x":320.790829224377,
+                 "y":65.1300966759003
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":6,
+ "nextobjectid":3,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.9.2",
+ "tileheight":32,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "source":"Interior.tsx"
+        }],
+ "tilewidth":32,
+ "type":"map",
+ "version":"1.9",
+ "width":12
+}

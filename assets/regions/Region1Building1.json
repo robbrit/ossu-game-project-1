@@ -24,12 +24,33 @@
          "y":0
         }, 
         {
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":10,
+         "id":6,
+         "name":"Ground Overlay",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
          "data":[1, 6, 1, 1, 1, 6, 1, 1, 1, 1, 6, 6,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6,
             1, 0, 0, 0, 3, 4, 4, 5, 0, 0, 0, 6,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 16, 1,
             6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6,
@@ -37,6 +58,27 @@
          "height":10,
          "id":1,
          "name":"Wall Tiles",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":10,
+         "id":7,
+         "name":"Decor",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
@@ -99,6 +141,18 @@
                  "width":0,
                  "x":190.833333333333,
                  "y":278
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":8,
+                 "name":"Stairs Entry",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":336.5,
+                 "y":90
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -137,6 +191,33 @@
                  "width":62.3333333333333,
                  "x":161,
                  "y":302.848484848485
+                }, 
+                {
+                 "class":"",
+                 "height":26.3182,
+                 "id":6,
+                 "name":"Stairs Up",
+                 "properties":[
+                        {
+                         "name":"on_collide",
+                         "type":"string",
+                         "value":"engine.builtin.transition_region"
+                        }, 
+                        {
+                         "name":"on_collide_region",
+                         "type":"string",
+                         "value":"Region1Building1Floor2"
+                        }, 
+                        {
+                         "name":"on_collide_start_location",
+                         "type":"string",
+                         "value":"Stairs Entry"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":29.8333,
+                 "x":321.83335,
+                 "y":34.0909
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -144,8 +225,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":5,
+ "nextlayerid":8,
+ "nextobjectid":9,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",
