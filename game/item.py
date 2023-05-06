@@ -5,11 +5,13 @@ from typing import (
 
 
 class ItemType(enum.Enum):
+    """Represents the item types."""
+
     WEAPON: 0
     OTHER: 1
 
 
-class Item:
+class Item(Protocol):
     """Protocol to define an Item."""
 
     _asset: str
