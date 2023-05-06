@@ -2,24 +2,21 @@ from typing import (
     Optional,
 )
 
-from item import (
-    Item,
-    ItemType,
-)
+from game import item
 
 
 class EquipmentSlot:
     """Represents a equipment slot."""
 
-    _item: Optional[Item]
-    _valid_types: set[ItemType]
+    _item: Optional[item.Item]
+    _valid_types: set[item.ItemType]
 
-    def __init__(self, item: Item, valid_types: set[ItemType]):
-        self._item = item
+    def __init__(self, _item: item.Item, valid_types: set[item.ItemType]):
+        self._item = _item
         self._valid_types = valid_types
 
-    def equip_item(self, item: Item):
+    def equip_item(self, _item: item.Item):
         """Equips an item if it's a valid type."""
 
-        if item.item_type in self._valid_types:
-            self._item = item
+        if _item.item_type in self._valid_types:
+            self._item = _item

@@ -2,13 +2,10 @@ from typing import (
     Optional,
 )
 
-from item import (
-    Item,
-    ItemType,
-)
+from game import item
 
 
 class Inventory:
     """Represents the inventory."""
 
-    _items: list[Optional[Item]] = [None] * 16
+    _items: list[Optional[item.Item]] = [None] * 16
