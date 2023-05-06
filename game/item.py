@@ -13,7 +13,7 @@ class Item:
     """Protocol to define an Item."""
 
     _asset: str
-    _itemType: ItemType
+    item_type: ItemType
 
     def __init__(self, asset, item_type):
         """Initialize the Item with an asset and a type"""
