@@ -48,6 +48,10 @@ class NoScript(Exception):
     """Raised when we attempt to load a script on an object that doesn't have one."""
 
 
+class SpriteAlreadyExists(Exception):
+    """Raised when a sprite is added that already exists."""
+
+
 @dataclasses.dataclass
 class RegionState:
     """Stores the state of a region."""
@@ -285,6 +289,9 @@ class World:
 
         if not script:
             raise NotImplementedError("Non-scripted sprites are not supported.")
+
+        if name in self._game_sprites or name in self._sprites_to_add:
+            raise SpriteAlreadyExists(f"Sprite named '{name}' already exists.")
 
         sprite = game_sprite.GameSprite(
             name=name,
