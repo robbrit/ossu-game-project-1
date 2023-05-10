@@ -99,9 +99,12 @@ class GUI:
 
     def _resume_game(self, event: gui.UIOnClickEvent) -> None:
         # pylint: disable=unused-argument
+        assert self.api is not None
         self.api.start_game()
 
     def _reset_widgets(self) -> None:
+        assert self.manager is not None
+
         self.manager.clear()
         # Dirty hack to get the UI manager to reset correctly.
         self.manager.children[0] = []
@@ -127,7 +130,7 @@ class GUI:
                 height=CHOICE_HEIGHT,
                 text=choice.text,
             )
-            button.on_click = self._choice_picked
+            button.on_click = self._choice_picked  # type: ignore
             self.manager.add(button, index=0)
 
         exit_button = gui.UIFlatButton(
@@ -136,7 +139,7 @@ class GUI:
             height=CHOICE_HEIGHT,
             text="Bye!",
         )
-        exit_button.on_click = self._resume_game
+        exit_button.on_click = self._resume_game  # type: ignore
         self.manager.add(exit_button, index=0)
 
         title = self.current.title or self.root.title
