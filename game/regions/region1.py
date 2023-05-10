@@ -7,11 +7,13 @@ from engine.gui import conversation
 
 class CoryCotton(scripts.SavesAPI, scripts.Script):
     def on_activate(self, owner: scripts.ScriptOwner, player: scripts.Player) -> None:
+        assert self.api is not None
         self.api.show_gui(CoryCottonChat())
 
 
 class LouisMckay(scripts.SavesAPI, scripts.Script):
     def on_activate(self, owner: scripts.ScriptOwner, player: scripts.Player) -> None:
+        assert self.api is not None
         self.api.show_gui(LouisMckayChat())
 
 
