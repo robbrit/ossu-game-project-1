@@ -120,7 +120,10 @@ class GUI:
             button = _ChoiceButton(
                 index=i,
                 x=CHOICES_OFFSET,
-                y=(i + 1) * CHOICE_HEIGHT + CONVERSATION_PADDING,
+                y=(
+                    (len(self.current.choices) - i) * CHOICE_HEIGHT
+                    + CONVERSATION_PADDING
+                ),
                 height=CHOICE_HEIGHT,
                 text=choice.text,
             )
