@@ -1,5 +1,6 @@
 import dataclasses
 import numbers
+import operator
 from typing import (
     Any,
     cast,
@@ -30,6 +31,7 @@ from engine.model import (
 TILE_SCALING = 1
 
 PLAYER_MOVEMENT_SPEED = 250
+PLAYER_Z_INDEX = 1
 
 # The distance in pixels from the center of the player object that we use for testing
 # activions.
@@ -170,10 +172,8 @@ class World:
         is_first_load = region_name not in self.regions_loaded
         self.regions_loaded.add(region_name)
 
-        self.scene = arcade.Scene.from_tilemap(tilemap)
+        self._build_scene(tilemap)
         self._load_scripted_objects(tilemap, region_state, is_first_load)
-
-        self.scene.add_sprite("Player", self._player_sprite)
 
         self._reset_player(start_location, tilemap)
 
@@ -189,6 +189,33 @@ class World:
             ),
         )
 
+    def _build_scene(self, tilemap: arcade.TileMap) -> None:
+        self.scene = arcade.Scene()
+
+        layers = [
+            (
+                name,
+                sprite_list,
+                sprite_list.properties.get("z-index", 0)
+                if sprite_list.properties is not None
+                else 0,
+            )
+            for name, sprite_list in tilemap.sprite_lists.items()
+        ]
+        player_list = arcade.SpriteList()
+        player_list.append(self._player_sprite)
+        layers.append(("Player", player_list, PLAYER_Z_INDEX))
+
+        scripted_objects = arcade.SpriteList(use_spatial_hash=True)
+        layers.append((SCRIPTED_OBJECTS, scripted_objects, PLAYER_Z_INDEX))
+
+        layers = sorted(layers, key=operator.itemgetter(2))
+
+        self.scene.add_sprite("Player", self._player_sprite)
+
+        for name, layer, _ in layers:
+            self.scene.add_sprite_list(name, sprite_list=layer)
+
     def _load_scripted_objects(
         self,
         tilemap: arcade.TileMap,
@@ -199,7 +226,8 @@ class World:
             raise SceneNotInitialized()
 
         self._game_sprites = {}
-        self.scene.add_sprite_list(SCRIPTED_OBJECTS, use_spatial_hash=True)
+        scripted_objects = self.scene.get_sprite_list(SCRIPTED_OBJECTS)
+        scripted_objects.clear()
 
         sprites = []
         script: Optional[scripts.Script] = None
@@ -258,7 +286,7 @@ class World:
             )
             sprite.properties["solid"] = obj.properties.get("solid", False)
 
-        self.scene.get_sprite_list(SCRIPTED_OBJECTS).extend(sprites)
+        scripted_objects.extend(sprites)
 
     def create_sprite(
         self,
