@@ -106,6 +106,10 @@ class ScriptOwner(Protocol):
     """Defines an owner for a script."""
 
     @property
+    def name(self) -> str:
+        """Gets the name of the script owner."""
+
+    @property
     def location(self) -> Tuple[float, float]:
         """Gets the location of the script owner in world coordinates."""
 

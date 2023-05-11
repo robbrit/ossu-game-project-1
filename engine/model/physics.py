@@ -43,6 +43,12 @@ class Engine:
         """Adds a number of sprites to the engine."""
         self.moveable_sprites.extend(sprites)
 
+    def remove_sprite(self, name: str) -> None:
+        """Removes a sprite from the physics engine."""
+        self.moveable_sprites = [
+            sprite for sprite in self.moveable_sprites if sprite.name != name
+        ]
+
     def update(
         self,
         delta_time: float,
