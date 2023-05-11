@@ -114,6 +114,7 @@ class World:
 
     in_update: bool
     _sprites_to_add: Dict[str, game_sprite.GameSprite]
+    _sprites_to_remove: Set[str]
 
     def __init__(
         self,
@@ -139,6 +140,7 @@ class World:
 
         self.in_update = False
         self._sprites_to_add = {}
+        self._sprites_to_remove = set()
 
         for region_name, region in game_spec.world.regions.items():
             self.tilemaps[region_name] = arcade.load_tilemap(
@@ -418,12 +420,21 @@ class World:
 
         self.physics_engine.update(delta_time, on_collide=self._handle_collision)
 
+        self._adjust_sprites()
+
+        self.sec_passed += delta_time
+        self.in_update = False
+
+    def _adjust_sprites(self):
+        """Adds or removes sprites from the game."""
         self._game_sprites.update(self._sprites_to_add)
         self.physics_engine.add_sprites(self._sprites_to_add.values())
         self._sprites_to_add = {}
 
-        self.sec_passed += delta_time
-        self.in_update = False
+        for sprite_name in self._sprites_to_remove:
+            self._remove_sprite(sprite_name)
+
+        self._sprites_to_remove = set()
 
     def _handle_collision(
         self,
@@ -542,7 +553,23 @@ class World:
 
     def remove_sprite(self, name: str) -> None:
         """Removes a sprite by name."""
-        self._game_sprites.pop(name, None)
+        # TODO(rob): We'll need to be able to handle when the sprite is still in the
+        # "to be created" list.
+        if name not in self._game_sprites:
+            raise KeyError(f"Unknown sprite {name}")
+
+        if self.in_update:
+            self._sprites_to_remove.add(name)
+        else:
+            self._remove_sprite(name)
+
+    def _remove_sprite(self, name: str) -> None:
+        assert self.scene is not None
+        assert self.physics_engine is not None
+
+        sprite = self._game_sprites.pop(name)
+        self.scene.get_sprite_list(SCRIPTED_OBJECTS).remove(sprite)
+        self.physics_engine.remove_sprite(name)
 
     @property
     def width(self) -> int:
