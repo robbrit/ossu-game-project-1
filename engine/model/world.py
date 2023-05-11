@@ -564,6 +564,9 @@ class World:
             self._remove_sprite(name)
 
     def _remove_sprite(self, name: str) -> None:
+        assert self.scene is not None
+        assert self.physics_engine is not None
+
         sprite = self._game_sprites.pop(name)
         self.scene.get_sprite_list(SCRIPTED_OBJECTS).remove(sprite)
         self.physics_engine.remove_sprite(name)
