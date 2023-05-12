@@ -121,7 +121,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
     def _spawn(self):
         self.id_counter += 1
 
-        logger.info(f"Spawner {self.name} spawning {self.sprite_spec}")
+        logger.info("Spawner %s spawning %s", self.name, self.sprite_spec)
 
         sprite = self.api.create_sprite(
             spec_name=self.sprite_spec,
