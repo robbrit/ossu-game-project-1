@@ -227,7 +227,7 @@
                  "class":"",
                  "height":0,
                  "id":5,
-                 "name":"Rat Waypoint 1",
+                 "name":"Rat Waypoint 1a",
                  "point":true,
                  "rotation":0,
                  "visible":true,
@@ -239,7 +239,7 @@
                  "class":"",
                  "height":0,
                  "id":6,
-                 "name":"Rat Waypoint 2",
+                 "name":"Rat Waypoint 1b",
                  "point":true,
                  "rotation":0,
                  "visible":true,
@@ -251,7 +251,7 @@
                  "class":"",
                  "height":0,
                  "id":7,
-                 "name":"Rat Waypoint 3",
+                 "name":"Rat Waypoint 1c",
                  "point":true,
                  "rotation":0,
                  "visible":true,
@@ -263,13 +263,109 @@
                  "class":"",
                  "height":0,
                  "id":8,
-                 "name":"Rat Waypoint 4",
+                 "name":"Rat Waypoint 1d",
                  "point":true,
                  "rotation":0,
                  "visible":true,
                  "width":0,
                  "x":1386,
                  "y":174
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":10,
+                 "name":"Rat Waypoint 2a",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1454,
+                 "y":979.333333333333
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":11,
+                 "name":"Rat Waypoint 2b",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1265.33333333333,
+                 "y":1048.66666666667
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":12,
+                 "name":"Rat Waypoint 2c",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1449.33333333333,
+                 "y":1148
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":13,
+                 "name":"Rat Waypoint 3a",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":526.003333333333,
+                 "y":531.329666666666
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":14,
+                 "name":"Rat Waypoint 3b",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":337.333333333333,
+                 "y":600.666666666667
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":15,
+                 "name":"Rat Waypoint 3c",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":402,
+                 "y":731.33
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":17,
+                 "name":"Rat Waypoint 3d",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":656.666666666667,
+                 "y":789.333333333333
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":18,
+                 "name":"Rat Waypoint 3e",
+                 "point":true,
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":718.666666666667,
+                 "y":570
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -313,7 +409,7 @@
                  "class":"",
                  "height":0,
                  "id":4,
-                 "name":"Monster Spawn 1",
+                 "name":"Rat Spawn 1",
                  "point":true,
                  "properties":[
                         {
@@ -334,22 +430,22 @@
                         {
                          "name":"script_spawn_script_waypoint_1",
                          "type":"string",
-                         "value":"Rat Waypoint 1"
+                         "value":"Rat Waypoint 1a"
                         }, 
                         {
                          "name":"script_spawn_script_waypoint_2",
                          "type":"string",
-                         "value":"Rat Waypoint 2"
+                         "value":"Rat Waypoint 1b"
                         }, 
                         {
                          "name":"script_spawn_script_waypoint_3",
                          "type":"string",
-                         "value":"Rat Waypoint 3"
+                         "value":"Rat Waypoint 1c"
                         }, 
                         {
                          "name":"script_spawn_script_waypoint_4",
                          "type":"string",
-                         "value":"Rat Waypoint 4"
+                         "value":"Rat Waypoint 1d"
                         }, 
                         {
                          "name":"script_sprite_spec",
@@ -359,8 +455,114 @@
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":1454,
-                 "y":146
+                 "x":1456.66666666667,
+                 "y":120
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":9,
+                 "name":"Rat Spawn 2",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"script",
+                         "type":"string",
+                         "value":"engine.builtin.Spawner"
+                        }, 
+                        {
+                         "name":"script_name",
+                         "type":"string",
+                         "value":"region2.rat_spawner2"
+                        }, 
+                        {
+                         "name":"script_spawn_script",
+                         "type":"string",
+                         "value":"game.creatures.forest.Rat"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_1",
+                         "type":"string",
+                         "value":"Rat Waypoint 2a"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_2",
+                         "type":"string",
+                         "value":"Rat Waypoint 2b"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_3",
+                         "type":"string",
+                         "value":"Rat Waypoint 2c"
+                        }, 
+                        {
+                         "name":"script_sprite_spec",
+                         "type":"string",
+                         "value":"forest.rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1457.33333333333,
+                 "y":1142.66666666667
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":19,
+                 "name":"Rat Spawn 3",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"script",
+                         "type":"string",
+                         "value":"engine.builtin.Spawner"
+                        }, 
+                        {
+                         "name":"script_name",
+                         "type":"string",
+                         "value":"region2.rat_spawner3"
+                        }, 
+                        {
+                         "name":"script_spawn_script",
+                         "type":"string",
+                         "value":"game.creatures.forest.Rat"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_1",
+                         "type":"string",
+                         "value":"Rat Waypoint 3a"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_2",
+                         "type":"string",
+                         "value":"Rat Waypoint 3b"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_3",
+                         "type":"string",
+                         "value":"Rat Waypoint 3c"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_4",
+                         "type":"string",
+                         "value":"Rat Waypoint 3d"
+                        }, 
+                        {
+                         "name":"script_spawn_script_waypoint_5",
+                         "type":"string",
+                         "value":"Rat Waypoint 3e"
+                        }, 
+                        {
+                         "name":"script_sprite_spec",
+                         "type":"string",
+                         "value":"forest.rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":721,
+                 "y":528
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -369,7 +571,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":9,
+ "nextobjectid":20,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

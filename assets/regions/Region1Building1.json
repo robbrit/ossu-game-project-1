@@ -135,7 +135,7 @@
                         {
                          "name":"spec",
                          "type":"string",
-                         "value":"region1.intro_character"
+                         "value":"region1.townsperson_male"
                         }],
                  "rotation":0,
                  "visible":true,
