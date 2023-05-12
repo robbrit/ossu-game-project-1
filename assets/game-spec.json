@@ -38,11 +38,23 @@
         "initial_region": "Region1"
     },
     "sprites": {
-        "region1.intro_character": {
+        "region1.townsperson_male": {
             "width": 32,
             "height": 32,
             "initial_animation": "idle",
-            "root_directory": "assets/sprites/intro_character",
+            "root_directory": "assets/sprites/townsperson_male",
+            "animations": {
+                "idle": {
+                    "frame_speed": 1,
+                    "num_frames": 1
+                }
+            }
+        },
+        "region1.townsperson_female": {
+            "width": 32,
+            "height": 32,
+            "initial_animation": "idle",
+            "root_directory": "assets/sprites/townsperson_female",
             "animations": {
                 "idle": {
                     "frame_speed": 1,

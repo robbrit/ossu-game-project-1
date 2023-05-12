@@ -1,5 +1,6 @@
 """This module defines a set of built-in scripts to be used from maps."""
 
+import logging
 import random
 import sys
 from typing import (
@@ -11,6 +12,8 @@ from typing import (
 
 from engine import scripts
 from engine.model import game_sprite
+
+logger = logging.Logger("engine.builtin")
 
 
 def transition_region(api: scripts.GameAPI, region: str, start_location: str) -> None:
@@ -38,7 +41,7 @@ def exit_game() -> None:
 # Maximum number of spawns a spawner can have.
 DEFAULT_NUM_SPAWNS = 1
 # Percentage chance each second of spawning a creature if there is room to spawn.
-DEFAULT_SPAWN_RATE_PER_SEC = 0.20
+DEFAULT_SPAWN_RATE_PER_SEC = 0.50
 # Minimum amount of time between spawns.
 DEFAULT_SPAWN_COOLDOWN_SECS = 10.0
 
@@ -117,6 +120,8 @@ class Spawner(scripts.SavesAPI, scripts.Script):
 
     def _spawn(self):
         self.id_counter += 1
+
+        logger.info(f"Spawner {self.name} spawning {self.sprite_spec}")
 
         sprite = self.api.create_sprite(
             spec_name=self.sprite_spec,

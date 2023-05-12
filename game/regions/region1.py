@@ -11,6 +11,12 @@ class CoryCotton(scripts.SavesAPI, scripts.Script):
         self.api.show_gui(CoryCottonChat())
 
 
+class AdeleCotton(scripts.SavesAPI, scripts.Script):
+    def on_activate(self, owner: scripts.ScriptOwner, player: scripts.Player) -> None:
+        assert self.api is not None
+        self.api.show_gui(AdeleCottonChat())
+
+
 class LouisMckay(scripts.SavesAPI, scripts.Script):
     def on_activate(self, owner: scripts.ScriptOwner, player: scripts.Player) -> None:
         assert self.api is not None
@@ -53,6 +59,27 @@ class CoryCottonChat(conversation.GUI):
                 choices=[
                     holden,
                     forest,
+                ],
+            )
+        )
+
+
+class AdeleCottonChat(conversation.GUI):
+    def __init__(self):
+        cory = conversation.Choice(
+            text="Cory",
+            link=conversation.Conversation(
+                text="That's my husband. He's standing over there.",
+                choices=[],
+            ),
+        )
+
+        super().__init__(
+            conversation.Conversation(
+                title="Adele Cotton",
+                text=("Hello, my name is Adele. I live here with my husband Cory."),
+                choices=[
+                    cory,
                 ],
             )
         )

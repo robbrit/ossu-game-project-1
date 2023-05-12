@@ -17,6 +17,12 @@
          "id":2,
          "name":"Ground Tiles",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"z-index",
+                 "type":"int",
+                 "value":-2
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":12,
@@ -26,7 +32,7 @@
         {
          "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 9, 10, 0, 0, 0, 0, 0, 0, 16, 16, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -38,6 +44,39 @@
          "id":1,
          "name":"Wall Tiles",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"z-index",
+                 "type":"int",
+                 "value":-1
+                }],
+         "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 11, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":10,
+         "id":5,
+         "name":"High Z-Index",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"z-index",
+                 "type":"int",
+                 "value":2
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":12,
@@ -105,7 +144,7 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":5,
+ "nextlayerid":6,
  "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
