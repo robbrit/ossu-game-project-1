@@ -163,17 +163,14 @@ class GameSprite(arcade.Sprite):
         animation = self._animation_state()
         direction = self._get_direction()
 
-        self.animations.set_animation(self._animation_name(animation, direction))
-        self.animations.update(delta_time)
-        self.texture = self.animations.texture
-
-    def _animation_name(self, name: str, direction: str) -> str:
-        key = f"{name}-{direction}"
+        key = f"{animation}-{direction}"
 
         if not self.animations.has_animation(key):
-            key = name
+            key = animation
 
-        return key
+        self.animations.set_animation(key)
+        self.animations.update(delta_time)
+        self.texture = self.animations.texture
 
     def _animation_state(self) -> str:
         """Determines which 'animation state' we're in."""
