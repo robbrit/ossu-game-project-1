@@ -45,9 +45,9 @@ class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
     def on_hit(self, owner: scripts.ScriptOwner, player: scripts.Player) -> None:
         """Triggered when the player hits the rat."""
         assert self.api is not None
-        self._health.adjust(-self.api.player_data["base_damage"])
-        if self._health.is_dead:
-            print("rat dead")
+
+        if not self._health.is_dead:
+            self._health.adjust(-self.api.player_data["base_damage"])
 
     def on_tick(self, game_time: float, delta_time: float) -> None:
         """Handles game ticks."""
@@ -57,11 +57,10 @@ class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
         if self._health.is_dead:
             if self._death_time is None:
                 self._death_time = game_time
+                self.owner.speed = (0, 0)
+                self.owner.custom_animation = "dead"
             elif self._death_time + RAT_DECAY_SECS < game_time:
                 self.api.remove_sprite(self.owner.name)
-
-            self.owner.speed = (0, 0)
-            # TODO(rob): Set the animation to dead once we have death animations.
             return
 
         if self._navigator is None:

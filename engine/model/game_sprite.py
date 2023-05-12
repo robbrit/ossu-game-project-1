@@ -62,6 +62,10 @@ class Animations:
         self.time_index = 0.0
         self.texture = current_animation.textures[0]
 
+    def has_animation(self, name: str) -> bool:
+        """Determines if the sequence has an animation with this name."""
+        return name in self.animations
+
     def set_animation(self, name: str) -> None:
         """Changes the current animation for the sprite.
 
@@ -113,6 +117,9 @@ class GameSprite(arcade.Sprite):
     facing_x: float
     facing_y: float
 
+    # Allows scripts to set a custom animation for this sprite.
+    custom_animation: Optional[str]
+
     def __init__(
         self,
         name: str,
@@ -134,6 +141,7 @@ class GameSprite(arcade.Sprite):
         self.set_facing(x=1.0, y=1.0)
         self._spec = sprite_spec
         self.script = script
+        self.custom_animation = None
 
         if sprite_spec is not None:
             self.animations = Animations(sprite_spec)
@@ -155,18 +163,20 @@ class GameSprite(arcade.Sprite):
         animation = self._animation_state()
         direction = self._get_direction()
 
-        try:
-            self.animations.set_animation(f"{animation}-{direction}")
-        except KeyError:
-            # This is possibly becase they don't have directional animations. If they
-            # don't, just use the base animation.
-            self.animations.set_animation(animation)
+        key = f"{animation}-{direction}"
 
+        if not self.animations.has_animation(key):
+            key = animation
+
+        self.animations.set_animation(key)
         self.animations.update(delta_time)
         self.texture = self.animations.texture
 
     def _animation_state(self) -> str:
         """Determines which 'animation state' we're in."""
+        if self.custom_animation:
+            return self.custom_animation
+
         if self.change_x != 0 or self.change_y != 0:
             return "walk"
 
