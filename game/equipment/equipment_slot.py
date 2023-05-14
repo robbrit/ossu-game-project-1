@@ -1,5 +1,6 @@
 from typing import (
     Optional,
+    Set,
 )
 
 from game import item
@@ -9,9 +10,9 @@ class EquipmentSlot:
     """Represents a equipment slot."""
 
     _item: Optional[item.Item]
-    _valid_types: set[item.ItemType]
+    _valid_types: Set[item.ItemType]
 
-    def __init__(self, _item: item.Item, valid_types: set[item.ItemType]):
+    def __init__(self, valid_types: Set[item.ItemType], _item: item.Item = None):
         self._item = _item
         self._valid_types = valid_types
 
