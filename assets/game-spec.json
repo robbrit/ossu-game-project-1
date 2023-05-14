@@ -239,6 +239,14 @@
                 {
                     "name": "exit-button-selected",
                     "path": "assets/gui/exit-button-selected.png"
+                },
+                {
+                    "name": "inventory-button",
+                    "path": "assets/gui/inventory-button.png"
+                },
+                {
+                    "name": "inventory-button-selected",
+                    "path": "assets/gui/inventory-button-selected.png"
                 }
             ],
             "buttons": [
@@ -261,6 +269,16 @@
                         180
                     ],
                     "action": "engine.builtin.exit_game"
+                },
+                {
+                    "selected_image_asset": "inventory-button-selected",
+                    "unselected_image_asset": "inventory-button",
+                    "name": "inventory-button",
+                    "center": [
+                        400,
+                        400
+                    ],
+                    "action": "game.menu.show_inventory"
                 }
             ],
             "images": [],
