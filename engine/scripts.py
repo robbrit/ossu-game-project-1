@@ -37,6 +37,14 @@ class KeyPoint:
     properties: Dict[str, Any]
 
 
+@dataclasses.dataclass
+class Message:
+    """Represents a message to the player."""
+
+    message: str
+    creation_time: float
+
+
 class GameAPI(Protocol):
     """A protocol for how game objects will interact with the engine."""
 
@@ -78,6 +86,10 @@ class GameAPI(Protocol):
     @property
     def current_time_secs(self) -> float:
         """Gets the current time in seconds."""
+
+    def send_message(self, message: str) -> None:
+        """Sends a message to the player."""
+
 
 
 GameCallable = Callable[[GameAPI], None]
