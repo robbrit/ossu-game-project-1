@@ -11,9 +11,10 @@ from engine import scripts
 
 RAT_HEALTH = 10
 RAT_DECAY_SECS = 10
+RAT_DAMAGE = 1
 
 
-class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
+class Rat(scripts.SavesOwner, health.DamagesPlayer, scripts.Script):
     """A rat creature."""
 
     _navigator: Optional[waypoints.Navigator]
@@ -29,7 +30,8 @@ class Rat(scripts.SavesAPI, scripts.SavesOwner, scripts.Script):
                        The actual values of N don't matter, so long as they are
                        unique.
         """
-        super(scripts.Script, self).__init__()
+        scripts.Script.__init__(self)
+        health.DamagesPlayer.__init__(self, RAT_DAMAGE)
         self._navigator = None
         waypoint_args = [
             int(index)
