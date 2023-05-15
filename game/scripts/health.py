@@ -43,16 +43,18 @@ INVINCIBLE_TIME = 1.5
 class DamagesPlayer(scripts.SavesAPI):
     """Class to handle damaging the player."""
 
-    _damage: float
+    _damage: int
     _last_damage_time: float
 
-    def __init__(self, damage: float):
+    def __init__(self, damage: int):
         scripts.SavesAPI.__init__(self)
         self._damage = damage
         self._last_damage_time = 0.0
 
     def on_collide(self, owner: scripts.ScriptOwner, other: scripts.Entity) -> None:
         """Triggered when the owner collides with another entity."""
+        assert self.api is not None
+
         if not isinstance(other, player_sprite.PlayerSprite):
             return
 
