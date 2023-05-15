@@ -1,7 +1,12 @@
+from typing import (
+    cast,
+)
+
 import arcade
 from arcade import gui
 
 from engine import scripts
+from game.scripts import health
 
 HP_WIDTH = 150
 HP_HEIGHT = 20
@@ -32,10 +37,9 @@ class HUD:
         """Renders the overlay."""
         state = self.api.player_data
 
-        current_hp = state["hp"]
-        max_hp = state["max_hp"]
+        hp = cast(health.Health, state["hp"])
 
-        hp_width = current_hp / max_hp * (HP_WIDTH - HP_BORDER * 2)
+        hp_width = hp.hp / hp.max_hp * (HP_WIDTH - HP_BORDER * 2)
 
         center_offset = (HP_WIDTH - hp_width - HP_BORDER) / 2 - 1
 
@@ -55,7 +59,7 @@ class HUD:
             color=HP_BAR_COLOR,
         )
 
-        text = f"{round(current_hp)}/{round(max_hp)}"
+        text = f"{round(hp.hp)}/{round(hp.max_hp)}"
 
         arcade.draw_text(
             text=text,

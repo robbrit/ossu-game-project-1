@@ -9,6 +9,7 @@ from engine.gui import spec_gui
 from game.gui import (
     hud,
 )
+from game.scripts import health
 
 STARTING_HP = 10
 STARTING_GOLD = 50
@@ -36,8 +37,7 @@ def run() -> None:
         menu_gui=create_menu_gui,
         game_spec=game_spec,
         initial_player_state={
-            "hp": STARTING_HP,
-            "max_hp": STARTING_HP,
+            "hp": health.Health(STARTING_HP),
             "gold": STARTING_GOLD,
             "base_damage": STARTING_DAMAGE,
         },
