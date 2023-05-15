@@ -17,7 +17,7 @@ class AnimationSpec:
 
 @dataclasses.dataclass
 class _GameSpriteSpecBase:
-    """Base class for GameSpriteSpec so we don't have to write a ton of code."""
+    """Base class for GameSpriteSpec, so we don't have to write a ton of code."""
 
     width: int
     height: int
@@ -72,8 +72,8 @@ class GameSpec:
     def __init__(
         self,
         world: Dict[str, Any],
-        player_spec: Dict[str, Any],
         sprites: Dict[str, Any],
+        player_spec: Dict[str, Any],
         guis: Dict[str, Any],
     ):
         self.world = WorldSpec(**world)

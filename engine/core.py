@@ -106,11 +106,19 @@ class Core(arcade.Window):
 
         self.current_state = self.ingame_state
 
-    def change_region(self, name: str, start_location: str) -> None:
-        """Changes the region of the game."""
-        if self.world is None:
+    def world_exist(self):
+        """Checking for the existence of the world"""
+        if not self.world:
             raise GameNotInitializedError()
 
+    def state_exist(self):
+        """Checking for the existence of the state"""
+        if not self.current_state:
+            raise GameNotInitializedError()
+
+    def change_region(self, name: str, start_location: str) -> None:
+        """Changes the region of the game."""
+        self.world_exist()
         self.world.load_region(name, start_location)
 
     def show_gui(self, gui: scripts.GUI) -> None:
@@ -126,55 +134,41 @@ class Core(arcade.Window):
         script: Optional[scripts.Script],
     ) -> None:
         """Creates a sprite."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         _spec = self._spec.sprites[spec_name]
         self.world.create_sprite(_spec, name, start_location, script)
 
     def get_key_points(self, name: Optional[str] = None) -> Iterable[scripts.KeyPoint]:
         """Queries for key points in the current region."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         return self.world.get_key_points(name)
 
     def get_sprites(self, name: Optional[str] = None) -> Iterable[arcade.Sprite]:
         """Gets all sprites with the given name."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         return self.world.get_sprites(name)
 
     def remove_sprite(self, name: str) -> None:
         """Removes a sprite by name."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         self.world.remove_sprite(name)
 
     @property
     def player_data(self) -> Dict[str, Any]:
         """Gets the player's data."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         return self.world.player_sprite.data
 
     @player_data.setter
     def player_data(self, value: Dict[str, Any]):
         """Sets the player's data."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         self.world.player_sprite.data = value
 
     @property
     def current_time_secs(self) -> float:
         """Gets the current time in seconds."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
+        self.world_exist()
         return self.world.game_time_sec
 
     def run(self):
@@ -191,31 +185,23 @@ class Core(arcade.Window):
 
     def on_draw(self) -> None:
         """Renders the game."""
-        if self.current_state is None:
-            raise GameNotInitializedError()
-
+        self.state_exist()
         self.clear()
         self.current_state.view.on_draw()
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         """Handles incoming key presses."""
-        if self.current_state is None:
-            raise GameNotInitializedError()
-
+        self.state_exist()
         self.current_state.controller.on_key_press(symbol, modifiers)
 
     def on_key_release(self, symbol: int, modifiers: int) -> None:
         """Handles incoming key releases."""
-        if self.current_state is None:
-            raise GameNotInitializedError()
-
+        self.state_exist()
         self.current_state.controller.on_key_release(symbol, modifiers)
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
         """Handles mouse movement."""
-        if self.current_state is None:
-            raise GameNotInitializedError()
-
+        self.state_exist()
         self.current_state.controller.on_mouse_motion(x, y, dx, dy)
 
     def on_mouse_release(
@@ -226,9 +212,7 @@ class Core(arcade.Window):
         modifiers: int,
     ) -> None:
         """Handles releasing the mouse button."""
-        if self.current_state is None:
-            raise GameNotInitializedError()
-
+        self.state_exist()
         self.current_state.controller.on_mouse_release(
             x,
             y,
@@ -238,7 +222,5 @@ class Core(arcade.Window):
 
     def on_update(self, delta_time: float) -> None:
         """Handles updates."""
-        if self.current_state is None:
-            raise GameNotInitializedError()
-
+        self.state_exist()
         self.current_state.on_update(delta_time)
