@@ -67,6 +67,9 @@ class GameAPI(Protocol):
     def remove_sprite(self, name: str) -> None:
         """Removes a sprite by name."""
 
+    def play_sound(self, name: str) -> None:
+        """Plays a sound."""
+
     @property
     def player_data(self) -> Dict[str, Any]:
         """Gets the player's data."""
