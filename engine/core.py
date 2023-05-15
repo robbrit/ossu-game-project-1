@@ -57,6 +57,8 @@ class Core(arcade.Window):
     initial_player_state: Dict[str, Any]
     _spec: spec.GameSpec
 
+    _sounds: Dict[str, arcade.Sound]
+
     def __init__(
         self,
         initial_gui: Callable[[scripts.GameAPI], scripts.GUI],
@@ -85,6 +87,14 @@ class Core(arcade.Window):
         self.gui_state = gui_game_state.GuiState(self, self.initial_gui)
         self.ingame_state = None
         self.current_state = None
+
+        self._sounds = {}
+        for name, sound_spec in game_spec.sounds.items():
+            sound = arcade.load_sound(sound_spec.path, streaming=sound_spec.stream)
+            if sound is None:
+                raise ValueError(f"Unable to load sound '{name}'")
+
+            self._sounds[name] = sound
 
     def setup(self) -> None:
         """Resets the game state."""
@@ -152,6 +162,10 @@ class Core(arcade.Window):
             raise GameNotInitializedError()
 
         self.world.remove_sprite(name)
+
+    def play_sound(self, name: str) -> None:
+        """Plays a sound."""
+        self._sounds[name].play()
 
     @property
     def player_data(self) -> Dict[str, Any]:

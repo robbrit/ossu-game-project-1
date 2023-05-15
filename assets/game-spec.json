@@ -35,7 +35,9 @@
                 "tiled_mapfile": "assets/regions/Region2.json"
             }
         },
-        "initial_region": "Region1"
+        "initial_region": "Region1",
+        "hit_sound": "attack",
+        "activate_sound": "activate"
     },
     "sprites": {
         "region1.townsperson_male": {
@@ -265,6 +267,14 @@
             ],
             "images": [],
             "initial_selected_button": "resume-button"
+        }
+    },
+    "sounds": {
+        "attack": {
+            "path": "assets/sounds/attack.wav"
+        },
+        "activate": {
+            "path": "assets/sounds/click.wav"
         }
     }
 }

@@ -501,6 +501,9 @@ class World:
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
+        if self._spec.world.activate_sound:
+            self.api.play_sound(self._spec.world.activate_sound)
+
         self._player_sprite.on_activate()
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
@@ -509,6 +512,10 @@ class World:
 
     def hit(self) -> None:
         """Hit whatever is in front of the player."""
+
+        if self._spec.world.hit_sound:
+            self.api.play_sound(self._spec.world.hit_sound)
+
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
                 continue
