@@ -41,5 +41,6 @@ def run() -> None:
             "gold": STARTING_GOLD,
             "base_damage": STARTING_DAMAGE,
             "last_damage_time": 0.0,
+            "quests": {},
         },
     ).run()
