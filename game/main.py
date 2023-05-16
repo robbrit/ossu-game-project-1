@@ -40,5 +40,6 @@ def run() -> None:
             "hp": health.Health(STARTING_HP),
             "gold": STARTING_GOLD,
             "base_damage": STARTING_DAMAGE,
+            "last_damage_time": 0.0,
         },
     ).run()
