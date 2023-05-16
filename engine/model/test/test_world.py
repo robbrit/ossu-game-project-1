@@ -89,6 +89,6 @@ class RemoveSpriteTest(unittest.TestCase):
 
         self.assertEqual(len(list(w.get_sprites(name="sprite"))), 1)
 
-        w.remove_sprite("sprite")
+        w._remove_sprite("sprite")
 
         self.assertEqual(len(list(w.get_sprites(name="sprite"))), 0)

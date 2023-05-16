@@ -11,6 +11,8 @@ import arcade
 import arcade.tilemap
 
 from engine import (
+    event_manager,
+    events,
     game_state,
     scripts,
     spec,
@@ -58,6 +60,7 @@ class Core(arcade.Window):
     _spec: spec.GameSpec
 
     _sounds: Dict[str, arcade.Sound]
+    _events: event_manager.EventManager
 
     def __init__(
         self,
@@ -95,6 +98,8 @@ class Core(arcade.Window):
                 raise ValueError(f"Unable to load sound '{name}'")
 
             self._sounds[name] = sound
+
+        self._events = event_manager.EventManager()
 
     def setup(self) -> None:
         """Resets the game state."""
@@ -158,10 +163,7 @@ class Core(arcade.Window):
 
     def remove_sprite(self, name: str) -> None:
         """Removes a sprite by name."""
-        if self.world is None:
-            raise GameNotInitializedError()
-
-        self.world.remove_sprite(name)
+        self.fire_event(events.SPRITE_REMOVED, events.SpriteRemoved(name))
 
     def play_sound(self, name: str) -> None:
         """Plays a sound."""
