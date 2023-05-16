@@ -1,4 +1,5 @@
 import dataclasses
+import functools
 from typing import (
     List,
     Optional,
@@ -8,6 +9,7 @@ from typing import (
 from arcade import gui
 
 from engine import scripts
+from engine.gui import base
 
 CONVERSATION_PADDING = 10
 CONVERSATION_Y = 200
@@ -63,48 +65,21 @@ class Conversation(Protocol):
         """Gets the title to display at the top of the conversation GUI."""
 
 
-class _ChoiceButton(gui.UIFlatButton):
-    """Class to allow us to attach data to a UI Button."""
-
-    index: int
-
-    def __init__(self, index, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.index = index
-
-
-class GUI:
+class GUI(base.GUI):
     """A GUI that navigates a conversation in the game."""
 
     root: Conversation
     current: Conversation
 
-    api: Optional[scripts.GameAPI]
-    manager: Optional[gui.UIManager]
-
     def __init__(self, root_conversation: Conversation):
+        super().__init__()
         self.root = root_conversation
         self.current = self.root
         self.api = None
         self.manager = None
 
-    def set_api(self, api: scripts.GameAPI) -> None:
-        """Sets the game API for this GUI."""
-        self.api = api
-
-    def set_manager(self, manager: gui.UIManager) -> None:
-        """Sets the UI manager for this GUI."""
-        self.manager = manager
-
-        self.manager.clear()
-        self._reset_widgets()
-
-    def draw(self) -> None:
-        """Renders the conversation."""
-
-    def _choice_picked(self, event: gui.UIOnClickEvent):
-        index = event.source.index
-        choice = self.current.choices[index]
+    def _choice_picked(self, choice: Choice, _event: gui.UIOnClickEvent):
+        assert self.api is not None
 
         if choice.link is not None:
             self.current = choice.link
@@ -137,8 +112,7 @@ class GUI:
         )
 
         for i, choice in enumerate(self.current.choices):
-            button = _ChoiceButton(
-                index=i,
+            button = gui.UIFlatButton(
                 x=CHOICES_OFFSET,
                 y=(
                     (len(self.current.choices) - i) * CHOICE_HEIGHT
@@ -147,7 +121,10 @@ class GUI:
                 height=CHOICE_HEIGHT,
                 text=choice.text,
             )
-            button.on_click = self._choice_picked  # type: ignore
+            button.set_handler(
+                "on_click",
+                functools.partial(self._choice_picked, choice),
+            )
             self.manager.add(button, index=0)
 
         exit_button = gui.UIFlatButton(

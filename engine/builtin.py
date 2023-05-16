@@ -35,8 +35,9 @@ def resume_game(api: scripts.GameAPI) -> None:
     api.start_game()
 
 
-def exit_game() -> None:
+def exit_game(api: scripts.GameAPI) -> None:
     """Exits the game."""
+    # pylint: disable=unused-argument
     sys.exit(0)
 
 
