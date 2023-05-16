@@ -153,6 +153,14 @@ class ScriptOwner(Protocol):
         """Sets the speed of the script owner."""
 
     @property
+    def facing(self) -> Tuple[float, float]:
+        """Gets the facing direction of the script owner."""
+
+    @facing.setter
+    def facing(self, value: Tuple[float, float]) -> None:
+        """Sets the facing direction of the script owner."""
+
+    @property
     def custom_animation(self) -> Optional[str]:
         """Gets the custom animation of the script owner."""
 
