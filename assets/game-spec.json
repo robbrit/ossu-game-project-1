@@ -241,6 +241,10 @@
                 {
                     "name": "exit-button-selected",
                     "path": "assets/gui/exit-button-selected.png"
+                },
+                {
+                    "name": "quests-button",
+                    "path": "assets/gui/quests-button.png"
                 }
             ],
             "buttons": [
@@ -250,9 +254,19 @@
                     "name": "resume-button",
                     "center": [
                         400,
-                        290
+                        370
                     ],
                     "action": "engine.builtin.resume_game"
+                },
+                {
+                    "selected_image_asset": "quests-button",
+                    "unselected_image_asset": "quests-button",
+                    "name": "quests-button",
+                    "center": [
+                        400,
+                        260
+                    ],
+                    "action": "game.gui.quests.show_quests_gui"
                 },
                 {
                     "selected_image_asset": "exit-button-selected",
@@ -260,7 +274,7 @@
                     "name": "exit-button",
                     "center": [
                         400,
-                        180
+                        150
                     ],
                     "action": "engine.builtin.exit_game"
                 }
