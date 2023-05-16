@@ -182,6 +182,9 @@ class World:
         is_first_load = region_name not in self.regions_loaded
         self.regions_loaded.add(region_name)
 
+        self._core.clear_events()
+        self._core.register_handler(events.SPRITE_REMOVED, self._queue_sprite_removal)
+
         self._build_scene(tilemap)
         self._load_scripted_objects(tilemap, region_state, is_first_load)
 
@@ -198,9 +201,6 @@ class World:
                 self.height * self.tile_height,
             ),
         )
-
-        self._core.clear_events()
-        self._core.register_handler(events.SPRITE_REMOVED, self._queue_sprite_removal)
 
     def _build_scene(self, tilemap: arcade.TileMap) -> None:
         self.scene = arcade.Scene()
@@ -307,7 +307,7 @@ class World:
         name: str,
         start_location: Tuple[float, float],
         script: Optional[scripts.Script],
-    ) -> arcade.Sprite:
+    ) -> game_sprite.GameSprite:
         """Adds a sprite to the model."""
         return self._create_sprite(
             sprite_spec,

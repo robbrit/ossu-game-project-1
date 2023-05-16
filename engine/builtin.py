@@ -14,7 +14,6 @@ from engine import (
     events,
     scripts,
 )
-from engine.model import game_sprite
 
 logger = logging.Logger("engine.builtin")
 
@@ -57,7 +56,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
     spawn_script: Callable[[None], scripts.Script]
     spawn_script_kwargs: Dict[str, Any]
     num_spawns: int
-    spawns: List[game_sprite.GameSprite]
+    spawns: List[scripts.Entity]
     last_spawn: float
     spawn_rate_per_sec: float
     spawn_cooldown_secs: float

@@ -37,6 +37,18 @@ class KeyPoint:
     properties: Dict[str, Any]
 
 
+class Entity(Protocol):
+    """Defines something in the game: a player, a monster, etc."""
+
+    @property
+    def name(self) -> str:
+        """Gets the name of this entity."""
+
+
+class Player(Protocol):
+    """Represents the player to scripts."""
+
+
 # A type that receives events when they are triggered.
 # Note that while this uses `Any`, all custom events defined by the engine use proper
 # types and any events defined by games are encouraged to do so as well. An event
@@ -62,7 +74,7 @@ class GameAPI(Protocol):
         name: str,
         start_location: Tuple[float, float],
         script: "Optional[Script]",
-    ) -> None:
+    ) -> Entity:
         """Creates a sprite."""
 
     def get_key_points(self, name: Optional[str] = None) -> Iterable[KeyPoint]:
@@ -147,14 +159,6 @@ class ScriptOwner(Protocol):
     @custom_animation.setter
     def custom_animation(self, value: Optional[str]) -> None:
         """Sets the custom animation of the script owner."""
-
-
-class Entity(Protocol):
-    """Defines something in the game: a player, a monster, etc."""
-
-
-class Player(Protocol):
-    """Represents the player to scripts."""
 
 
 class Script:

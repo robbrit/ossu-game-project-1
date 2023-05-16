@@ -139,13 +139,13 @@ class Core(arcade.Window):
         name: str,
         start_location: Tuple[int, int],
         script: Optional[scripts.Script],
-    ) -> None:
+    ) -> scripts.Entity:
         """Creates a sprite."""
         if self.world is None:
             raise GameNotInitializedError()
 
         _spec = self._spec.sprites[spec_name]
-        self.world.create_sprite(_spec, name, start_location, script)
+        return self.world.create_sprite(_spec, name, start_location, script)
 
     def get_key_points(self, name: Optional[str] = None) -> Iterable[scripts.KeyPoint]:
         """Queries for key points in the current region."""
