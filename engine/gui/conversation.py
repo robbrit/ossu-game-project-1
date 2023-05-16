@@ -2,6 +2,7 @@ import dataclasses
 from typing import (
     List,
     Optional,
+    Protocol,
 )
 
 from arcade import gui
@@ -29,12 +30,8 @@ class Choice:
 
 
 @dataclasses.dataclass
-class Conversation:
-    """A conversation allows the player to interact with NPCs in the world.
-
-    Conversations are implemented as a directed graph data structure, with the edges
-    leading from a conversation
-    """
+class StaticConversation:
+    """A conversation that is always the same."""
 
     # The text to show in the bottom-left text area.
     text: str
@@ -44,6 +41,26 @@ class Conversation:
     # The title to show in the top. If it's not set, falls back to the initial
     # conversation's title.
     title: Optional[str] = None
+
+
+class Conversation(Protocol):
+    """A conversation allows the player to interact with NPCs in the world.
+
+    Conversations are implemented as a directed graph data structure, with the edges
+    representing choices between conversations.
+    """
+
+    @property
+    def text(self) -> str:
+        """Gets the text to display for this conversation."""
+
+    @property
+    def choices(self) -> List[Choice]:
+        """Gets a set of choices that can be made for this conversation."""
+
+    @property
+    def title(self) -> Optional[str]:
+        """Gets the title to display at the top of the conversation GUI."""
 
 
 class _ChoiceButton(gui.UIFlatButton):
