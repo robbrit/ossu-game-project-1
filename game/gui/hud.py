@@ -1,10 +1,11 @@
 from typing import (
     cast,
 )
-from engine.core import SCREEN_WIDTH, SCREEN_HEIGHT
 
 import arcade
 from arcade import gui
+
+from engine.core import SCREEN_WIDTH, SCREEN_HEIGHT
 
 from engine import scripts
 from game.scripts import health
