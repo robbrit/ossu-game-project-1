@@ -1,11 +1,14 @@
 from typing import (
     cast,
 )
+
 import arcade
 from arcade import gui
 
-from engine import scripts
-from engine.core import SCREEN_WIDTH, SCREEN_HEIGHT
+from engine import (
+  core,
+  scripts,
+)
 from game.scripts import health
 
 HP_WIDTH = 150
@@ -66,10 +69,10 @@ class HUD:
             damage_taken_color = (255, 0, 0, alpha)
 
             arcade.draw_rectangle_filled(
-                center_x=SCREEN_WIDTH / 2,
-                center_y=SCREEN_HEIGHT / 2,
-                width=SCREEN_WIDTH,
-                height=SCREEN_HEIGHT,
+                center_x=core.SCREEN_WIDTH / 2,
+                center_y=core.SCREEN_HEIGHT / 2,
+                width=core.SCREEN_WIDTH,
+                height=core.SCREEN_HEIGHT,
                 color=damage_taken_color,
             )
 
