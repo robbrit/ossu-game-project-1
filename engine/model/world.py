@@ -72,6 +72,13 @@ class WorldState:
     region_states: Dict[str, RegionState]
 
 
+class _Core(scripts.GameAPI):
+    """Extended API for interacting with the core."""
+
+    def clear_events(self) -> None:
+        """Clears all events in the event handler."""
+
+
 class World:
     """
     This class represents the world. It manages maintenance of the state of the world.
@@ -83,7 +90,7 @@ class World:
     # - Make as much as possible private; things outside this class are starting to poke
     #   into it which adds extra coupling.
 
-    api: scripts.GameAPI
+    _core: _Core
 
     _player_sprite: player_sprite.PlayerSprite
 
@@ -119,18 +126,16 @@ class World:
 
     def __init__(
         self,
-        api: scripts.GameAPI,
+        core: _Core,
         game_spec: spec.GameSpec,
         initial_player_data: Dict[str, Any],
     ):
-        self.api = api
+        self._core = core
         self._spec = game_spec
         self.sec_passed = 0.0
 
-        api.register_handler(events.SPRITE_REMOVED, self._queue_sprite_removal)
-
         self._player_sprite = player_sprite.PlayerSprite(
-            api=api,
+            api=core,
             sprite_spec=game_spec.player_spec,
             initial_data=initial_player_data,
         )
@@ -193,6 +198,9 @@ class World:
                 self.height * self.tile_height,
             ),
         )
+
+        self._core.clear_events()
+        self._core.register_handler(events.SPRITE_REMOVED, self._queue_sprite_removal)
 
     def _build_scene(self, tilemap: arcade.TileMap) -> None:
         self.scene = arcade.Scene()
@@ -344,7 +352,7 @@ class World:
         if is_first_load:
             script.on_start(sprite)
 
-        script.set_api(self.api)
+        script.set_api(self._core)
         script.set_owner(sprite)
 
         return sprite
@@ -380,7 +388,7 @@ class World:
             return self._load_script(properties)
         except NoScript:
             return scripts.ObjectScript(
-                self.api,
+                self._core,
                 on_activate=properties.get("on_activate"),
                 on_activate_args=scripts.extract_script_args(
                     "on_activate_",
@@ -406,7 +414,7 @@ class World:
         cls = scripts.load_script_class(properties["script"])
         args = scripts.extract_script_args("script_", properties)
         obj = cls(**args)
-        obj.set_api(self.api)
+        obj.set_api(self._core)
         return obj
 
     def on_update(self, delta_time: float) -> None:
@@ -505,7 +513,7 @@ class World:
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
         if self._spec.world.activate_sound:
-            self.api.play_sound(self._spec.world.activate_sound)
+            self._core.play_sound(self._spec.world.activate_sound)
 
         self._player_sprite.on_activate()
         for obj in self._objs_in_front_of_player():
@@ -517,7 +525,7 @@ class World:
         """Hit whatever is in front of the player."""
 
         if self._spec.world.hit_sound:
-            self.api.play_sound(self._spec.world.hit_sound)
+            self._core.play_sound(self._spec.world.hit_sound)
 
         for obj in self._objs_in_front_of_player():
             if obj.script is None:

@@ -169,6 +169,26 @@ class Core(arcade.Window):
         """Plays a sound."""
         self._sounds[name].play()
 
+    def register_handler(self, event_name: str, handler: scripts.EventHandler) -> None:
+        """Registers an event handler for a custom event."""
+        self._events.register_handler(event_name, handler)
+
+    def unregister_handler(
+        self,
+        event_name: str,
+        handler: scripts.EventHandler,
+    ) -> None:
+        """Unregisters an event handler."""
+        self._events.unregister_handler(event_name, handler)
+
+    def fire_event(self, event_name: str, data: Any) -> None:
+        """Fires an event."""
+        self._events.fire_event(event_name, data)
+
+    def clear_events(self) -> None:
+        """Clears all events."""
+        self._events.clear_events()
+
     @property
     def player_data(self) -> Dict[str, Any]:
         """Gets the player's data."""
