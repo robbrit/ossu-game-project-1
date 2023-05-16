@@ -17,6 +17,7 @@ import arcade.tilemap
 from pyglet import math as pmath
 
 from engine import (
+    events,
     scripts,
     spec,
 )
@@ -125,6 +126,8 @@ class World:
         self.api = api
         self._spec = game_spec
         self.sec_passed = 0.0
+
+        api.register_handler(events.SPRITE_REMOVED, self._queue_sprite_removal)
 
         self._player_sprite = player_sprite.PlayerSprite(
             api=api,
@@ -558,17 +561,18 @@ class World:
 
         return (sprite for sprite in self._game_sprites.values() if name in sprite.name)
 
-    def remove_sprite(self, name: str) -> None:
+    def _queue_sprite_removal(
+        self,
+        _event_name: str,
+        event: events.SpriteRemoved,
+    ) -> None:
         """Removes a sprite by name."""
         # TODO(rob): We'll need to be able to handle when the sprite is still in the
         # "to be created" list.
-        if name not in self._game_sprites:
-            raise KeyError(f"Unknown sprite {name}")
-
         if self.in_update:
-            self._sprites_to_remove.add(name)
+            self._sprites_to_remove.add(event.name)
         else:
-            self._remove_sprite(name)
+            self._remove_sprite(event.name)
 
     def _remove_sprite(self, name: str) -> None:
         assert self.scene is not None

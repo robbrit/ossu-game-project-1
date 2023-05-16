@@ -37,6 +37,13 @@ class KeyPoint:
     properties: Dict[str, Any]
 
 
+# A type that receives events when they are triggered.
+# Note that while this uses `Any`, all custom events defined by the engine use proper
+# types and any events defined by games are encouraged to do so as well. An event
+# handler may be more specialized than Any.
+EventHandler = Callable[[str, Any], None]
+
+
 class GameAPI(Protocol):
     """A protocol for how game objects will interact with the engine."""
 
@@ -69,6 +76,15 @@ class GameAPI(Protocol):
 
     def play_sound(self, name: str) -> None:
         """Plays a sound."""
+
+    def register_handler(self, event_name: str, handler: EventHandler) -> None:
+        """Registers an event handler for a custom event."""
+
+    def unregister_handler(self, event_name: str, handler: EventHandler) -> None:
+        """Unregisters an event handler."""
+
+    def fire_event(self, event_name: str, data: Any) -> None:
+        """Fires an event."""
 
     @property
     def player_data(self) -> Dict[str, Any]:
