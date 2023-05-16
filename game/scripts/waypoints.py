@@ -34,14 +34,6 @@ class NavigatorOwner(Protocol):
         """Sets the speed of the owner."""
 
     @property
-    def facing(self) -> Tuple[float, float]:
-        """Gets the facing direction of the owner."""
-
-    @facing.setter
-    def facing(self, value: Tuple[float, float]) -> None:
-        """Sets the facing direction of the owner."""
-
-    @property
     def location(self) -> Tuple[float, float]:
         """Gets the location of the owner."""
 
@@ -93,7 +85,6 @@ class Navigator:
 
         delta = self._vec_to_waypoint(next_waypoint_idx).normalize().scale(self._speed)
         self._owner.speed = (delta.x, delta.y)
-        self._owner.facing = (delta.x, delta.y)
         self._state = NavigatorState.MOVING
 
     def _handle_moving(self, game_time: float) -> None:

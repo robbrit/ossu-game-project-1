@@ -33,7 +33,7 @@ class Animations:
     animations: Dict[str, Animation]
     # Name of the animation that is currently selected.
     current_animation: str
-    # How much time we we've spent in the current animation.
+    # How much time we've spent in the current animation.
     time_index: float
 
     texture: arcade.Texture
@@ -212,16 +212,11 @@ class GameSprite(arcade.Sprite):
     def speed(self, value: Tuple[float, float]) -> None:
         """Sets the speed of the script owner."""
         self.change_x, self.change_y = value
-
-    @property
-    def facing(self) -> Tuple[float, float]:
-        """Gets the facing direction of the script owner."""
-        return (self.facing_x, self.facing_y)
-
-    @facing.setter
-    def facing(self, value: Tuple[float, float]) -> None:
-        """Sets the facing direction of the script owner."""
         self.facing_x, self.facing_y = value
+
+        if self.facing_x == 0.0 and self.facing_y == 0.0:
+            # Face down when not moving.
+            self.facing_y = -1.0
 
     @property
     def state(self) -> SpriteState:

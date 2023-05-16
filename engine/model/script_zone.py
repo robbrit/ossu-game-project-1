@@ -55,13 +55,3 @@ class ScriptZone(game_sprite.GameSprite):
     def speed(self, value: Tuple[float, float]) -> None:
         """Sets the speed of the script owner."""
         # Deliberately does nothing. Zones don't move.
-
-    @property
-    def facing(self) -> Tuple[float, float]:
-        """Gets the facing direction of the script owner."""
-        return (0.0, 0.0)
-
-    @facing.setter
-    def facing(self, value: Tuple[float, float]) -> None:
-        """Sets the facing direction of the script owner."""
-        # Deliberately does nothing. Zones don't face anywhere.
