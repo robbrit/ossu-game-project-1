@@ -139,13 +139,13 @@ class Core(arcade.Window):
         name: str,
         start_location: Tuple[int, int],
         script: Optional[scripts.Script],
-    ) -> None:
+    ) -> scripts.Entity:
         """Creates a sprite."""
         if self.world is None:
             raise GameNotInitializedError()
 
         _spec = self._spec.sprites[spec_name]
-        self.world.create_sprite(_spec, name, start_location, script)
+        return self.world.create_sprite(_spec, name, start_location, script)
 
     def get_key_points(self, name: Optional[str] = None) -> Iterable[scripts.KeyPoint]:
         """Queries for key points in the current region."""
@@ -168,6 +168,26 @@ class Core(arcade.Window):
     def play_sound(self, name: str) -> None:
         """Plays a sound."""
         self._sounds[name].play()
+
+    def register_handler(self, event_name: str, handler: scripts.EventHandler) -> None:
+        """Registers an event handler for a custom event."""
+        self._events.register_handler(event_name, handler)
+
+    def unregister_handler(
+        self,
+        event_name: str,
+        handler: scripts.EventHandler,
+    ) -> None:
+        """Unregisters an event handler."""
+        self._events.unregister_handler(event_name, handler)
+
+    def fire_event(self, event_name: str, data: Any) -> None:
+        """Fires an event."""
+        self._events.fire_event(event_name, data)
+
+    def clear_events(self) -> None:
+        """Clears all events."""
+        self._events.clear_events()
 
     @property
     def player_data(self) -> Dict[str, Any]:

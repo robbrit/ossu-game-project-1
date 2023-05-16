@@ -107,7 +107,7 @@ class GameSprite(arcade.Sprite):
     This includes support for animations, facing directions, etc.
     """
 
-    name: str
+    _name: str
 
     _spec: Optional[spec.GameSpriteSpec]
     animations: Optional[Animations] = None
@@ -137,7 +137,7 @@ class GameSprite(arcade.Sprite):
             image_width=width,
             image_height=height,
         )
-        self.name = name
+        self._name = name
         self.set_facing(x=1.0, y=1.0)
         self._spec = sprite_spec
         self.script = script
@@ -189,6 +189,11 @@ class GameSprite(arcade.Sprite):
             return "up" if self.facing_y > 0 else "down"
 
         return "right" if self.facing_x > 0 else "left"
+
+    @property
+    def name(self) -> str:
+        """Gets the name of this sprite."""
+        return self._name
 
     @property
     def location(self) -> Tuple[float, float]:

@@ -14,6 +14,10 @@ class EventManager:
     _handlers: Dict[str, List[scripts.EventHandler]]
 
     def __init__(self):
+        self.clear_events()
+
+    def clear_events(self) -> None:
+        """Unregisters all events in the manager."""
         self._handlers = collections.defaultdict(list)
 
     def register_handler(self, event_name: str, handler: scripts.EventHandler) -> None:

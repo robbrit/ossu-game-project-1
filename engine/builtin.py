@@ -10,8 +10,10 @@ from typing import (
     List,
 )
 
-from engine import scripts
-from engine.model import game_sprite
+from engine import (
+    events,
+    scripts,
+)
 
 logger = logging.Logger("engine.builtin")
 
@@ -54,7 +56,7 @@ class Spawner(scripts.SavesAPI, scripts.Script):
     spawn_script: Callable[[None], scripts.Script]
     spawn_script_kwargs: Dict[str, Any]
     num_spawns: int
-    spawns: List[game_sprite.GameSprite]
+    spawns: List[scripts.Entity]
     last_spawn: float
     spawn_rate_per_sec: float
     spawn_cooldown_secs: float
@@ -103,6 +105,11 @@ class Spawner(scripts.SavesAPI, scripts.Script):
         """Triggered the first time this spawn is created."""
         self._state["location"] = owner.location
 
+    def set_api(self, api: scripts.GameAPI) -> None:
+        """Sets the API for this spawner."""
+        scripts.SavesAPI.set_api(self, api)
+        api.register_handler(events.SPRITE_REMOVED, self._cleanup_removed_sprite)
+
     def _can_spawn(self, now: float) -> bool:
         return (
             len(self.spawns) < self.num_spawns
@@ -130,3 +137,10 @@ class Spawner(scripts.SavesAPI, scripts.Script):
             script=self.spawn_script(**self.spawn_script_kwargs),
         )
         self.spawns.append(sprite)
+
+    def _cleanup_removed_sprite(
+        self,
+        _event_name: str,
+        event: events.SpriteRemoved,
+    ) -> None:
+        self.spawns = [spawn for spawn in self.spawns if spawn.name != event.name]
