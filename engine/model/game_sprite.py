@@ -33,7 +33,7 @@ class Animations:
     animations: Dict[str, Animation]
     # Name of the animation that is currently selected.
     current_animation: str
-    # How much time we we've spent in the current animation.
+    # How much time we've spent in the current animation.
     time_index: float
 
     texture: arcade.Texture
