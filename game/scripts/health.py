@@ -66,3 +66,4 @@ class DamagesPlayer(scripts.SavesAPI):
 
         hp.adjust(-self._damage)
         self._last_damage_time = self.api.current_time_secs
+        self.api.player_data["last_damage_time"] = self._last_damage_time
