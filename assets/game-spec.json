@@ -35,7 +35,9 @@
                 "tiled_mapfile": "assets/regions/Region2.json"
             }
         },
-        "initial_region": "Region1"
+        "initial_region": "Region1",
+        "hit_sound": "attack",
+        "activate_sound": "activate"
     },
     "sprites": {
         "region1.townsperson_male": {
@@ -239,6 +241,10 @@
                 {
                     "name": "exit-button-selected",
                     "path": "assets/gui/exit-button-selected.png"
+                },
+                {
+                    "name": "quests-button",
+                    "path": "assets/gui/quests-button.png"
                 }
             ],
             "buttons": [
@@ -248,9 +254,19 @@
                     "name": "resume-button",
                     "center": [
                         400,
-                        290
+                        370
                     ],
                     "action": "engine.builtin.resume_game"
+                },
+                {
+                    "selected_image_asset": "quests-button",
+                    "unselected_image_asset": "quests-button",
+                    "name": "quests-button",
+                    "center": [
+                        400,
+                        260
+                    ],
+                    "action": "game.gui.quests.show_quests_gui"
                 },
                 {
                     "selected_image_asset": "exit-button-selected",
@@ -258,13 +274,21 @@
                     "name": "exit-button",
                     "center": [
                         400,
-                        180
+                        150
                     ],
                     "action": "engine.builtin.exit_game"
                 }
             ],
             "images": [],
             "initial_selected_button": "resume-button"
+        }
+    },
+    "sounds": {
+        "attack": {
+            "path": "assets/sounds/attack.wav"
+        },
+        "activate": {
+            "path": "assets/sounds/click.wav"
         }
     }
 }

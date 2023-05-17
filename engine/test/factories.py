@@ -58,6 +58,7 @@ def fake_game_spec(**args) -> spec.GameSpec:
         "player_spec": dataclasses.asdict(fake_sprite_spec(**args.get("player", {}))),
         "sprites": {},
         "guis": {},
+        "sounds": {},
     }
 
     for key in ["world", "player_spec"]:

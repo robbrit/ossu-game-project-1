@@ -37,6 +37,25 @@ class KeyPoint:
     properties: Dict[str, Any]
 
 
+class Entity(Protocol):
+    """Defines something in the game: a player, a monster, etc."""
+
+    @property
+    def name(self) -> str:
+        """Gets the name of this entity."""
+
+
+class Player(Protocol):
+    """Represents the player to scripts."""
+
+
+# A type that receives events when they are triggered.
+# Note that while this uses `Any`, all custom events defined by the engine use proper
+# types and any events defined by games are encouraged to do so as well. An event
+# handler may be more specialized than Any.
+EventHandler = Callable[[str, Any], None]
+
+
 class GameAPI(Protocol):
     """A protocol for how game objects will interact with the engine."""
 
@@ -55,7 +74,7 @@ class GameAPI(Protocol):
         name: str,
         start_location: Tuple[float, float],
         script: "Optional[Script]",
-    ) -> None:
+    ) -> Entity:
         """Creates a sprite."""
 
     def get_key_points(self, name: Optional[str] = None) -> Iterable[KeyPoint]:
@@ -66,6 +85,18 @@ class GameAPI(Protocol):
 
     def remove_sprite(self, name: str) -> None:
         """Removes a sprite by name."""
+
+    def play_sound(self, name: str) -> None:
+        """Plays a sound."""
+
+    def register_handler(self, event_name: str, handler: EventHandler) -> None:
+        """Registers an event handler for a custom event."""
+
+    def unregister_handler(self, event_name: str, handler: EventHandler) -> None:
+        """Unregisters an event handler."""
+
+    def fire_event(self, event_name: str, data: Any) -> None:
+        """Fires an event."""
 
     @property
     def player_data(self) -> Dict[str, Any]:
@@ -122,20 +153,20 @@ class ScriptOwner(Protocol):
         """Sets the speed of the script owner."""
 
     @property
+    def facing(self) -> Tuple[float, float]:
+        """Gets the facing direction of the script owner."""
+
+    @facing.setter
+    def facing(self, value: Tuple[float, float]) -> None:
+        """Sets the facing direction of the script owner."""
+
+    @property
     def custom_animation(self) -> Optional[str]:
         """Gets the custom animation of the script owner."""
 
     @custom_animation.setter
     def custom_animation(self, value: Optional[str]) -> None:
         """Sets the custom animation of the script owner."""
-
-
-class Entity(Protocol):
-    """Defines something in the game: a player, a monster, etc."""
-
-
-class Player(Protocol):
-    """Represents the player to scripts."""
 
 
 class Script:

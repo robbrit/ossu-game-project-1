@@ -17,6 +17,7 @@ import arcade.tilemap
 from pyglet import math as pmath
 
 from engine import (
+    events,
     scripts,
     spec,
 )
@@ -71,6 +72,13 @@ class WorldState:
     region_states: Dict[str, RegionState]
 
 
+class _Core(scripts.GameAPI):
+    """Extended API for interacting with the core."""
+
+    def clear_events(self) -> None:
+        """Clears all events in the event handler."""
+
+
 class World:
     """
     This class represents the world. It manages maintenance of the state of the world.
@@ -82,7 +90,7 @@ class World:
     # - Make as much as possible private; things outside this class are starting to poke
     #   into it which adds extra coupling.
 
-    api: scripts.GameAPI
+    _core: _Core
 
     _player_sprite: player_sprite.PlayerSprite
 
@@ -118,16 +126,16 @@ class World:
 
     def __init__(
         self,
-        api: scripts.GameAPI,
+        core: _Core,
         game_spec: spec.GameSpec,
         initial_player_data: Dict[str, Any],
     ):
-        self.api = api
+        self._core = core
         self._spec = game_spec
         self.sec_passed = 0.0
 
         self._player_sprite = player_sprite.PlayerSprite(
-            api=api,
+            api=core,
             sprite_spec=game_spec.player_spec,
             initial_data=initial_player_data,
         )
@@ -173,6 +181,9 @@ class World:
 
         is_first_load = region_name not in self.regions_loaded
         self.regions_loaded.add(region_name)
+
+        self._core.clear_events()
+        self._core.register_handler(events.SPRITE_REMOVED, self._queue_sprite_removal)
 
         self._build_scene(tilemap)
         self._load_scripted_objects(tilemap, region_state, is_first_load)
@@ -296,7 +307,7 @@ class World:
         name: str,
         start_location: Tuple[float, float],
         script: Optional[scripts.Script],
-    ) -> arcade.Sprite:
+    ) -> game_sprite.GameSprite:
         """Adds a sprite to the model."""
         return self._create_sprite(
             sprite_spec,
@@ -341,7 +352,7 @@ class World:
         if is_first_load:
             script.on_start(sprite)
 
-        script.set_api(self.api)
+        script.set_api(self._core)
         script.set_owner(sprite)
 
         return sprite
@@ -377,7 +388,7 @@ class World:
             return self._load_script(properties)
         except NoScript:
             return scripts.ObjectScript(
-                self.api,
+                self._core,
                 on_activate=properties.get("on_activate"),
                 on_activate_args=scripts.extract_script_args(
                     "on_activate_",
@@ -403,7 +414,7 @@ class World:
         cls = scripts.load_script_class(properties["script"])
         args = scripts.extract_script_args("script_", properties)
         obj = cls(**args)
-        obj.set_api(self.api)
+        obj.set_api(self._core)
         return obj
 
     def on_update(self, delta_time: float) -> None:
@@ -501,6 +512,9 @@ class World:
 
     def activate(self) -> None:
         """Activates whatever is in front of the player."""
+        if self._spec.world.activate_sound:
+            self._core.play_sound(self._spec.world.activate_sound)
+
         self._player_sprite.on_activate()
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
@@ -509,6 +523,10 @@ class World:
 
     def hit(self) -> None:
         """Hit whatever is in front of the player."""
+
+        if self._spec.world.hit_sound:
+            self._core.play_sound(self._spec.world.hit_sound)
+
         for obj in self._objs_in_front_of_player():
             if obj.script is None:
                 continue
@@ -551,17 +569,18 @@ class World:
 
         return (sprite for sprite in self._game_sprites.values() if name in sprite.name)
 
-    def remove_sprite(self, name: str) -> None:
+    def _queue_sprite_removal(
+        self,
+        _event_name: str,
+        event: events.SpriteRemoved,
+    ) -> None:
         """Removes a sprite by name."""
         # TODO(rob): We'll need to be able to handle when the sprite is still in the
         # "to be created" list.
-        if name not in self._game_sprites:
-            raise KeyError(f"Unknown sprite {name}")
-
         if self.in_update:
-            self._sprites_to_remove.add(name)
+            self._sprites_to_remove.add(event.name)
         else:
-            self._remove_sprite(name)
+            self._remove_sprite(event.name)
 
     def _remove_sprite(self, name: str) -> None:
         assert self.scene is not None

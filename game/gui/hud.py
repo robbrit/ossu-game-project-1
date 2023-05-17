@@ -5,20 +5,21 @@ from typing import (
 import arcade
 from arcade import gui
 
-from engine import scripts
+from engine import (
+  core,
+  scripts,
+)
 from game.scripts import health
 
 HP_WIDTH = 150
 HP_HEIGHT = 20
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 650
 HP_BORDER = 2
 HP_X = 10 + HP_WIDTH / 2 + HP_BORDER
 HP_Y = 10 + HP_HEIGHT / 2 + HP_BORDER
 HP_BORDER_COLOR = (255, 255, 255)
 HP_BAR_COLOR = (0, 255, 0)
 HP_TEXT_MARGIN = 5
-EFFECT_TIME = 0.3
+DAMAGE_FLASH_SECS = 0.3
 
 
 class HUD:
@@ -61,16 +62,17 @@ class HUD:
             height=HP_HEIGHT - HP_BORDER * 2,
             color=HP_BAR_COLOR,
         )
-        if self.api.current_time_secs < self.api.player_data["last_damage_time"] + EFFECT_TIME:
+        last_damage_time = cast(float, self.api.player_data["last_damage_time"])
+        if self.api.current_time_secs < last_damage_time + DAMAGE_FLASH_SECS:
             alpha = int(
-                (1.0 - (self.api.current_time_secs - self.api.player_data["last_damage_time"]) / EFFECT_TIME) * 255)
+                (1.0 - (self.api.current_time_secs - last_damage_time) / DAMAGE_FLASH_SECS) * 255)
             damage_taken_color = (255, 0, 0, alpha)
 
             arcade.draw_rectangle_filled(
-                center_x=SCREEN_WIDTH / 2,
-                center_y=SCREEN_HEIGHT / 2,
-                width=SCREEN_WIDTH,
-                height=SCREEN_HEIGHT,
+                center_x=core.SCREEN_WIDTH / 2,
+                center_y=core.SCREEN_HEIGHT / 2,
+                width=core.SCREEN_WIDTH,
+                height=core.SCREEN_HEIGHT,
                 color=damage_taken_color,
             )
 

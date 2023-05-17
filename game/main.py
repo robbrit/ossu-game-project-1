@@ -9,6 +9,7 @@ from engine.gui import spec_gui
 from game.gui import (
     hud,
 )
+from game.quests import all as quests
 from game.scripts import health
 
 STARTING_HP = 10
@@ -31,6 +32,8 @@ def run() -> None:
     def create_menu_gui(api: scripts.GameAPI) -> scripts.GUI:
         return spec_gui.SpecGUI(api, game_spec.guis["ingame-menu"])
 
+    quests.register()
+
     core.Core(
         initial_gui=create_start_screen,
         ingame_gui=create_hud,
@@ -40,6 +43,7 @@ def run() -> None:
             "hp": health.Health(STARTING_HP),
             "gold": STARTING_GOLD,
             "base_damage": STARTING_DAMAGE,
+            "quests": {},
             "last_damage_time": 0.0,
         },
     ).run()
