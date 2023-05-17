@@ -61,6 +61,9 @@ class DamagesPlayer(scripts.SavesAPI):
         if self.api.current_time_secs < self._last_damage_time + INVINCIBLE_TIME:
             return
 
+        if owner.is_dying:
+            return
+
         data = self.api.player_data
         hp = cast(Health, data["hp"])
 

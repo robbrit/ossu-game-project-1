@@ -68,6 +68,7 @@ class Rat(scripts.SavesOwner, health.DamagesPlayer, scripts.Script):
                 self._death_time = game_time
                 self.owner.speed = (0, 0)
                 self.owner.custom_animation = "dead"
+                self.owner.is_dying = True
             elif self._death_time + RAT_DECAY_SECS < game_time:
                 self.api.remove_sprite(self.owner.name)
             return

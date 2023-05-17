@@ -168,6 +168,14 @@ class ScriptOwner(Protocol):
     def custom_animation(self, value: Optional[str]) -> None:
         """Sets the custom animation of the script owner."""
 
+    @property
+    def is_dying(self) -> bool:
+        """Gets the creature is dead or not."""
+
+    @is_dying.setter
+    def is_dying(self, value: bool) -> None:
+        """Sets the creature is dead or not."""
+
 
 class Script:
     """Base class for all scripts."""

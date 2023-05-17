@@ -33,7 +33,7 @@ class Animations:
     animations: Dict[str, Animation]
     # Name of the animation that is currently selected.
     current_animation: str
-    # How much time we we've spent in the current animation.
+    # How much time we've spent in the current animation.
     time_index: float
 
     texture: arcade.Texture
@@ -142,6 +142,7 @@ class GameSprite(arcade.Sprite):
         self._spec = sprite_spec
         self.script = script
         self.custom_animation = None
+        self._is_dying = None
 
         if sprite_spec is not None:
             self.animations = Animations(sprite_spec)
@@ -222,6 +223,16 @@ class GameSprite(arcade.Sprite):
     def facing(self, value: Tuple[float, float]) -> None:
         """Sets the facing direction of the script owner."""
         self.facing_x, self.facing_y = value
+
+    @property
+    def is_dying(self) -> bool:
+        """Gets the creature is dead or not."""
+        return self._is_dying
+
+    @is_dying.setter
+    def is_dying(self, value: bool) -> None:
+        """Sets the creature is dead or not."""
+        self._is_dying = value
 
     @property
     def state(self) -> SpriteState:
