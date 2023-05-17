@@ -1,8 +1,11 @@
 import dataclasses
 from typing import (
     Any,
+    Callable,
     Dict,
 )
+
+from engine import scripts
 
 
 @dataclasses.dataclass
@@ -19,6 +22,8 @@ class Quest:
     name: str
     title: str
     steps: Dict[str, QuestStep]
+    initial_step: str
+    initial_data: Callable[[scripts.GameAPI], Dict[str, Any]]
 
 
 @dataclasses.dataclass

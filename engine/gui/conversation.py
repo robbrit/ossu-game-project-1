@@ -1,6 +1,7 @@
 import dataclasses
 import functools
 from typing import (
+    Callable,
     List,
     Optional,
     Protocol,
@@ -16,6 +17,8 @@ CONVERSATION_Y = 200
 CONVERSATION_HEIGHT = 180
 SCREEN_HEIGHT = 600
 CHOICES_OFFSET = 650
+CHOICE_PADDING = 5
+CHOICE_WIDTH = 150
 CHOICE_HEIGHT = 30
 
 
@@ -30,13 +33,16 @@ class Choice:
     # An action to take when they make this choice.
     action: Optional[scripts.GameCallable] = None
 
+    # Determines whether to show this choice or not.
+    condition: Callable[[scripts.GameAPI], bool] = lambda _api: True
+
 
 @dataclasses.dataclass
 class StaticConversation:
     """A conversation that is always the same."""
 
     # The text to show in the bottom-left text area.
-    text: str
+    text: str | Callable[[scripts.GameAPI], str]
     # A set of choices that the player may take from this conversation.
     choices: List[Choice]
 
@@ -53,7 +59,7 @@ class Conversation(Protocol):
     """
 
     @property
-    def text(self) -> str:
+    def text(self) -> str | Callable[[scripts.GameAPI], str]:
         """Gets the text to display for this conversation."""
 
     @property
@@ -94,7 +100,16 @@ class GUI(base.GUI):
         assert self.api is not None
         self.api.start_game()
 
+    def _current_text(self) -> str:
+        assert self.api is not None
+
+        if callable(self.current.text):
+            return self.current.text(self.api)
+
+        return self.current.text
+
     def _reset_widgets(self) -> None:
+        assert self.api is not None
         assert self.manager is not None
 
         self.manager.clear()
@@ -106,18 +121,21 @@ class GUI(base.GUI):
                 x=CONVERSATION_PADDING,
                 y=CONVERSATION_Y,
                 height=CONVERSATION_HEIGHT,
-                text=self.current.text,
+                text=self._current_text(),
             ),
             index=0,
         )
 
-        for i, choice in enumerate(self.current.choices):
+        valid_choices = [
+            choice for choice in self.current.choices if choice.condition(self.api)
+        ]
+
+        y = len(valid_choices) * (CHOICE_HEIGHT + CHOICE_PADDING) + CONVERSATION_PADDING
+        for choice in valid_choices:
             button = gui.UIFlatButton(
                 x=CHOICES_OFFSET,
-                y=(
-                    (len(self.current.choices) - i) * CHOICE_HEIGHT
-                    + CONVERSATION_PADDING
-                ),
+                y=y,
+                width=CHOICE_WIDTH,
                 height=CHOICE_HEIGHT,
                 text=choice.text,
             )
@@ -127,13 +145,17 @@ class GUI(base.GUI):
             )
             self.manager.add(button, index=0)
 
+            y -= CHOICE_HEIGHT + CHOICE_PADDING
+
         exit_button = gui.UIFlatButton(
             x=CHOICES_OFFSET,
             y=CONVERSATION_PADDING,
+            width=CHOICE_WIDTH,
             height=CHOICE_HEIGHT,
             text="Bye!",
         )
-        exit_button.on_click = self._resume_game  # type: ignore
+
+        exit_button.set_handler("on_click", self._resume_game)
         self.manager.add(exit_button, index=0)
 
         title = self.current.title or self.root.title

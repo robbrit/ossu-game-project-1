@@ -21,6 +21,8 @@ from game.quests import (
 )
 
 GUI_PADDING = 5
+QUEST_BUTTON_WIDTH = 150
+QUEST_DESCRIPTION_HEIGHT = 400
 
 
 class GUI(base.GUI):
@@ -36,9 +38,9 @@ class GUI(base.GUI):
 
     def _select_quest(
         self,
+        _event: gui.UIEvent,
         quest: quests.Quest,
         quest_state: quests.QuestState,
-        _event: gui.UIEvent,
     ) -> None:
         assert self._quest_title is not None
         assert self._quest_description is not None
@@ -61,7 +63,10 @@ class GUI(base.GUI):
         ]
 
         self._quest_title = gui.UILabel(size_hint=(1.0, 0.1), text="")
-        self._quest_description = gui.UITextArea(size_hint=(1.0, 0.9), text="")
+        self._quest_description = gui.UITextArea(
+            height=QUEST_DESCRIPTION_HEIGHT,
+            text="",
+        )
 
         quest_details_pane = gui.UIBoxLayout(
             vertical=True,
@@ -80,7 +85,7 @@ class GUI(base.GUI):
 
         for quest, quest_state in quest_states:
             button = gui.UIFlatButton(
-                size_hint=(1.0, None),
+                width=QUEST_BUTTON_WIDTH,
                 height=30,
                 text=quest.title,
             )
@@ -109,7 +114,7 @@ class GUI(base.GUI):
                         gui.UIBoxLayout(
                             vertical=True,
                             children=[
-                                gui.UILabel(text="Quests"),
+                                gui.UILabel(text="Quests", width=QUEST_BUTTON_WIDTH),
                             ]
                             + quest_buttons,
                             space_between=GUI_PADDING,

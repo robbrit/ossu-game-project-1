@@ -4,6 +4,7 @@ from typing import (
 )
 
 from game.scripts import (
+    events,
     health,
     waypoints,
 )
@@ -50,6 +51,12 @@ class Rat(scripts.SavesOwner, health.DamagesPlayer, scripts.Script):
 
         if not self._health.is_dead:
             self._health.adjust(-self.api.player_data["base_damage"])
+
+            if self._health.is_dead:
+                self.api.fire_event(
+                    events.CREATURE_KILLED,
+                    events.CreatureKilled("rat"),
+                )
 
     def on_tick(self, game_time: float, delta_time: float) -> None:
         """Handles game ticks."""
