@@ -25,7 +25,7 @@ class GuiView:
         """Sets up the view."""
 
     def on_draw(self) -> None:
-        """ "Renders the view."""
+        """ Renders the view."""
         self.gui.draw()
         self.manager.draw()
 
